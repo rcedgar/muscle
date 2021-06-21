@@ -47,3 +47,8 @@ Binary files are self-contained, no dependencies.
     All algorithms:
       -quiet               Turn off progress messages.
       -log filename        Write time, memory use and progress messages to file.
+
+
+# Reference
+R.C. Edgar (2021) "MUSCLE v5 enables improved estimates of phylogenetictree confidence by ensemble bootstrapping"
+[https://www.biorxiv.org/content/10.1101/2021.06.20.449169v1.full.pdf](https://www.biorxiv.org/content/10.1101/2021.06.20.449169v1.full.pdf)
