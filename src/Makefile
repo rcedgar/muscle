@@ -1,0 +1,968 @@
+CPP = ccache g++
+CPPOPTS = -fopenmp -msse -mfpmath=sse -O3 -DNDEBUG -c
+
+CC = ccache gcc
+CCOPTS = -fopenmp -msse -mfpmath=sse -O3 -DNDEBUG -c
+
+LNK = g++
+LNKOPTS = -O3 -fopenmp -pthread -lpthread -static
+
+HDRS = \
+  accaln.h \
+  alpha.h \
+  alpha3.h \
+  clust.h \
+  cluster.h \
+  clustset.h \
+  clustsetdf.h \
+  clustsetmsa.h \
+  cmds.h \
+  countsort.h \
+  derep.h \
+  diaglist.h \
+  distcalc.h \
+  distfunc.h \
+  dpregionlist.h \
+  dpreglist.h \
+  eacluster.h \
+  edgelist.h \
+  enumopts.h \
+  enums.h \
+  estring.h \
+  filebuffer.h \
+  gapscoredimer.h \
+  gobuff.h \
+  gonnet.h \
+  guidetree.h \
+  hmmparams.h \
+  hmmtrans.h \
+  intmath.h \
+  mpc.h \
+  msa.h \
+  msadist.h \
+  multisequence.h \
+  muscle.h \
+  myopts.h \
+  myutils.h \
+  objscore.h \
+  pairhmm.h \
+  params.h \
+  pprog.h \
+  probcons.h \
+  profile.h \
+  pwpath.h \
+  qscorer.h \
+  qscorer3.h \
+  quarts.h \
+  scorehistory.h \
+  scoretype.h \
+  seq.h \
+  sequence.h \
+  seqvect.h \
+  sort.h \
+  sparsematrix.h \
+  sparsemx.h \
+  super4.h \
+  super5.h \
+  textfile.h \
+  timing.h \
+  transaln.h \
+  tree.h \
+  treeperm.h \
+  treesplitter.h \
+  types.h \
+  uclust.h \
+  unixio.h \
+  upgma5.h \
+  usage.h \
+  usorter.h \
+  ver_counter.h \
+
+OBJS = \
+  o/accaln.o \
+  o/align.o \
+  o/aligngivenpath.o \
+  o/aligngivenpathsw.o \
+  o/aligntwomsas.o \
+  o/aligntwoprofs.o \
+  o/aln.o \
+  o/alnaln.o \
+  o/alnmsas.o \
+  o/alpha.o \
+  o/alpha3.o \
+  o/anchors.o \
+  o/assertsameseqs.o \
+  o/bittraceback.o \
+  o/blosum62.o \
+  o/blosumla.o \
+  o/buildposterior.o \
+  o/buildposterior2.o \
+  o/buildposterior3.o \
+  o/clust.o \
+  o/cluster.o \
+  o/clwwt.o \
+  o/color.o \
+  o/computealn.o \
+  o/computebwd.o \
+  o/computefwd.o \
+  o/computeposterior.o \
+  o/computetotalprob.o \
+  o/cons.o \
+  o/convert.o \
+  o/defaulthmmparams.o \
+  o/deltahmm.o \
+  o/deltahmme.o \
+  o/derep.o \
+  o/dividetree.o \
+  o/diaglist.o \
+  o/diffobjscore.o \
+  o/diffpaths.o \
+  o/difftrees.o \
+  o/difftreese.o \
+  o/distcalc.o \
+  o/distfunc.o \
+  o/distmxfromseqvectea.o \
+  o/distpwkimura.o \
+  o/mpcaccaln.o \
+  o/mpc.o \
+  o/domuscle.o \
+  o/dorelax.o \
+  o/dosp.o \
+  o/dpreglist.o \
+  o/drawtree.o \
+  o/eacluster.o \
+  o/eadistmx.o \
+  o/eadistmxmsas.o \
+  o/edgelist.o \
+  o/enumopts.o \
+  o/enumtostr.o \
+  o/estring.o \
+  o/fasta.o \
+  o/fasta2.o \
+  o/fastclust.o \
+  o/fastdist.o \
+  o/fastdistjones.o \
+  o/fastdistkbit.o \
+  o/fastdistkmer.o \
+  o/fastdistmafft.o \
+  o/fastdistnuc.o \
+  o/fastscorepath2.o \
+  o/progaln5.o \
+  o/finddiags.o \
+  o/finddiagsn.o \
+  o/getconsseq.o \
+  o/glbalign.o \
+  o/glbaligndiag.o \
+  o/glbalignle.o \
+  o/glbalignsimple.o \
+  o/glbalignsp.o \
+  o/glbalignspn.o \
+  o/glbalignss.o \
+  o/glbalndimer.o \
+  o/globalinputms.o \
+  o/globals.o \
+  o/globalslinux.o \
+  o/globalsosx.o \
+  o/globalsother.o \
+  o/globalswin32.o \
+  o/gonnet.o \
+  o/guidetreejoinorder.o \
+  o/henikoffweight.o \
+  o/henikoffweightpb.o \
+  o/hmmalignpair.o \
+  o/hmmdump.o \
+  o/hmmparams.o \
+  o/html.o \
+  o/hydro.o \
+  o/insertgappy.o \
+  o/intmath.o \
+  o/jointrees.o \
+  o/local.o \
+  o/logaln.o \
+  o/main.o \
+  o/msa2tree.o \
+  o/msablosumscore.o \
+  o/msastats.o \
+  o/multisequence.o \
+  o/mydist.o \
+  o/pc2.o \
+  o/pc2x.o \
+  o/permutetree.o \
+  o/pp.o \
+  o/pprog.o \
+  o/pprog2.o \
+  o/pprogt.o \
+  o/probcons.o \
+  o/makerootmsa.o \
+  o/makerootmsab.o \
+  o/maketree.o \
+  o/mhack.o \
+  o/mpam200.o \
+  o/msa.o \
+  o/msa2.o \
+  o/msadistkimura.o \
+  o/msf.o \
+  o/muscle.o \
+  o/muscleout.o \
+  o/myutils.o \
+  o/nucmx.o \
+  o/nwdasimple.o \
+  o/nwdasimple2.o \
+  o/nwdasmall.o \
+  o/nwrec.o \
+  o/nwsmall.o \
+  o/objscore.o \
+  o/objscore2.o \
+  o/objscoreda.o \
+  o/onexception.o \
+  o/options.o \
+  o/outweights.o \
+  o/pam200mafft.o \
+  o/params.o \
+  o/phy.o \
+  o/phy2.o \
+  o/phy3.o \
+  o/phy4.o \
+  o/phyfromclust.o \
+  o/phyfromfile.o \
+  o/physeq.o \
+  o/phytofile.o \
+  o/posgap.o \
+  o/ppscore.o \
+  o/pairhmm.o \
+  o/processtree.o \
+  o/profdb.o \
+  o/profile.o \
+  o/profilefrommsa.o \
+  o/progress.o \
+  o/progressivealign.o \
+  o/project.o \
+  o/pwpath.o \
+  o/qscore.o \
+  o/qscore2.o \
+  o/qscore3.o \
+  o/qscorer.o \
+  o/quarts.o \
+  o/readmx.o \
+  o/sequence.o \
+  o/setprobconsparams.o \
+  o/realigndiffs.o \
+  o/refine.o \
+  o/refinehoriz.o \
+  o/refineprob.o \
+  o/refinesubfams.o \
+  o/refinetree.o \
+  o/refinevert.o \
+  o/relax.o \
+  o/relax1.o \
+  o/savebest.o \
+  o/scoredist.o \
+  o/scoregaps.o \
+  o/scorehistory.o \
+  o/scorepp.o \
+  o/seq.o \
+  o/seqvect.o \
+  o/setblosumweights.o \
+  o/setgscweights.o \
+  o/setnewhandler.o \
+  o/sparsematrix.o \
+  o/sparsemx.o \
+  o/spfast.o \
+  o/sptest.o \
+  o/stabilize.o \
+  o/stripgappycols.o \
+  o/super4.o \
+  o/super5.o \
+  o/sw.o \
+  o/termgaps.o \
+  o/textfile.o \
+  o/threewaywt.o \
+  o/tomhydro.o \
+  o/traceback.o \
+  o/tracebackopt.o \
+  o/tracebacksw.o \
+  o/trainhmm.o \
+  o/transaln.o \
+  o/transq.o \
+  o/treefrommsa.o \
+  o/treefrommsa5.o \
+  o/treefromseqvectea.o \
+  o/treenode.o \
+  o/treesplitter.o \
+  o/treesubsetnodes.o \
+  o/typetostr.o \
+  o/uclust.o \
+  o/upgma2.o \
+  o/upgma5.o \
+  o/usage.o \
+  o/usorter.o \
+  o/validateids.o \
+  o/vtml2.o \
+  o/writescorefile.o \
+
+muscle5 : o/ $(OBJS)
+	$(LNK) $(LNKOPTS) $(OBJS) -o o/muscle5
+	strip -d o/muscle5
+
+o/ :
+	mkdir -p o/
+
+o/accaln.o : accaln.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/accaln.o accaln.cpp
+
+o/align.o : align.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/align.o align.cpp
+
+o/aligngivenpath.o : aligngivenpath.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/aligngivenpath.o aligngivenpath.cpp
+
+o/aligngivenpathsw.o : aligngivenpathsw.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/aligngivenpathsw.o aligngivenpathsw.cpp
+
+o/aligntwomsas.o : aligntwomsas.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/aligntwomsas.o aligntwomsas.cpp
+
+o/aligntwoprofs.o : aligntwoprofs.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/aligntwoprofs.o aligntwoprofs.cpp
+
+o/aln.o : aln.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/aln.o aln.cpp
+
+o/alnaln.o : alnaln.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/alnaln.o alnaln.cpp
+
+o/alnmsas.o : alnmsas.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/alnmsas.o alnmsas.cpp
+
+o/alpha.o : alpha.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/alpha.o alpha.cpp
+
+o/alpha3.o : alpha3.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/alpha3.o alpha3.cpp
+
+o/anchors.o : anchors.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/anchors.o anchors.cpp
+
+o/assertsameseqs.o : assertsameseqs.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/assertsameseqs.o assertsameseqs.cpp
+
+o/bittraceback.o : bittraceback.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/bittraceback.o bittraceback.cpp
+
+o/blosum62.o : blosum62.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/blosum62.o blosum62.cpp
+
+o/blosumla.o : blosumla.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/blosumla.o blosumla.cpp
+
+o/buildposterior.o : buildposterior.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/buildposterior.o buildposterior.cpp
+
+o/buildposterior2.o : buildposterior2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/buildposterior2.o buildposterior2.cpp
+
+o/buildposterior3.o : buildposterior3.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/buildposterior3.o buildposterior3.cpp
+
+o/clust.o : clust.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/clust.o clust.cpp
+
+o/cluster.o : cluster.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/cluster.o cluster.cpp
+
+o/clwwt.o : clwwt.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/clwwt.o clwwt.cpp
+
+o/color.o : color.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/color.o color.cpp
+
+o/computealn.o : computealn.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/computealn.o computealn.cpp
+
+o/computebwd.o : computebwd.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/computebwd.o computebwd.cpp
+
+o/computefwd.o : computefwd.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/computefwd.o computefwd.cpp
+
+o/computeposterior.o : computeposterior.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/computeposterior.o computeposterior.cpp
+
+o/computetotalprob.o : computetotalprob.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/computetotalprob.o computetotalprob.cpp
+
+o/cons.o : cons.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/cons.o cons.cpp
+
+o/convert.o : convert.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/convert.o convert.cpp
+
+o/defaulthmmparams.o : defaulthmmparams.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/defaulthmmparams.o defaulthmmparams.cpp
+
+o/deltahmm.o : deltahmm.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/deltahmm.o deltahmm.cpp
+
+o/deltahmme.o : deltahmme.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/deltahmme.o deltahmme.cpp
+
+o/derep.o : derep.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/derep.o derep.cpp
+
+o/dividetree.o : dividetree.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/dividetree.o dividetree.cpp
+
+o/diaglist.o : diaglist.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/diaglist.o diaglist.cpp
+
+o/diffobjscore.o : diffobjscore.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/diffobjscore.o diffobjscore.cpp
+
+o/diffpaths.o : diffpaths.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/diffpaths.o diffpaths.cpp
+
+o/difftrees.o : difftrees.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/difftrees.o difftrees.cpp
+
+o/difftreese.o : difftreese.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/difftreese.o difftreese.cpp
+
+o/distcalc.o : distcalc.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/distcalc.o distcalc.cpp
+
+o/distfunc.o : distfunc.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/distfunc.o distfunc.cpp
+
+o/distmxfromseqvectea.o : distmxfromseqvectea.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/distmxfromseqvectea.o distmxfromseqvectea.cpp
+
+o/distpwkimura.o : distpwkimura.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/distpwkimura.o distpwkimura.cpp
+
+o/mpcaccaln.o : mpcaccaln.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/mpcaccaln.o mpcaccaln.cpp
+
+o/mpc.o : mpc.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/mpc.o mpc.cpp
+
+o/domuscle.o : domuscle.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/domuscle.o domuscle.cpp
+
+o/dorelax.o : dorelax.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/dorelax.o dorelax.cpp
+
+o/dosp.o : dosp.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/dosp.o dosp.cpp
+
+o/dpreglist.o : dpreglist.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/dpreglist.o dpreglist.cpp
+
+o/drawtree.o : drawtree.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/drawtree.o drawtree.cpp
+
+o/eacluster.o : eacluster.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/eacluster.o eacluster.cpp
+
+o/eadistmx.o : eadistmx.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/eadistmx.o eadistmx.cpp
+
+o/eadistmxmsas.o : eadistmxmsas.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/eadistmxmsas.o eadistmxmsas.cpp
+
+o/edgelist.o : edgelist.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/edgelist.o edgelist.cpp
+
+o/enumopts.o : enumopts.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/enumopts.o enumopts.cpp
+
+o/enumtostr.o : enumtostr.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/enumtostr.o enumtostr.cpp
+
+o/estring.o : estring.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/estring.o estring.cpp
+
+o/fasta.o : fasta.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fasta.o fasta.cpp
+
+o/fasta2.o : fasta2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fasta2.o fasta2.cpp
+
+o/fastclust.o : fastclust.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fastclust.o fastclust.cpp
+
+o/fastdist.o : fastdist.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fastdist.o fastdist.cpp
+
+o/fastdistjones.o : fastdistjones.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fastdistjones.o fastdistjones.cpp
+
+o/fastdistkbit.o : fastdistkbit.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fastdistkbit.o fastdistkbit.cpp
+
+o/fastdistkmer.o : fastdistkmer.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fastdistkmer.o fastdistkmer.cpp
+
+o/fastdistmafft.o : fastdistmafft.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fastdistmafft.o fastdistmafft.cpp
+
+o/fastdistnuc.o : fastdistnuc.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fastdistnuc.o fastdistnuc.cpp
+
+o/fastscorepath2.o : fastscorepath2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/fastscorepath2.o fastscorepath2.cpp
+
+o/progaln5.o : progaln5.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/progaln5.o progaln5.cpp
+
+o/finddiags.o : finddiags.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/finddiags.o finddiags.cpp
+
+o/finddiagsn.o : finddiagsn.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/finddiagsn.o finddiagsn.cpp
+
+o/getconsseq.o : getconsseq.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/getconsseq.o getconsseq.cpp
+
+o/glbalign.o : glbalign.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/glbalign.o glbalign.cpp
+
+o/glbaligndiag.o : glbaligndiag.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/glbaligndiag.o glbaligndiag.cpp
+
+o/glbalignle.o : glbalignle.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/glbalignle.o glbalignle.cpp
+
+o/glbalignsimple.o : glbalignsimple.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/glbalignsimple.o glbalignsimple.cpp
+
+o/glbalignsp.o : glbalignsp.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/glbalignsp.o glbalignsp.cpp
+
+o/glbalignspn.o : glbalignspn.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/glbalignspn.o glbalignspn.cpp
+
+o/glbalignss.o : glbalignss.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/glbalignss.o glbalignss.cpp
+
+o/glbalndimer.o : glbalndimer.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/glbalndimer.o glbalndimer.cpp
+
+o/globalinputms.o : globalinputms.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/globalinputms.o globalinputms.cpp
+
+o/globals.o : globals.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/globals.o globals.cpp
+
+o/globalslinux.o : globalslinux.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/globalslinux.o globalslinux.cpp
+
+o/globalsosx.o : globalsosx.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/globalsosx.o globalsosx.cpp
+
+o/globalsother.o : globalsother.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/globalsother.o globalsother.cpp
+
+o/globalswin32.o : globalswin32.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/globalswin32.o globalswin32.cpp
+
+o/gonnet.o : gonnet.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/gonnet.o gonnet.cpp
+
+o/guidetreejoinorder.o : guidetreejoinorder.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/guidetreejoinorder.o guidetreejoinorder.cpp
+
+o/henikoffweight.o : henikoffweight.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/henikoffweight.o henikoffweight.cpp
+
+o/henikoffweightpb.o : henikoffweightpb.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/henikoffweightpb.o henikoffweightpb.cpp
+
+o/hmmalignpair.o : hmmalignpair.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/hmmalignpair.o hmmalignpair.cpp
+
+o/hmmdump.o : hmmdump.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/hmmdump.o hmmdump.cpp
+
+o/hmmparams.o : hmmparams.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/hmmparams.o hmmparams.cpp
+
+o/html.o : html.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/html.o html.cpp
+
+o/hydro.o : hydro.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/hydro.o hydro.cpp
+
+o/insertgappy.o : insertgappy.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/insertgappy.o insertgappy.cpp
+
+o/intmath.o : intmath.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/intmath.o intmath.cpp
+
+o/jointrees.o : jointrees.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/jointrees.o jointrees.cpp
+
+o/local.o : local.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/local.o local.cpp
+
+o/logaln.o : logaln.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/logaln.o logaln.cpp
+
+o/main.o : main.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/main.o main.cpp
+
+o/msa2tree.o : msa2tree.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/msa2tree.o msa2tree.cpp
+
+o/msablosumscore.o : msablosumscore.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/msablosumscore.o msablosumscore.cpp
+
+o/msastats.o : msastats.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/msastats.o msastats.cpp
+
+o/multisequence.o : multisequence.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/multisequence.o multisequence.cpp
+
+o/mydist.o : mydist.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/mydist.o mydist.cpp
+
+o/pc2.o : pc2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/pc2.o pc2.cpp
+
+o/pc2x.o : pc2x.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/pc2x.o pc2x.cpp
+
+o/permutetree.o : permutetree.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/permutetree.o permutetree.cpp
+
+o/pp.o : pp.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/pp.o pp.cpp
+
+o/pprog.o : pprog.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/pprog.o pprog.cpp
+
+o/pprog2.o : pprog2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/pprog2.o pprog2.cpp
+
+o/pprogt.o : pprogt.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/pprogt.o pprogt.cpp
+
+o/probcons.o : probcons.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/probcons.o probcons.cpp
+
+o/makerootmsa.o : makerootmsa.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/makerootmsa.o makerootmsa.cpp
+
+o/makerootmsab.o : makerootmsab.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/makerootmsab.o makerootmsab.cpp
+
+o/maketree.o : maketree.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/maketree.o maketree.cpp
+
+o/mhack.o : mhack.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/mhack.o mhack.cpp
+
+o/mpam200.o : mpam200.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/mpam200.o mpam200.cpp
+
+o/msa.o : msa.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/msa.o msa.cpp
+
+o/msa2.o : msa2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/msa2.o msa2.cpp
+
+o/msadistkimura.o : msadistkimura.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/msadistkimura.o msadistkimura.cpp
+
+o/msf.o : msf.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/msf.o msf.cpp
+
+o/muscle.o : muscle.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/muscle.o muscle.cpp
+
+o/muscleout.o : muscleout.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/muscleout.o muscleout.cpp
+
+o/myutils.o : myutils.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/myutils.o myutils.cpp
+
+o/nucmx.o : nucmx.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/nucmx.o nucmx.cpp
+
+o/nwdasimple.o : nwdasimple.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/nwdasimple.o nwdasimple.cpp
+
+o/nwdasimple2.o : nwdasimple2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/nwdasimple2.o nwdasimple2.cpp
+
+o/nwdasmall.o : nwdasmall.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/nwdasmall.o nwdasmall.cpp
+
+o/nwrec.o : nwrec.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/nwrec.o nwrec.cpp
+
+o/nwsmall.o : nwsmall.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/nwsmall.o nwsmall.cpp
+
+o/objscore.o : objscore.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/objscore.o objscore.cpp
+
+o/objscore2.o : objscore2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/objscore2.o objscore2.cpp
+
+o/objscoreda.o : objscoreda.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/objscoreda.o objscoreda.cpp
+
+o/onexception.o : onexception.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/onexception.o onexception.cpp
+
+o/options.o : options.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/options.o options.cpp
+
+o/outweights.o : outweights.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/outweights.o outweights.cpp
+
+o/pam200mafft.o : pam200mafft.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/pam200mafft.o pam200mafft.cpp
+
+o/params.o : params.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/params.o params.cpp
+
+o/phy.o : phy.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/phy.o phy.cpp
+
+o/phy2.o : phy2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/phy2.o phy2.cpp
+
+o/phy3.o : phy3.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/phy3.o phy3.cpp
+
+o/phy4.o : phy4.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/phy4.o phy4.cpp
+
+o/phyfromclust.o : phyfromclust.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/phyfromclust.o phyfromclust.cpp
+
+o/phyfromfile.o : phyfromfile.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/phyfromfile.o phyfromfile.cpp
+
+o/physeq.o : physeq.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/physeq.o physeq.cpp
+
+o/phytofile.o : phytofile.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/phytofile.o phytofile.cpp
+
+o/posgap.o : posgap.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/posgap.o posgap.cpp
+
+o/ppscore.o : ppscore.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/ppscore.o ppscore.cpp
+
+o/pairhmm.o : pairhmm.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/pairhmm.o pairhmm.cpp
+
+o/processtree.o : processtree.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/processtree.o processtree.cpp
+
+o/profdb.o : profdb.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/profdb.o profdb.cpp
+
+o/profile.o : profile.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/profile.o profile.cpp
+
+o/profilefrommsa.o : profilefrommsa.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/profilefrommsa.o profilefrommsa.cpp
+
+o/progress.o : progress.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/progress.o progress.cpp
+
+o/progressivealign.o : progressivealign.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/progressivealign.o progressivealign.cpp
+
+o/project.o : project.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/project.o project.cpp
+
+o/pwpath.o : pwpath.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/pwpath.o pwpath.cpp
+
+o/qscore.o : qscore.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/qscore.o qscore.cpp
+
+o/qscore2.o : qscore2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/qscore2.o qscore2.cpp
+
+o/qscore3.o : qscore3.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/qscore3.o qscore3.cpp
+
+o/qscorer.o : qscorer.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/qscorer.o qscorer.cpp
+
+o/quarts.o : quarts.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/quarts.o quarts.cpp
+
+o/readmx.o : readmx.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/readmx.o readmx.cpp
+
+o/sequence.o : sequence.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/sequence.o sequence.cpp
+
+o/setprobconsparams.o : setprobconsparams.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/setprobconsparams.o setprobconsparams.cpp
+
+o/realigndiffs.o : realigndiffs.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/realigndiffs.o realigndiffs.cpp
+
+o/refine.o : refine.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/refine.o refine.cpp
+
+o/refinehoriz.o : refinehoriz.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/refinehoriz.o refinehoriz.cpp
+
+o/refineprob.o : refineprob.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/refineprob.o refineprob.cpp
+
+o/refinesubfams.o : refinesubfams.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/refinesubfams.o refinesubfams.cpp
+
+o/refinetree.o : refinetree.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/refinetree.o refinetree.cpp
+
+o/refinevert.o : refinevert.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/refinevert.o refinevert.cpp
+
+o/relax.o : relax.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/relax.o relax.cpp
+
+o/relax1.o : relax1.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/relax1.o relax1.cpp
+
+o/savebest.o : savebest.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/savebest.o savebest.cpp
+
+o/scoredist.o : scoredist.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/scoredist.o scoredist.cpp
+
+o/scoregaps.o : scoregaps.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/scoregaps.o scoregaps.cpp
+
+o/scorehistory.o : scorehistory.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/scorehistory.o scorehistory.cpp
+
+o/scorepp.o : scorepp.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/scorepp.o scorepp.cpp
+
+o/seq.o : seq.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/seq.o seq.cpp
+
+o/seqvect.o : seqvect.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/seqvect.o seqvect.cpp
+
+o/setblosumweights.o : setblosumweights.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/setblosumweights.o setblosumweights.cpp
+
+o/setgscweights.o : setgscweights.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/setgscweights.o setgscweights.cpp
+
+o/setnewhandler.o : setnewhandler.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/setnewhandler.o setnewhandler.cpp
+
+o/sparsematrix.o : sparsematrix.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/sparsematrix.o sparsematrix.cpp
+
+o/sparsemx.o : sparsemx.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/sparsemx.o sparsemx.cpp
+
+o/spfast.o : spfast.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/spfast.o spfast.cpp
+
+o/sptest.o : sptest.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/sptest.o sptest.cpp
+
+o/stabilize.o : stabilize.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/stabilize.o stabilize.cpp
+
+o/stripgappycols.o : stripgappycols.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/stripgappycols.o stripgappycols.cpp
+
+o/super4.o : super4.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/super4.o super4.cpp
+
+o/super5.o : super5.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/super5.o super5.cpp
+
+o/sw.o : sw.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/sw.o sw.cpp
+
+o/termgaps.o : termgaps.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/termgaps.o termgaps.cpp
+
+o/textfile.o : textfile.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/textfile.o textfile.cpp
+
+o/threewaywt.o : threewaywt.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/threewaywt.o threewaywt.cpp
+
+o/tomhydro.o : tomhydro.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/tomhydro.o tomhydro.cpp
+
+o/traceback.o : traceback.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/traceback.o traceback.cpp
+
+o/tracebackopt.o : tracebackopt.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/tracebackopt.o tracebackopt.cpp
+
+o/tracebacksw.o : tracebacksw.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/tracebacksw.o tracebacksw.cpp
+
+o/trainhmm.o : trainhmm.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/trainhmm.o trainhmm.cpp
+
+o/transaln.o : transaln.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/transaln.o transaln.cpp
+
+o/transq.o : transq.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/transq.o transq.cpp
+
+o/treefrommsa.o : treefrommsa.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/treefrommsa.o treefrommsa.cpp
+
+o/treefrommsa5.o : treefrommsa5.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/treefrommsa5.o treefrommsa5.cpp
+
+o/treefromseqvectea.o : treefromseqvectea.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/treefromseqvectea.o treefromseqvectea.cpp
+
+o/treenode.o : treenode.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/treenode.o treenode.cpp
+
+o/treesplitter.o : treesplitter.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/treesplitter.o treesplitter.cpp
+
+o/treesubsetnodes.o : treesubsetnodes.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/treesubsetnodes.o treesubsetnodes.cpp
+
+o/typetostr.o : typetostr.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/typetostr.o typetostr.cpp
+
+o/uclust.o : uclust.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/uclust.o uclust.cpp
+
+o/upgma2.o : upgma2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/upgma2.o upgma2.cpp
+
+o/upgma5.o : upgma5.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/upgma5.o upgma5.cpp
+
+o/usage.o : usage.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/usage.o usage.cpp
+
+o/usorter.o : usorter.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/usorter.o usorter.cpp
+
+o/validateids.o : validateids.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/validateids.o validateids.cpp
+
+o/vtml2.o : vtml2.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/vtml2.o vtml2.cpp
+
+o/writescorefile.o : writescorefile.cpp $(HDRS)
+	$(CPP) $(CPPOPTS) -o o/writescorefile.o writescorefile.cpp
