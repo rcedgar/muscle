@@ -10,17 +10,17 @@ Binary files are self-contained, no dependencies.
 
 ## Usage
 
-    Amino acid sequences, runs MPC or Super5 algorithm:
+    Amino acid sequences, use MPC or Super5 algorithm:
       muscle -mpc seqs.fa -out aln.fa
       muscle -super5 seqs.fa -out aln.fa
     
-    Nucleotide or amino acid sequences, runs muscle v3 algorithm:
+    Nucleotide sequences, use muscle v3 algorithm:
       muscle -in seqs.fa -out aln.fa [-maxiters 2]
     
     Input is FASTA, output is aligned FASTA.
     
-    For amino acid sequences, use MPC for up to around 500 sequences, for larger
-    sets, use Super5. The muscle v3 algorithm is less accurate, not recommended.
+    The muscle v3 algorithm also supports amino acid sequences, but is
+    less accurate than MPC and Super5.
     
     For nucleotide sequences, use -maxiters 2 if the default is too slow, which
     typically happens with a few hundred sequences.
