@@ -1,7 +1,7 @@
-CPP = ccache g++
+CPP = g++
 CPPOPTS = -fopenmp -msse -mfpmath=sse -O3 -DNDEBUG -c
 
-CC = ccache gcc
+CC = gcc
 CCOPTS = -fopenmp -msse -mfpmath=sse -O3 -DNDEBUG -c
 
 LNK = g++
