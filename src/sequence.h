@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cctype>
 #include <cstdlib>
-#include "FileBuffer.h"
+#include "filebuffer.h"
 
 // data uses one-based indexing, data[0] set to '@'.
 class Sequence

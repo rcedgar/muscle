@@ -7,7 +7,7 @@ doi: 10.1101/gr.2821705
 ***/
 
 #include "multisequence.h"
-#include "ScoreType.h"
+#include "scoretype.h"
 #include "pairhmm.h"
 #include "guidetree.h"
 #include "sparsematrix.h"
