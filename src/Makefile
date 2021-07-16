@@ -1,6 +1,12 @@
+UNAME_S := $(shell uname -s)
+
 CXX = g++
-CXXFLAGS = -O3 -DNDEBUG -fopenmp -msse -mfpmath=sse
-LDFLAGS = -O3 -fopenmp -pthread -lpthread -static
+CXXFLAGS = -O3 -DNDEBUG -fopenmp -ffast-math -msse -mfpmath=sse
+
+LDFLAGS = -O3 -fopenmp -pthread -lpthread
+ifeq ($(UNAME_S),Linux)
+    LDFLAGS += -static
+endif
 
 HDRS = \
   accaln.h \
@@ -295,6 +301,8 @@ OBJS = \
   o/vtml2.o \
   o/writescorefile.o \
 
+.PHONY: clean
+
 o/muscle5 : o/ $(OBJS)
 	$(CXX) $(LDFLAGS) $(OBJS) -o $@
 	strip -d o/muscle5
@@ -304,3 +312,6 @@ o/ :
 
 o/%.o : %.cpp $(HDRS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+clean:
+	-rm -rf o/
