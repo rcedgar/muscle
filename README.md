@@ -74,8 +74,8 @@ Windows [muscle.exe](https://github.com/rcedgar/muscle/raw/main/binaries/muscle.
         -jalview aln.features
             Jalview feature file with LC values and colors.
 
-    More documentation at:
-        [https://drive5.com/muscle](https://drive5.com/muscle)
+More documentation at:
+    [https://drive5.com/muscle](https://drive5.com/muscle)
 
 
 # Reference
