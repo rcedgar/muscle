@@ -1,13 +1,86 @@
 #include "myutils.h"
 #include "sequence.h"
 
-void Sequence::Create(vector<char>* a_data, string a_label, uint GSI, uint SMI)
-	{
-	assert(a_data);
-	assert((*a_data)[0] == '@');
+#if SEQ_TRACE
+#include "locallock.h"
+static vector<const char *> g_Files;
+static vector<int> g_Lines;
+static vector<bool> g_Deleted;
+static vector<const Sequence *> g_SeqPtrs;
 
-	data = a_data;
-	label = a_label;
+void Sequence::AllocReport(const string &Msg)
+	{
+	Log("\nSequence::AllocReport(%s)\n", Msg.c_str());
+	uint64 TotalBytes = 0;
+	const uint N = SIZE(g_Files);
+	asserta(SIZE(g_Lines) == N);
+	asserta(SIZE(g_Deleted) == N);
+	asserta(SIZE(g_SeqPtrs) == N);
+	uint DeletedCount = 0;
+	uint NotDeletedCount = 0;
+	Log("\n");
+	for (uint i = 0; i < N; ++i)
+		{
+		if (g_Deleted[i])
+			continue;
+		++NotDeletedCount;
+		double Bytes = double(g_SeqPtrs.size());
+		TotalBytes += g_SeqPtrs.capacity();
+		Log("[%7u]  %10.0f bytes  %s:%u\n",
+		  i, Bytes, g_Files[i], g_Lines[i]);
+		}
+	Log("Seqs %u / %u not freed, bytes %s\n", 
+	  NotDeletedCount, N, MemBytesToStr(TotalBytes));
+	}
+
+void Sequence::AssertId() const
+	{
+	asserta(m_Id < SIZE(g_Files));
+	}
+
+Sequence *Sequence::_NewSequence(const char *File, int Line)
+	{
+	Sequence *Seq = new Sequence;
+	Lock();
+	uint Id = SIZE(g_Files);
+	Seq->m_Id = Id;
+	g_Files.push_back(File);
+	g_Lines.push_back(Line);
+	g_Deleted.push_back(false);
+	g_SeqPtrs.push_back(Seq);
+	Unlock();
+	return Seq;
+	}
+
+void Sequence::_DeleteSequence(const Sequence *s,
+  const char *File, int Line)
+	{
+	uint Id = s->m_Id;
+	asserta(Id < SIZE(g_Deleted));
+	asserta(!g_Deleted[Id]);
+	delete s;
+	g_Deleted[Id] = true;
+	}
+
+#else
+
+Sequence *Sequence::_NewSequence()
+	{
+	Sequence *Seq = new Sequence;
+	return Seq;
+	}
+
+void Sequence::_DeleteSequence(const Sequence *Seq)
+	{
+	delete Seq;
+	}
+
+#endif
+
+void Sequence::Create(const vector<char> *a_data, string a_label, uint GSI, uint SMI)
+	{
+	m_CharVec = *a_data;
+	m_Label = a_label;
 	m_GSI = GSI;
 	m_SMI = SMI;
 	}
@@ -17,40 +90,39 @@ bool Sequence::FromFileBuffer(FileBuffer& infile, bool stripGaps)
 	if (infile.eof())
 		return false;
 
-	label = "~";
-	asserta(data == 0);
-	asserta(m_GSI == UINT_MAX);
-	asserta(m_SMI == UINT_MAX);
+	m_GSI = UINT_MAX;
+	m_SMI = UINT_MAX;
+	m_Label = "~";
 
 // Skip blank lines
 	for (;;)
 		{
 		if (infile.eof())
 			{
-			if (label.empty())
+			if (m_Label.empty())
 				return false;
 			asserta(false);
 			}
-		infile.GetLine(label);
-		if (label.length() > 0)
+		infile.GetLine(m_Label);
+		if (m_Label.length() > 0)
 			break;
 		}
 
-	if (label[0] != '>')
-		Die("Expected '>' in FASTA, got '%s'", label.c_str());
+	if (m_Label[0] != '>')
+		Die("Expected '>' in FASTA, got '%s'", m_Label.c_str());
 
 // Remove leading ">"
-	label = label.substr(1);
+	m_Label = m_Label.substr(1);
 
 	if (opt(accs))
 		{
 		string Acc;
-		GetAccFromLabel(label, Acc);
-		label = Acc;
+		GetAccFromLabel(m_Label, Acc);
+		m_Label = Acc;
 		}
 
-	data = new vector<char>; assert(data);
-	data->push_back('@');
+	m_CharVec.clear();
+	m_CharVec.push_back('@');
 
 	char ch;
 	while (infile.Get(ch))
@@ -67,69 +139,37 @@ bool Sequence::FromFileBuffer(FileBuffer& infile, bool stripGaps)
 		if (stripGaps && ch == '-')
 			continue;
 
-		data->push_back(ch);
+		m_CharVec.push_back(ch);
 		}
 	return true;
 	}
 
 // Writes the sequence to outfile in MFA format.  Uses numColumns
 // columns per line.  If useIndex is set to false, then the
-// label is printed as normal, but if useIndex is true, then
-// ">S###" is printed where ### represents the sequence label.
+// m_Label is printed as normal, but if useIndex is true, then
+// ">S###" is printed where ### represents the sequence m_Label.
 void Sequence::WriteMFA(FILE *f) const
 	{
-	const vector<char> &v = (*data);
+	const vector<char> &v = m_CharVec;
 	const int L = GetLength();
 	byte *Seq = myalloc(byte, L);
 	for (int i = 0; i < L; ++i)
 		Seq[i] = v[i+1];
-	SeqToFasta(f, Seq, (uint) L, label.c_str());
+	SeqToFasta(f, Seq, (uint) L, m_Label.c_str());
 	}
 
 Sequence* Sequence::Clone() const
 	{
-	Sequence* ret = new Sequence();
+	Sequence* ret = NewSequence();
 	asserta(ret);
 
-	ret->label = label;
-	ret->data = new vector<char>;
-	asserta(ret->data);
-	*(ret->data) = *data;
+	ret->m_Label = m_Label;
+	ret->m_CharVec = m_CharVec;
 	ret->m_GSI = m_GSI;
 	ret->m_SMI = m_SMI;
 
 	return ret;
 	}
-
-//// Extract subset of positions using ZERO-based column indexes
-//// (note conflict between RCE convention of 0-based and CBD
-//// convention of 1-based).
-//Sequence* Sequence::MakeSubset(const vector<uint> &Cols) const
-//	{
-//	Sequence* ret = new Sequence();
-//	asserta(ret);
-//
-//	const uint ColCount = SIZE(Cols);
-//	asserta(ColCount > 0);
-//
-//	ret->label = label;
-//	ret->data = new vector<char>;
-//	asserta(ret->data);
-//	//ret->sequenceIndex = sequenceIndex;
-//	ret->inputIndex = inputIndex;
-//	ret->data->push_back('@');
-//
-//	const char *ZeroBasedSeqData = data->data() + 1;
-//	asserta(ColCount <= (uint) GetLength());
-//	for (uint i = 0; i < ColCount; ++i)
-//		{
-//		uint Pos = Cols[i];
-//		char c = ZeroBasedSeqData[Pos];
-//		ret->data->push_back(c);
-//		}
-//
-//	return ret;
-//	}
 
 /////////////////////////////////////////////////////////////////
 // Sequence::AddGaps()
@@ -146,34 +186,61 @@ Sequence* Sequence::Clone() const
 /////////////////////////////////////////////////////////////////
 Sequence* Sequence::AddGaps(const vector<char>* alignment, char id) const
 	{
-	Sequence* ret = new Sequence();
+	Sequence* ret = NewSequence();
 	assert(ret);
 
-	ret->SetGSI(m_GSI);
-	ret->SetSMI(m_SMI);
+	ret->m_GSI = m_GSI;
+	ret->m_SMI = m_SMI;
 
-	ret->label = label;
-	ret->data = new vector<char>; 
-	assert(ret->data != 0);
-	ret->data->push_back('@');
+	ret->m_Label = m_Label;
+	ret->m_CharVec.clear();
+	ret->m_CharVec.push_back('@');
 
-	vector<char>::iterator dataIter = data->begin() + 1;
+	vector<char>::const_iterator dataIter = m_CharVec.begin() + 1;
 	for (vector<char>::const_iterator iter = alignment->begin();
 	  iter != alignment->end(); ++iter)
 		{
 		if (*iter == 'B' || *iter == id)
 			{
-			ret->data->push_back(*dataIter);
+			ret->m_CharVec.push_back(*dataIter);
 			++dataIter;
 			}
 		else
-			ret->data->push_back('-');
+			ret->m_CharVec.push_back('-');
 		}
 
 	return ret;
 	}
 
-// Returns vector containing 1-based col indexes, e.g. if data
+Sequence* Sequence::AddGapsPath(const string &Path, char id) const
+	{
+	Sequence* ret = NewSequence();
+	assert(ret);
+
+	ret->m_GSI = m_GSI;
+	ret->m_SMI = m_SMI;
+
+	ret->m_Label = m_Label;
+	ret->m_CharVec.clear();
+	ret->m_CharVec.push_back('@');
+
+	vector<char>::const_iterator dataIter = m_CharVec.begin() + 1;
+	for (string::const_iterator iter = Path.begin();
+	  iter != Path.end(); ++iter)
+		{
+		if (*iter == 'B' || *iter == id)
+			{
+			ret->m_CharVec.push_back(*dataIter);
+			++dataIter;
+			}
+		else
+			ret->m_CharVec.push_back('-');
+		}
+
+	return ret;
+	}
+
+// Returns vector containing 1-based col indexes, e.g. if m_CharVec
 // is "ATGCC---GT--CA" vector is set to {1,2,3,4,5,9,10,13,14}.
 void Sequence::GetPosToCol_OneBased(vector<uint> &PosToCol) const
 	{
@@ -182,7 +249,7 @@ void Sequence::GetPosToCol_OneBased(vector<uint> &PosToCol) const
 	uint L = GetLength();
 	for (uint i = 1; i <= L; i++)
 		{
-		if ((*data)[i] != '-')
+		if (m_CharVec[i] != '-')
 			PosToCol.push_back(i);
 		}
 	}
@@ -218,62 +285,46 @@ void Sequence::GetColToPos(vector<uint> &ColToPos) const
 
 Sequence *Sequence::DeleteGaps() const
 	{
-	Sequence* ret = new Sequence();
+	Sequence* ret = NewSequence();
 	asserta(ret);
 
-	ret->label = label;
+	ret->m_Label = m_Label;
 	ret->m_GSI = m_GSI;
 	ret->m_SMI = m_SMI;
-	ret->data = new vector<char>;
-	asserta(ret->data);
-	asserta(!(*data).empty() && (*data)[0] == '@');
+	ret->m_CharVec.clear();
+	asserta(!m_CharVec.empty() && m_CharVec[0] == '@');
 	int L = GetLength();
-	(*(ret->data)).push_back('@');
+	ret->m_CharVec.push_back('@');
 	for (int i = 1; i <= L; ++i)
 		{
-		char c = (*data)[i];
+		char c = m_CharVec[i];
 		if (c != '-')
-			(*(ret->data)).push_back(c);
+			ret->m_CharVec.push_back(c);
 		}
 	return ret;
 	}
 
-void Sequence::Copy(const Sequence &rhs)
-	{
-	label = rhs.label;
-	m_GSI = rhs.m_GSI;
-	m_SMI = rhs.m_SMI;
-
-	if (rhs.data == 0)
-		data = 0;
-	else
-		{
-		data = new vector<char>;
-		asserta(data);
-		const vector<char> &rhsdata = *rhs.data;
-		int L = rhs.GetLength();
-		for (int i = 0; i <= L; ++i)
-			{
-			char c = (*rhs.data)[i];
-			(*(data)).push_back(c);
-			}
-		}
-	}
+//void Sequence::Copy(const Sequence &rhs)
+//	{
+//	m_Label = rhs.m_Label;
+//	m_SMI = rhs.m_SMI;
+//	m_GSI = rhs.m_GSI;
+//	m_CharVec = rhs.m_CharVec;
+//	}
 
 void Sequence::FromString(const string &Label, const string &Seq)
 	{
-	asserta(m_GSI == UINT_MAX);
-	asserta(m_SMI == UINT_MAX);
+	m_GSI = UINT_MAX;
+	m_SMI = UINT_MAX;
 
-	label = Label;
-	data = new vector<char>;
-	asserta(data);
+	m_Label = Label;
+	m_CharVec.clear();
 	int L = (int) SIZE(Seq);
-	(*(data)).push_back('@');
+	m_CharVec.push_back('@');
 	for (int i = 0; i < L; ++i)
 		{
 		char c = Seq[i];
-		(*(data)).push_back(c);
+		m_CharVec.push_back(c);
 		}
 	}
 
@@ -282,8 +333,8 @@ void Sequence::LogMe() const
 	Log("\n");
 	uint L = GetLength();
 	Log("Sequence(%p) length %u  >%s\n",
-	  this, L, label.c_str());
+	  this, L, m_Label.c_str());
 	for (uint i = 1; i <= L; ++i)
-		Log("%c", (*data)[i]);
+		Log("%c", m_CharVec[i]);
 	Log("\n");
 	}

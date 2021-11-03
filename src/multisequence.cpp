@@ -2,35 +2,6 @@
 #include "alpha3.h"
 #include "sort.h"
 
-MultiSequence::~MultiSequence()
-	{
-	// if sequences allocated
-	if (sequences)
-		{
-		// free all sequences
-		for (vector<Sequence*>::iterator iter = sequences->begin(); iter != sequences->end(); ++iter)
-			{
-			assert(*iter);
-			delete* iter;
-			*iter = NULL;
-			}
-
-		// free sequence vector
-		delete sequences;
-		sequences = NULL;
-		}
-	}
-
-// Call before d'tor when sequences were not allocated by this object
-void MultiSequence::FreeNonOwner()
-	{
-	if (sequences == 0)
-		return;
-	sequences->clear();
-	delete sequences;
-	sequences = 0;
-	}
-
 void MultiSequence::LoadMFA(const string& filename, bool stripGaps)
 	{
 	// try opening file
@@ -46,18 +17,46 @@ void MultiSequence::LoadMFA(const string& filename, bool stripGaps)
 	infile.close();
 	}
 
+#if SEQ_TRACE
+void MultiSequence::AssertSeqIds() const
+	{
+	const uint SeqCount = GetSeqCount();
+	asserta(SIZE(m_Owners) == SIZE(m_Seqs));
+	for (uint i = 0; i < SeqCount; ++i)
+		m_Seqs[i]->AssertId();
+	}
+#endif
+
+void MultiSequence::Clear()
+	{
+	const uint SeqCount = GetSeqCount();
+	asserta(SIZE(m_Owners) == SIZE(m_Seqs));
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		if (m_Owners[i])
+			DeleteSequence(m_Seqs[i]);
+		}
+	m_Seqs.clear();
+	m_Owners.clear();
+	}
+
 void MultiSequence::Copy(const MultiSequence &rhs)
 	{
-	asserta(sequences == 0);
+	Clear();
 	const uint SeqCount = rhs.GetSeqCount();
 	for (uint i = 0; i < SeqCount; ++i)
 		{
-		Sequence *newseq = new Sequence;
-		asserta(newseq);
-		const Sequence *rhsseq = rhs.GetSequence(i);
-		newseq->Copy(*rhsseq);
-		AddSequence(newseq);
+		const Sequence *r = rhs.GetSequence(i)->Clone();
+		AddSequence(r, true);
 		}
+	}
+
+void MultiSequence::LogMe() const
+	{
+	Log("\n");
+	Log("MultiSequence::LogMe(%p), %u seqs\n", this, GetSeqCount());
+	for (uint i = 0; i < GetSeqCount(); ++i)
+		m_Seqs[i]->LogMe();
 	}
 
 uint MultiSequence::GetGSI(uint SeqIndex) const
@@ -67,7 +66,7 @@ uint MultiSequence::GetGSI(uint SeqIndex) const
 	return L;
 	}
 
-uint MultiSequence::GetLength(uint SeqIndex) const
+uint MultiSequence::GetSeqLength(uint SeqIndex) const
 	{
 	const Sequence *Seq = GetSequence(SeqIndex);
 	uint L = (uint) Seq->GetLength();
@@ -89,9 +88,23 @@ void MultiSequence::GetLengthOrder(vector<uint> &SeqIndexes) const
 	QuickSortOrderDesc<uint>(PtrLs, SeqCount, PtrOrder);
 	}
 
+void MultiSequence::AssertGSIs() const
+	{
+	const uint GlobalSeqCount = GetGlobalMSSeqCount();
+	const uint SeqCount = GetSeqCount();
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		const Sequence *Seq = GetSequence(i);
+		asserta(Seq != 0);
+		uint GSI = Seq->GetGSI();
+		asserta(GSI < GlobalSeqCount);
+		}
+	}
+
 void MultiSequence::LogGSIs(const char *Msg) const
 	{
 	const MultiSequence &GlobalMS = GetGlobalInputMS();
+	const uint GlobalSeqCount = GlobalMS.GetSeqCount();
 	Log("\n");
 	Log("LogGSIs()");
 	if (Msg != 0)
@@ -103,8 +116,11 @@ void MultiSequence::LogGSIs(const char *Msg) const
 		Log("[%5u]", i);
 		const Sequence *Seq = GetSequence(i);
 		uint GSI = (uint) Seq->GetGSI();
-		const string Label = string(Seq->GetLabel());
-		const string GlobalLabel = string(GlobalMS.GetLabel(GSI));
+		string Label = Seq->GetLabel();
+		asserta(GSI < GlobalSeqCount);
+		const Sequence *GlobalSeq = GlobalMS.GetSequence(GSI);
+		string GlobalLabel = GlobalSeq->GetLabel();
+
 		Log("  %5d", GSI);
 		Log("  >%s", Label.c_str());
 		Log("  (%s)", GlobalLabel.c_str());
@@ -121,20 +137,17 @@ void MultiSequence::LoadMFA(FileBuffer& infile, bool stripGaps)
 
 	for (;;)
 		{
-		Sequence* seq = new Sequence;
+		Sequence *seq = Sequence::NewSequence();
 		bool Ok = seq->FromFileBuffer(infile, stripGaps);
 		if (!Ok)
 			{
-			delete seq;
+			DeleteSequence(seq);
 			break;
 			}
 
-		if (sequences == 0)
-			sequences = new vector<Sequence *>;
-		sequences->push_back(seq);
+		m_Seqs.push_back(seq);
+		m_Owners.push_back(true);
 		}
-	if (!sequences)
-		Die("No sequences");
 	}
 
 uint MultiSequence::GetColCount() const
@@ -199,4 +212,40 @@ bool MultiSequence::GuessIsNucleo() const
 	if (NucleoCount > 75)
 		return true;
 	return false;
+	}
+
+void MultiSequence::FromStrings(const vector<string> &Labels,
+  const vector<string> &Seqs)
+	{
+	Clear();
+	const uint N = SIZE(Seqs);
+	asserta(SIZE(Labels) == N);
+	for (uint i = 0; i < N; ++i)
+		{
+		const string &Label = Labels[i];
+		const string &Str = Seqs[i];
+		Sequence *Seq = Sequence::NewSequence();
+		Seq->FromString(Label, Str);
+		AddSequence(Seq, true);
+		}
+	}
+
+void MultiSequence::ToMSA(MSA &msa) const
+	{
+	uint SeqCount = GetSeqCount();
+	uint ColCount = GetColCount();
+	msa.SetSize(SeqCount, ColCount);
+	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
+		{
+		const Sequence *Seq = GetSequence(SeqIndex);
+		const byte *ByteSeq = Seq->GetBytePtr();
+		const char *Label = Seq->GetLabel().c_str();
+		uint L = Seq->GetLength();
+
+		char *CharSeq = myalloc(char, L+1);
+		memcpy(CharSeq, ByteSeq, L);
+		CharSeq[L] = 0;
+		msa.m_szSeqs[SeqIndex] = CharSeq;
+		msa.m_szNames[SeqIndex] = mystrsave(Label);
+		}
 	}

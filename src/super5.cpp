@@ -16,7 +16,25 @@ void CharVecToStr(const vector<char> &Vec, string &Str)
 		Str += Vec[i];
 	}
 
-void Super5::Run(MultiSequence &InputSeqs)
+void Super5::SetOpts()
+	{
+	m_MinEAPass1 = (float) optd(super5_minea1, DEFAULT_MIN_EA_SUPER5_PASS1);
+	}
+
+void Super5::ClearTreesAndMSAs()
+	{
+	m_GuideTree_None.Clear();
+	m_GuideTree_ABC.Clear();
+	m_GuideTree_ACB.Clear();
+	m_GuideTree_BCA.Clear();
+
+	m_FinalMSA_None.Clear();
+	m_FinalMSA_ABC.Clear();
+	m_FinalMSA_ACB.Clear();
+	m_FinalMSA_BCA.Clear();
+	}
+
+void Super5::MakeCentroidSeqs(MultiSequence &InputSeqs)
 	{
 	m_InputSeqs = &InputSeqs;
 	m_UniqueSeqs = new MultiSequence;
@@ -28,17 +46,62 @@ void Super5::Run(MultiSequence &InputSeqs)
 	m_D.GetUniqueSeqs(*m_UniqueSeqs);
 	SetDupeVecs();
 
-	m_U.Run(*m_UniqueSeqs, m_UClustEA);
+	m_U.Run(*m_UniqueSeqs, m_MinEAPass1);
 	m_U.GetCentroidSeqs(*m_CentroidSeqs);
 	SetCentroidVecs();
 	SetCentroidSeqsVecs();
 	ValidateVecs();
+	}
 
-	RunSuper4(*m_CentroidSeqs, *m_CentroidMSA, m_TreePerm);
+void Super5::Run(MultiSequence &InputSeqs, TREEPERM Perm)
+	{
+	MakeCentroidSeqs(InputSeqs);
+	m_S4.Run(*m_CentroidSeqs, Perm);
+
+	if (Perm != TP_All)
+		{
+		m_CentroidMSA = &m_S4.m_FinalMSA;
+		SetCentroidMSAVecs();
+		AlignMembers();
+		AlignDupes();
+		m_FinalMSA = m_ExtendedMSA;
+		return;
+		}
+
+	m_CentroidMSA = &m_S4.m_FinalMSA_None;
 	SetCentroidMSAVecs();
 	AlignMembers();
 	AlignDupes();
-	m_FinalMSA = m_ExtendedMSA;
+	m_FinalMSA_None.Copy(*m_ExtendedMSA);
+
+	m_CentroidMSA = &m_S4.m_FinalMSA_ABC;
+	SetCentroidMSAVecs();
+	AlignMembers();
+	AlignDupes();
+	m_FinalMSA_ABC.Copy(*m_ExtendedMSA);
+
+	m_CentroidMSA = &m_S4.m_FinalMSA_ACB;
+	SetCentroidMSAVecs();
+	AlignMembers();
+	AlignDupes();
+	m_FinalMSA_ACB.Copy(*m_ExtendedMSA);
+
+	m_CentroidMSA = &m_S4.m_FinalMSA_BCA;
+	SetCentroidMSAVecs();
+	AlignMembers();
+	AlignDupes();
+	m_FinalMSA_BCA.Copy(*m_ExtendedMSA);
+	}
+
+void Super5::AlignCentroidSeqs(TREEPERM Perm, MultiSequence &MSA)
+	{
+	m_S4.Run(*m_CentroidSeqs, Perm);
+	m_CentroidMSA = &m_S4.m_FinalMSA;
+	SetCentroidMSAVecs();
+	AlignMembers();
+	AlignDupes();
+	asserta(m_ExtendedMSA != 0);
+	MSA.Copy(*m_ExtendedMSA);
 	}
 
 void Super5::SetCentroidMSAVecs()
@@ -215,7 +278,7 @@ void Super5::AlignMembers()
 		{
 		uint MemberGSI = m_MemberGSIs[MemberIndex];
 		Sequence *MemberSeq = (Sequence *) &GetGlobalInputSeq(MemberGSI);
-		MemberSeqs->AddSequence(MemberSeq);
+		MemberSeqs->AddSequence(MemberSeq, false);
 
 		uint CentroidGSI = m_MemberCentroidGSIs[MemberIndex];
 		asserta(CentroidGSI < GSICount);
@@ -270,7 +333,7 @@ void Super5::AlignDupes()
 		AlignedDupe->OverwriteGSI(DupeGSI);
 		const string &Label = GetGlobalInputSeqLabel(DupeGSI);
 		AlignedDupe->OverwriteLabel(Label);
-		m_ExtendedMSA->AddSequence(AlignedDupe);
+		m_ExtendedMSA->AddSequence(AlignedDupe, true);
 		}
 	ProgressLog(" done.\n");
 	AssertSeqsEqInput(*m_ExtendedMSA);
@@ -278,30 +341,89 @@ void Super5::AlignDupes()
 
 void cmd_super5()
 	{
-	const string &InputFileName = opt(super5);
-	const string &OutputFileName = opt(output);
-	const float UClustEA = (float) optd(minea, 0.99f);
+	LoadGlobalInputMS(opt(super5));
 
-	MultiSequence &InputSeqs = LoadGlobalInputMS(InputFileName);
+	string &OutputPattern = opt(output);
+	if (OutputPattern.empty())
+		Die("Must set -output");
+
+	MultiSequence &InputSeqs = GetGlobalInputMS();
 	const uint InputSeqCount = GetGlobalMSSeqCount();
 
-	bool IsNucleo = InputSeqs.GuessIsNucleo();
-	if (IsNucleo)
-		Warning("Input may be nucleotide, a.a. required for -super5");
+	bool Nucleo = false;
+	if (opt(nt))
+		Nucleo = true;
+	else if (opt(amino))
+		Nucleo = false;
+	else
+		Nucleo = InputSeqs.GuessIsNucleo();
 
-	SetAlpha(ALPHA_Amino);
+	SetAlpha(Nucleo ? ALPHA_Nucleo : ALPHA_Amino);
 	InitProbcons();
 
-	TREEPERM TP = TP_None;
+	if (optset_diversified)
+		Die("-diversified not supported");
+	if (optset_replicates)
+		Die("-replicates not supported");
+	if (optset_stratified)
+		Die("-stratified not supported");
+
+	TREEPERM Perm = TP_None;
 	if (optset_perm)
-		TP = StrToTREEPERM(opt(perm));
-	if (TP == TP_All)
-		Die("-perm all not supported, please specify none, abc, acb or bca");
+		Perm = StrToTREEPERM(opt(perm));
+
+	if (Perm == TP_All && OutputPattern.find('@') == string::npos)
+		Die("Must be '@' in output filename with -perm all");
 
 	Super5 S5;
-	S5.m_TreePerm = TP;
-	S5.m_UClustEA = UClustEA;
-	S5.Run(InputSeqs);
+	S5.SetOpts();
+	S5.Run(InputSeqs, Perm);
+	if (Perm == TP_All)
+		{
+		string FileName_None;
+		string FileName_ABC;
+		string FileName_ACB;
+		string FileName_BCA;
 
-	S5.m_FinalMSA->WriteMFA(OutputFileName);
+		uint PerturbSeed = 0;
+		if (optset_perturb)
+			PerturbSeed = opt(perturb);
+		MakeReplicateFileName(OutputPattern, TP_None, PerturbSeed, FileName_None);
+		MakeReplicateFileName(OutputPattern, TP_ABC, PerturbSeed, FileName_ABC);
+		MakeReplicateFileName(OutputPattern, TP_ACB, PerturbSeed, FileName_ACB);
+		MakeReplicateFileName(OutputPattern, TP_BCA, PerturbSeed, FileName_BCA);
+
+		S5.m_FinalMSA_None.WriteMFA(FileName_None);
+		S5.m_FinalMSA_ABC.WriteMFA(FileName_ABC);
+		S5.m_FinalMSA_ACB.WriteMFA(FileName_ACB);
+		S5.m_FinalMSA_BCA.WriteMFA(FileName_BCA);
+		}
+	else
+		{
+		uint PerturbSeed = 0;
+		if (optset_perturb)
+			PerturbSeed = opt(perturb);
+		
+		string OutputFileName;
+		if (OutputPattern.find('@') == string::npos)
+			OutputFileName = OutputPattern;
+		else
+			MakeReplicateFileName(OutputPattern, Perm, PerturbSeed, OutputFileName);
+
+		S5.m_FinalMSA->WriteMFA(OutputFileName);
+		}
+
+	if (S5.m_FinalMSA != 0)
+		{
+		S5.m_FinalMSA->Clear();
+		S5.m_FinalMSA = 0;
+		}
+	S5.m_FinalMSA_None.Clear();
+	S5.m_FinalMSA_ABC.Clear();
+	S5.m_FinalMSA_ACB.Clear();
+	S5.m_FinalMSA_BCA.Clear();
+	ClearGlobalInputMS();
+#if SEQ_TRACE
+	Sequence::AllocReport("final");
+#endif
 	}

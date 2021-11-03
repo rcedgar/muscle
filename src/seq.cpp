@@ -37,12 +37,12 @@ bool Seq::FromFASTAFile(TextFile &File)
 	if (bEof)
 		return true;
 	if ('>' != szLine[0])
-		Quit("Expecting '>' in FASTA file %s line %u",
+		Die("Expecting '>' in FASTA file %s line %u",
 		  File.GetFileName(), File.GetLineNr());
 
 	size_t n = strlen(szLine);
 	if (1 == n)
-		Quit("Missing annotation following '>' in FASTA file %s line %u",
+		Die("Missing annotation following '>' in FASTA file %s line %u",
 		  File.GetFileName(), File.GetLineNr());
 
 	m_ptrName = new char[n];
@@ -56,7 +56,7 @@ bool Seq::FromFASTAFile(TextFile &File)
 			{
 			if (0 == size())
 				{
-				Quit("Empty sequence in FASTA file %s line %u",
+				Die("Empty sequence in FASTA file %s line %u",
 				  File.GetFileName(), File.GetLineNr());
 				return true;
 				}
@@ -65,7 +65,7 @@ bool Seq::FromFASTAFile(TextFile &File)
 		if ('>' == szLine[0])
 			{
 			if (0 == size())
-				Quit("Empty sequence in FASTA file %s line %u",
+				Die("Empty sequence in FASTA file %s line %u",
 				  File.GetFileName(), File.GetLineNr());
 		// Rewind to beginning of this line, it's the start of the
 		// next sequence.
@@ -89,7 +89,7 @@ bool Seq::FromFASTAFile(TextFile &File)
 					c = w;
 					}
 				else
-					Quit("Invalid byte hex %02x in FASTA file %s line %d",
+					Die("Invalid byte hex %02x in FASTA file %s line %d",
 					  (unsigned char) c, File.GetFileName(), File.GetLineNr());
 				}
 			c = toupper(c);

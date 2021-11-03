@@ -34,7 +34,7 @@ public:
 		clear();
 		delete[] m_ptrName;
 		m_ptrName = 0;
-		m_uId = uInsane;
+		m_uId = UINT_MAX;
 		}
 	const char *GetName() const
 		{
@@ -42,8 +42,8 @@ public:
 		}
 	unsigned GetId() const
 		{
-		if (uInsane == m_uId)
-			Quit("Seq::GetId, id not set");
+		if (UINT_MAX == m_uId)
+			Die("Seq::GetId, id not set");
 		return m_uId;
 		}
 	void SetId(unsigned uId) { m_uId = uId; }

@@ -1,6 +1,13 @@
 #ifndef	alpha_h
 #define	alpha_h
 
+enum ALPHA
+	{
+	ALPHA_Undefined,
+	ALPHA_Nucleo,
+	ALPHA_Amino
+	};
+
 bool StrHasAmino(const char *Str);
 bool StrHasGap(const char *Str);
 void ClearInvalidLetterWarning();
@@ -107,5 +114,8 @@ static inline bool isgap(char c)
 	{
 	return c == '-' || c == '.';
 	}
+
+extern byte g_CharToLetterNucleo[256];
+extern byte g_CharToLetterAmino[256];
 
 #endif	// alpha_h

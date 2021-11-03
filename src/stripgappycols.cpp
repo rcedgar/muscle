@@ -21,13 +21,6 @@ void cmd_strip_gappy_cols()
 	ProgressLog("%u seqs, %u cols, max gaps %.4f\n",
 	  SeqCount, ColCount, MaxGapFract);
 
-	vector<uint> Ls;
-	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
-		{
-		uint L = Aln.GetSeqLength(SeqIndex);
-		Ls.push_back(L);
-		}
-
 	vector<uint> KeepCols;
 	uint GappyCount = 0;
 	for (uint Col = 0; Col < ColCount; ++Col)

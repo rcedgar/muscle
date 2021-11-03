@@ -925,7 +925,7 @@ void Die_(const char *Format, ...)
 	fprintf(stderr, "Elapsed time %s\n", SecsToHHMMSS((int) ElapsedSeconds));
 	fprintf(stderr, "Max memory %s\n", MemBytesToStr(g_PeakMemUseBytes));
 	fprintf(stderr, "\n---Fatal error---\n%s\n", szStr);
-	Log("\n---Fatal error---\n%s\n", szStr);
+	Log("\n---Fatal error---\n%s\n", szStr); 
 
 #ifdef _MSC_VER
 	if (IsDebuggerPresent())
@@ -2055,7 +2055,7 @@ void Split(const string &Str, vector<string> &Fields, char Sep)
 void GetVersionString(string &s)
 	{
 	const int counter = 
-#include "ver_counter.h"
+#include "../ver/counter.h"
 	;
 	const char *Flags = ""
 
@@ -2656,26 +2656,16 @@ void MyCmdLine(int argc, char **argv)
 		}
 	}
 
-bool AccChar(char c)
-	{
-	if (isalpha(c))
-		return true;
-	if (isdigit(c))
-		return true;
-	if (c == '_' || c == '.')
-		return true;
-	return false;
-	}
-
 void GetAccFromLabel(const string &Label, string &Acc)
 	{
 	Acc.clear();
 	for (uint i = 0; i < SIZE(Label); ++i)
 		{
 		char c = Label[i];
-		if (!AccChar(c))
+		if (isalnum(c) || c == '_')
+			Acc += c;
+		else
 			return;
-		Acc += c;
 		}
 	}
 

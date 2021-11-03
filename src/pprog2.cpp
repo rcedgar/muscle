@@ -1,6 +1,5 @@
 #include "myutils.h"
 #include "muscle.h"
-#include "probcons.h"
 #include "pprog.h"
 
 void ReadStringsFromFile(const string &FileName,
@@ -11,8 +10,8 @@ void PProg::AlignAndJoin(uint Index1, uint Index2)
 	m_JoinMSAIndexes1.push_back(Index1);
 	m_JoinMSAIndexes2.push_back(Index2);
 
-	MultiSequence &MSA1 = (MultiSequence &) GetMSA(Index1);
-	MultiSequence &MSA2 = (MultiSequence &) GetMSA(Index2);
+	const MultiSequence &MSA1 = GetMSA(Index1);
+	const MultiSequence &MSA2 = GetMSA(Index2);
 	AssertSameLabels(MSA1);
 	AssertSameLabels(MSA2);
 
@@ -21,8 +20,8 @@ void PProg::AlignAndJoin(uint Index1, uint Index2)
 	string ProgressStr;
 	Ps(ProgressStr, "Join %u / %u", m_JoinIndex+1, m_JoinCount);
 
-	vector<char> Path;
-	float Score = AlignMSAs(ProgressStr, MSA1, MSA2, m_TargetPairCount, Path);
+	string Path;
+	AlignMSAsFlat(ProgressStr, MSA1, MSA2, m_TargetPairCount, Path);
 
 	string MSALabel12;
 	Ps(MSALabel12, "Join_%u", m_JoinIndex+1);
@@ -33,6 +32,16 @@ void PProg::AlignAndJoin(uint Index1, uint Index2)
 	AssertSeqsEq(MSA2, *MSA12);
 	AssertSameSeqsJoin(MSA1, MSA2, *MSA12);
 	AssertSameLabels(*MSA12);
+	if (Index1 >= m_InputMSACount)
+		{
+		delete &MSA1;
+		m_MSAs[Index1] = 0;
+		}
+	if (Index2 >= m_InputMSACount)
+		{
+		delete &MSA2;
+		m_MSAs[Index2] = 0;
+		}
 
 	uint NewMSAIndex = m_InputMSACount + m_JoinIndex;
 	SetMSA(NewMSAIndex, *MSA12);
@@ -81,6 +90,9 @@ void cmd_pprog2()
 	if (optset_paircount)
 		PP.m_TargetPairCount = int(opt(paircount));
 
+	bool IsNucleo;
+	PP.LoadMSAs(MSAFileNames, IsNucleo);
+	SetAlpha(IsNucleo ? ALPHA_Nucleo : ALPHA_Amino);
 	InitProbcons();
 
 	vector<uint> Indexes1;
@@ -100,7 +112,6 @@ void cmd_pprog2()
 	CloseStdioFile(f);
 	f = 0;
 
-	PP.LoadMSAs(MSAFileNames);
 	PP.Run2(Indexes1, Indexes2);
 
 	const MultiSequence &FinalMSA = PP.GetFinalMSA();

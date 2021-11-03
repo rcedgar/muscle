@@ -1,8 +1,4 @@
 #include "muscle.h"
-#include "seqvect.h"
-#include "probcons.h"
-
-void SetAlphaFromSeqVect(SeqVect &SV);
 
 static char GetConsChar(const MultiSequence &MSA, uint ColIndex)
 	{
@@ -63,10 +59,6 @@ void cmd_consseq()
 	string Label = "CONSENSUS";
 	if (optset_label)
 		Label = opt(label);
-
-	SeqVect v;
-	v.FromFASTAFile(MSAFileName);
-	SetAlphaFromSeqVect(v);
 
 	MultiSequence MSA;
 	MSA.FromFASTA(MSAFileName);

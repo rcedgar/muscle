@@ -20,32 +20,32 @@ void PairHMM::WriteParamsReport(FILE *fOut)
 	for (uint i = 0; i < HMMSTATE_COUNT; ++i)
 		{
 		float Score = PairHMM::m_StartScore[i];
-		float Prob = EXP(Score);
+		float Prob = exp(Score);
 		InitProbs.push_back(Prob);
 		InitScores.push_back(Score);
 		}
 
 	const float InitProb_M = InitProbs[HMMSTATE_M];
-	const float InitProb_ISX = InitProbs[HMMSTATE_ISX];
-	const float InitProb_ISY = InitProbs[HMMSTATE_ISY];
-	const float InitProb_ILX = InitProbs[HMMSTATE_ILX];
-	const float InitProb_ILY = InitProbs[HMMSTATE_ILY];
+	const float InitProb_IX = InitProbs[HMMSTATE_IX];
+	const float InitProb_IY = InitProbs[HMMSTATE_IY];
+	const float InitProb_JX = InitProbs[HMMSTATE_JX];
+	const float InitProb_JY = InitProbs[HMMSTATE_JY];
 	const float InitSum = InitProb_M +
-	  InitProb_ISX + InitProb_ISY +
-	  InitProb_ILX + InitProb_ILY;
+	  InitProb_IX + InitProb_IY +
+	  InitProb_JX + InitProb_JY;
 
-	const float InitProb_IS = InitProb_ISX;
-	const float InitProb_IL = InitProb_ILX;
+	const float InitProb_IS = InitProb_IX;
+	const float InitProb_IL = InitProb_JX;
 
-	asserta(feq(InitProb_ISX, InitProb_ISY));
-	asserta(feq(InitProb_ILX, InitProb_ILY));
+	asserta(feq(InitProb_IX, InitProb_IY));
+	asserta(feq(InitProb_JX, InitProb_JY));
 	asserta(feq(InitSum, 1.0));
 
 	fprintf(fOut, "\n");
 	fprintf(fOut, "// Probs\n");
 	fprintf(fOut, "const float InitProb_IM = %.5g;\n", InitProb_M);
-	fprintf(fOut, "const float InitProb_IS = %.5g;\n", InitProb_ISX);
-	fprintf(fOut, "const float InitProb_IL = %.5g;\n", InitProb_ILX);
+	fprintf(fOut, "const float InitProb_IS = %.5g;\n", InitProb_IX);
+	fprintf(fOut, "const float InitProb_IL = %.5g;\n", InitProb_JX);
 
 	vector<vector<float> > TransProbs(HMMSTATE_COUNT);
 	vector<vector<float> > TransScores(HMMSTATE_COUNT);
@@ -58,7 +58,7 @@ void PairHMM::WriteParamsReport(FILE *fOut)
 		for (uint j = 0; j < HMMSTATE_COUNT; ++j)
 			{
 			float Score = PairHMM::m_TransScore[i][j];
-			float Prob = EXP(Score);
+			float Prob = exp(Score);
 			Sum += Prob;
 			TransProbs[i][j] = Prob;
 			TransScores[i][j] = Score;
@@ -67,51 +67,51 @@ void PairHMM::WriteParamsReport(FILE *fOut)
 		}
 
 // No transitions between different insert states
-	asserta(TransProbs[HMMSTATE_ISX][HMMSTATE_ISY] == 0);
-	asserta(TransProbs[HMMSTATE_ISX][HMMSTATE_ILY] == 0);
-	asserta(TransProbs[HMMSTATE_ILX][HMMSTATE_ISY] == 0);
-	asserta(TransProbs[HMMSTATE_ILX][HMMSTATE_ILY] == 0);
+	asserta(TransProbs[HMMSTATE_IX][HMMSTATE_IY] == 0);
+	asserta(TransProbs[HMMSTATE_IX][HMMSTATE_JY] == 0);
+	asserta(TransProbs[HMMSTATE_JX][HMMSTATE_IY] == 0);
+	asserta(TransProbs[HMMSTATE_JX][HMMSTATE_JY] == 0);
 
-	asserta(TransProbs[HMMSTATE_ISY][HMMSTATE_ISX] == 0);
-	asserta(TransProbs[HMMSTATE_ISY][HMMSTATE_ILX] == 0);
-	asserta(TransProbs[HMMSTATE_ILY][HMMSTATE_ISX] == 0);
-	asserta(TransProbs[HMMSTATE_ILY][HMMSTATE_ILX] == 0);
+	asserta(TransProbs[HMMSTATE_IY][HMMSTATE_IX] == 0);
+	asserta(TransProbs[HMMSTATE_IY][HMMSTATE_JX] == 0);
+	asserta(TransProbs[HMMSTATE_JY][HMMSTATE_IX] == 0);
+	asserta(TransProbs[HMMSTATE_JY][HMMSTATE_JX] == 0);
 
-	asserta(TransProbs[HMMSTATE_M][HMMSTATE_ISX] ==
-	  TransProbs[HMMSTATE_M][HMMSTATE_ISY]);
+	asserta(TransProbs[HMMSTATE_M][HMMSTATE_IX] ==
+	  TransProbs[HMMSTATE_M][HMMSTATE_IY]);
 
-	asserta(TransProbs[HMMSTATE_M][HMMSTATE_ILX] ==
-	  TransProbs[HMMSTATE_M][HMMSTATE_ILY]);
+	asserta(TransProbs[HMMSTATE_M][HMMSTATE_JX] ==
+	  TransProbs[HMMSTATE_M][HMMSTATE_JY]);
 
-	asserta(TransProbs[HMMSTATE_ISX][HMMSTATE_M] ==
-	  TransProbs[HMMSTATE_ISY][HMMSTATE_M]);
+	asserta(TransProbs[HMMSTATE_IX][HMMSTATE_M] ==
+	  TransProbs[HMMSTATE_IY][HMMSTATE_M]);
 
-	asserta(TransProbs[HMMSTATE_ILX][HMMSTATE_M] ==
-	  TransProbs[HMMSTATE_ILY][HMMSTATE_M]);
+	asserta(TransProbs[HMMSTATE_JX][HMMSTATE_M] ==
+	  TransProbs[HMMSTATE_JY][HMMSTATE_M]);
 
-	asserta(TransProbs[HMMSTATE_ISX][HMMSTATE_M] ==
-	  TransProbs[HMMSTATE_ISY][HMMSTATE_M]);
+	asserta(TransProbs[HMMSTATE_IX][HMMSTATE_M] ==
+	  TransProbs[HMMSTATE_IY][HMMSTATE_M]);
 
 	const float TransProb_M_M = TransProbs[HMMSTATE_M][HMMSTATE_M];
 	const float TransScore_M_M = TransScores[HMMSTATE_M][HMMSTATE_M];
 
-	const float TransProb_M_IS = TransProbs[HMMSTATE_M][HMMSTATE_ISX];
-	const float TransScore_M_IS = TransScores[HMMSTATE_M][HMMSTATE_ISX];
+	const float TransProb_M_IS = TransProbs[HMMSTATE_M][HMMSTATE_IX];
+	const float TransScore_M_IS = TransScores[HMMSTATE_M][HMMSTATE_IX];
 
-	const float TransProb_M_IL = TransProbs[HMMSTATE_M][HMMSTATE_ILX];
-	const float TransScore_M_IL = TransScores[HMMSTATE_M][HMMSTATE_ILX];
+	const float TransProb_M_IL = TransProbs[HMMSTATE_M][HMMSTATE_JX];
+	const float TransScore_M_IL = TransScores[HMMSTATE_M][HMMSTATE_JX];
 
-	const float TransProb_IS_IS = TransProbs[HMMSTATE_ISX][HMMSTATE_ISX];
-	const float TransScore_IS_IS = TransScores[HMMSTATE_ISX][HMMSTATE_ISX];
+	const float TransProb_IS_IS = TransProbs[HMMSTATE_IX][HMMSTATE_IX];
+	const float TransScore_IS_IS = TransScores[HMMSTATE_IX][HMMSTATE_IX];
 
-	const float TransProb_IL_IL = TransProbs[HMMSTATE_ILX][HMMSTATE_ILX];
-	const float TransScore_IL_IL = TransScores[HMMSTATE_ILX][HMMSTATE_ILX];
+	const float TransProb_IL_IL = TransProbs[HMMSTATE_JX][HMMSTATE_JX];
+	const float TransScore_IL_IL = TransScores[HMMSTATE_JX][HMMSTATE_JX];
 
-	const float TransProb_IS_M = TransProbs[HMMSTATE_ISX][HMMSTATE_M];
-	const float TransScore_IS_M = TransScores[HMMSTATE_ISX][HMMSTATE_M];
+	const float TransProb_IS_M = TransProbs[HMMSTATE_IX][HMMSTATE_M];
+	const float TransScore_IS_M = TransScores[HMMSTATE_IX][HMMSTATE_M];
 
-	const float TransProb_IL_M = TransProbs[HMMSTATE_ILX][HMMSTATE_M];
-	const float TransScore_IL_M = TransScores[HMMSTATE_ILX][HMMSTATE_M];
+	const float TransProb_IL_M = TransProbs[HMMSTATE_JX][HMMSTATE_M];
+	const float TransScore_IL_M = TransScores[HMMSTATE_JX][HMMSTATE_M];
 
 	asserta(feq(InitProb_M + 2*InitProb_IS + 2*InitProb_IL, 1.0));
 	asserta(feq(TransProb_IS_IS + TransProb_IS_M, 1.0));
@@ -137,7 +137,7 @@ void PairHMM::WriteParamsReport(FILE *fOut)
 		char a = A[i];
 		uint Letter = uint(a);
 		float Score = PairHMM::m_InsScore[Letter];
-		float Prob = EXP(Score);
+		float Prob = exp(Score);
 		InsProbs[i] = Prob;
 		InsScores[i] = Score;
 		Sum += Prob;
@@ -159,7 +159,7 @@ void PairHMM::WriteParamsReport(FILE *fOut)
 			char b = A[j];
 			uint Letter_b = uint(b);
 			float Score = PairHMM::m_MatchScore[Letter_a][Letter_b];
-			float Prob = EXP(Score);
+			float Prob = exp(Score);
 			EmitProbs[i][j] = Prob;
 			EmitScores[i][j] = Score;
 			Sum += Prob;
@@ -207,8 +207,8 @@ void PairHMM::WriteParamsReport(FILE *fOut)
 	fprintf(fOut, "\n");
 	fprintf(fOut, "// Scores\n");
 	fprintf(fOut, "const float InitScore_IM = %.5g;\n", InitScores[HMMSTATE_M]);
-	fprintf(fOut, "const float InitScore_IS = %.5g;\n", InitScores[HMMSTATE_ISX]);
-	fprintf(fOut, "const float InitScore_IL = %.5g;\n", InitScores[HMMSTATE_ILX]);
+	fprintf(fOut, "const float InitScore_IS = %.5g;\n", InitScores[HMMSTATE_IX]);
+	fprintf(fOut, "const float InitScore_IL = %.5g;\n", InitScores[HMMSTATE_JX]);
 
 	fprintf(fOut, "\n");
 	fprintf(fOut, "const float TransScore_M_M   = %.5g;\n", TransScore_M_M);
@@ -259,18 +259,25 @@ void cmd_hmmdump()
 	string OutDir = opt(hmmdump);
 	Dirize(OutDir);
 
+	SetAlpha(ALPHA_Amino);
 	InitProbcons();
 	
 	PairHMM::WriteParamsReport(OutDir + "params_report.txt");
 
+	bool Nucleo = opt(nt);
+
 	HMMParams HP;
-	HP.FromDefaults();
+	HP.FromDefaults(Nucleo);
 	HP.ToFile(OutDir + "hmm.tsv");
 
 	HP.ToPairHMM();
 	PairHMM::WriteParamsReport(OutDir + "params_report2.txt");
 
-	HP.ToFile("hmm2.tsv");
-	HP.FromFile("hmm2.tsv");
-	HP.ToFile("hmm3.tsv");
+	HP.ToFile(OutDir + "hmm2.tsv");
+	HP.FromFile(OutDir + "hmm2.tsv");
+	HP.ToFile(OutDir + "hmm3.tsv");
+
+	HMMParams SA;
+	HP.ToSingleAffineProbs(SA);
+	SA.ToFile(OutDir + "sa.hmm");
 	}

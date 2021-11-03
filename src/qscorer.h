@@ -3,11 +3,10 @@
 class QScorer
 	{
 public:
-	string m_TestName;
-	string m_RefName;
-
 	const MSA *m_Test;
 	const MSA *m_Ref;
+	double m_MaxGapFract = 1.0;
+
 	uint m_RefAlignedColCount = 0;
 
 	vector<string> m_Labels;
@@ -33,17 +32,32 @@ public:
 
 	uint64 m_CorrectPairs = 0;
 	uint m_CorrectCols = 0;
-	uint m_CorrectCols90 = 0;
 
 	float m_Q = 0;
 	float m_TC = 0;
-	float m_TC90 = 0;
-	float m_CF = 0;
-	float m_Acc = 0;
+
+	vector<string> m_RefLabels;
+	map<string, uint> m_RefLabelToSeqIndex;
+	vector<uint> m_TestColToCount;
 
 public:
-	void Run(const string &TestName, const string &RefName,
-	  const MSA &Test, const MSA &Ref);
-	void Report(FILE *f) const;
-	void Report1(FILE *f, uint Index) const;
+	void Clear();
+	void Run(const MSA &Test, const MSA &Ref);
+
+	void InitRefLabels();
+	void InitRefToTest();
+	void InitColPosVecs();
+	void InitColPosVecs1(uint i);
+	void InitRefCols();
+	void InitRefUngappedCounts();
+	void DoRefCols();
+	void DoRefCol(uint k);
+	void SetTestColToBestRefCol();
+	void UpdateRefLetterCounts(vector<vector<uint> > &LetterCountsVec) const;
+	void UpdateRefLetterCountsCol(uint k, vector<vector<uint> > &LetterCountsVec) const;
+
+	uint GetRefSeqCount() const { return m_Ref->GetSeqCount(); }
+	uint GetTestSeqCount() const { return m_Test->GetSeqCount(); }
+	uint GetRefColCount() const { return m_Ref->GetColCount(); }
+	uint GetTestColCount() const { return m_Test->GetColCount(); }
 	};

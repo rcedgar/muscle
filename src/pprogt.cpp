@@ -1,6 +1,5 @@
 #include "myutils.h"
 #include "muscle.h"
-#include "probcons.h"
 #include "textfile.h"
 #include "tree.h"
 #include "pprog.h"
@@ -38,12 +37,14 @@ void cmd_pprogt()
 	if (optset_paircount)
 		PP.m_TargetPairCount = int(opt(paircount));
 
+	bool IsNucleo;
+	PP.LoadMSAs(MSAFileNames, IsNucleo);
+	SetAlpha(IsNucleo ? ALPHA_Nucleo : ALPHA_Amino);
 	InitProbcons();
 
 	Tree T;
 	T.FromFile(opt(guidetreein));
 
-	PP.LoadMSAs(MSAFileNames);
 	PP.RunGuideTree(T);
 
 	const MultiSequence &FinalMSA = PP.GetFinalMSA();

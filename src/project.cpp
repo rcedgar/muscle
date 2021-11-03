@@ -22,7 +22,7 @@ MultiSequence* MultiSequence::Project(const set<int>& indices)
 	//	oldPtrs[i++] = GetSequence(*iter)->GetDataPtr();
 
 	int i = 0;
-	vector<char *> oldPtrs(indices.size());
+	vector<const char *> oldPtrs(indices.size());
 	for (set<int>::const_iterator iter = indices.begin();
 	  iter != indices.end(); ++iter)
 		oldPtrs[i++] = GetSequence(*iter)->GetCharPtr1();
@@ -71,16 +71,16 @@ MultiSequence* MultiSequence::Project(const set<int>& indices)
 	  iter != indices.end(); ++iter)
 		{
 		const Sequence *OldSeq = GetSequence(*iter);
-		Sequence *NewSeq = new Sequence;
+		Sequence *NewSeq = NewSequence();
 		asserta(NewSeq != 0);
 		vector<char> *DataPtr = newPtrs[i++];
 
-		const string &Label = OldSeq->label;
+		const string &Label = OldSeq->m_Label;
 		uint GSI = OldSeq->GetGSI();
 		uint SMI = OldSeq->GetSMI();
 
 		NewSeq->Create(DataPtr, Label, GSI, SMI);
-		ret->AddSequence(NewSeq);
+		ret->AddSequence(NewSeq, true);
 		}
 
 	return ret;

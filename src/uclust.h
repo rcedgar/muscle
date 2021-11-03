@@ -13,14 +13,13 @@ public:
 	
 	vector<uint> m_CentroidSeqIndexes;
 	vector<uint> m_SeqIndexToCentroidSeqIndex;
-	vector<vector<char> > m_SeqIndexToPath;
+	vector<string> m_SeqIndexToPath;
 
 public:
 	void Run(MultiSequence &InputSeqs, float MinEA);
-	uint Search(uint SeqIndex, vector<char> &Path);
+	uint Search(uint SeqIndex, string &Path);
 	void AddSeqToIndex(uint SeqIndex);
-	float AlignSeqPair(uint SeqIndex1, uint SeqIndex2,
-	  vector<char> &Path);
+	float AlignSeqPair(uint SeqIndex1, uint SeqIndex2, string &Path);
 	void GetCentroidSeqs(MultiSequence &CentroidSeqs) const;
 	void GetGSIs(
 	  vector<uint> &CentroidGSIs,

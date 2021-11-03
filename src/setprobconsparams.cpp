@@ -8,7 +8,7 @@ void InitProbcons()
 	if (g_InitDone)
 		return;
 
-	SetAlpha(ALPHA_Amino);
+	asserta(g_Alpha == ALPHA_Amino || g_Alpha == ALPHA_Nucleo);
 
 	HMMParams HP;
 	if (optset_hmmin)
@@ -18,20 +18,22 @@ void InitProbcons()
 		HP.FromFile(FileName);
 		}
 	else
-		HP.FromDefaults();
+		{
+		bool Nucleo = (g_Alpha == ALPHA_Nucleo);
+		HP.FromDefaults(Nucleo);
+		}
 
 	if (optset_perturb)
 		{
 		uint Seed = opt(perturb);
 		if (Seed > 0)
 			{
-			ProgressLog("Perturbing HMM parameters with seed %us\n", Seed);
+			ProgressLog("Perturbing HMM parameters with seed %u\n", Seed);
 			ResetRand(Seed);
-			HP.Delta();
+			HP.PerturbProbs(Seed);
 			}
 		}
 
-	HP.ToPairHMM();
 	if (optset_hmmout)
 		HP.ToFile(opt(hmmout));
 

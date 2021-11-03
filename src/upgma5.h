@@ -48,6 +48,7 @@ public:
 	map<string, uint> m_LabelToIndex;
 
 public:
+	void Clear();
 	void Init(const vector<string> &Labels,
 	  const vector<vector<float> > &DistMx);
 	void Run(LINKAGE Linkage, Tree &tree);

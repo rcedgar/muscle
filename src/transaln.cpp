@@ -659,11 +659,11 @@ Sequence *TransAln::ExtendFreshSeq(uint FreshIndex) const
 	const uint ColCount = SIZE(m_MPath);
 	const string &FLabel = GetFreshLabel(FreshIndex);
 	uint MSACol = 0;
-	Sequence *FX = new Sequence;
+	Sequence *FX = Sequence::NewSequence();
 	FX->InitData();
 	uint GSI = F.GetGSI();
 	FX->SetGSI(GSI);
-	FX->label = F.label;
+	FX->m_Label = F.m_Label;
 	uint FPos = 0;
 	for (uint Col = 0; Col < ColCount; ++Col)
 		{
@@ -702,11 +702,11 @@ Sequence *TransAln::ExtendMSASeq(uint MSAIndex) const
 	const uint ColCount = SIZE(m_MPath);
 	const string &MLabel = GetMSALabel(MSAIndex);
 	uint MSACol = 0;
-	Sequence *MX = new Sequence;
+	Sequence *MX = Sequence::NewSequence();
 	MX->InitData();
 	uint GSI = M.GetGSI();
 	MX->SetGSI(GSI);
-	MX->label = M.label;
+	MX->m_Label = M.m_Label;
 	for (uint Col = 0; Col < ColCount; ++Col)
 		{
 		char c = m_MPath[Col];
@@ -743,13 +743,13 @@ void TransAln::MakeExtendedMSA()
 	for (uint i = 0; i < MSACount; ++i)
 		{
 		Sequence *S = ExtendMSASeq(i);
-		m_ExtendedMSA->AddSequence(S);
+		m_ExtendedMSA->AddSequence(S, true);
 		}
 
 	for (uint i = 0; i < FreshCount; ++i)
 		{
 		Sequence *S = ExtendFreshSeq(i);
-		m_ExtendedMSA->AddSequence(S);
+		m_ExtendedMSA->AddSequence(S, true);
 		}
 	}
 
@@ -772,7 +772,7 @@ void cmd_transaln()
 		{
 		const Sequence *AlignedRefSeq = RefMSA.GetSequence(i);
 		Sequence *UngappedRefSeq = AlignedRefSeq->DeleteGaps();
-		UngappedRefSeqs.AddSequence(UngappedRefSeq);
+		UngappedRefSeqs.AddSequence(UngappedRefSeq, true);
 		}
 
 	vector<string> PWPaths;
@@ -782,11 +782,11 @@ void cmd_transaln()
 		const uint RefSeqIndex = InputSeqIndex%RefSeqCount;
 		FreshIndexToMSAIndex.push_back(RefSeqIndex);
 
-		Sequence *InputSeq = InputSeqs.GetSequence(InputSeqIndex);
-		Sequence *RefSeq = UngappedRefSeqs.GetSequence(RefSeqIndex);
+		const Sequence *InputSeq = InputSeqs.GetSequence(InputSeqIndex);
+		const Sequence *RefSeq = UngappedRefSeqs.GetSequence(RefSeqIndex);
 
 		string PWPath;
-		PairHMM::AlignPair_StrPath(InputSeq, RefSeq, PWPath);
+		AlignPairFlat(InputSeq, RefSeq, PWPath);
 
 		PWPaths.push_back(PWPath);
 		}

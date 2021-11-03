@@ -1,5 +1,4 @@
 #include "muscle.h"
-#include "probcons.h"
 #include "pprog.h"
 
 void ReadStringsFromFile(const string &FileName,
@@ -12,7 +11,7 @@ void ReadStringsFromFile(const string &FileName,
 		Strings.push_back(Line);
 	}
 
-void InvertPath(const vector<char> &Path, vector<char> &InvertedPath)
+void InvertPath(const string &Path, string &InvertedPath)
 	{
 	InvertedPath.clear();
 	const uint n = SIZE(Path);
@@ -30,7 +29,7 @@ void InvertPath(const vector<char> &Path, vector<char> &InvertedPath)
 		}
 	}
 
-void ValidatePath(const vector<char> &Path, uint LX, uint LY)
+void ValidatePath(const string &Path, uint LX, uint LY)
 	{
 	uint nX = 0;
 	uint nY = 0;
@@ -50,10 +49,8 @@ void ValidatePath(const vector<char> &Path, uint LX, uint LY)
 	}
 
 void AlignMSAsByPath(const MultiSequence &MSA1, const MultiSequence &MSA2,
-  const vector<char> &Path, MultiSequence &MSA12)
+  const string &Path, MultiSequence &MSA12)
 	{
-	AssertSameLabels((MultiSequence &) MSA1);
-	AssertSameLabels((MultiSequence &) MSA2);
 	uint LX = MSA1.GetColCount();
 	uint LY = MSA2.GetColCount();
 	ValidatePath(Path, LX, LY);
@@ -63,29 +60,16 @@ void AlignMSAsByPath(const MultiSequence &MSA1, const MultiSequence &MSA2,
 	for (int SeqIndex = 0; SeqIndex < (int) SeqCount1; ++SeqIndex)
 		{
 		const Sequence *Seq1 = MSA1.GetSequence(SeqIndex);
-		Sequence *AlignedSeq1 = Seq1->AddGaps(&Path, 'X');
-		int IndexA = Seq1->GetGSI();//@@
-		int IndexB = AlignedSeq1->GetGSI();//@@
-		MSA12.AddSequence(AlignedSeq1);
-		const Sequence *NewSeq = MSA12.GetSequence(SeqIndex);
-		int IndexC = NewSeq->GetGSI();//@@
-		asserta(IndexB == IndexA);//@@
-		asserta(IndexC == IndexA);//@@
+		Sequence *AlignedSeq1 = Seq1->AddGapsPath(Path, 'X');
+		MSA12.AddSequence(AlignedSeq1, true);
 		}
 
 	for (int SeqIndex = 0; SeqIndex < MSA2.GetNumSequences(); ++SeqIndex)
 		{
 		const Sequence *Seq2 = MSA2.GetSequence(SeqIndex);
-		Sequence *AlignedSeq2 = Seq2->AddGaps(&Path, 'Y');
-		int IndexA = Seq2->GetGSI();//@@
-		int IndexB = AlignedSeq2->GetGSI();//@@
-		MSA12.AddSequence(AlignedSeq2);
-		const Sequence *NewSeq = MSA12.GetSequence(SeqCount1 + SeqIndex);
-		int IndexC = NewSeq->GetGSI();//@@
-		asserta(IndexB == IndexA);//@@
-		asserta(IndexC == IndexA);//@@
+		Sequence *AlignedSeq2 = Seq2->AddGapsPath(Path, 'Y');
+		MSA12.AddSequence(AlignedSeq2, true);
 		}
-	AssertSameLabels(MSA12);
 	}
 
 void PProg::DeleteIndexesFromPending(uint Index1, uint Index2)
@@ -155,7 +139,7 @@ const string &PProg::GetMSALabel(uint Index) const
 void PProg::SetMSA(uint Index, const MultiSequence &MSA)
 	{
 	asserta(Index < SIZE(m_MSAs));
-	asserta(m_MSAs[Index] == 0);
+//	asserta(m_MSAs[Index] == 0); // TODO: memory leak
 	m_MSAs[Index] = &MSA;
 	}
 
@@ -189,6 +173,7 @@ const MultiSequence &PProg::GetFinalMSA() const
 void PProg::SetMSAs(const vector<const MultiSequence *> &MSAs,
   const vector<string> &MSALabels)
 	{
+	m_MSALabelToIndex.clear();
 	m_InputMSACount = SIZE(MSAs);
 	asserta(SIZE(MSALabels) == m_InputMSACount);
 	m_MSAs = MSAs;
@@ -206,7 +191,7 @@ void PProg::SetMSAs(const vector<const MultiSequence *> &MSAs,
 		}
 	}
 
-void PProg::LoadMSAs(const vector<string> &FileNames)
+void PProg::LoadMSAs(const vector<string> &FileNames, bool &IsNucleo)
 	{
 	m_MSALabelToIndex.clear();
 	m_MSAs.clear();
@@ -228,6 +213,11 @@ void PProg::LoadMSAs(const vector<string> &FileNames)
 		ProgressStep(MSAIndex, m_InputMSACount, "Reading %s", FileName.c_str());
 		MultiSequence &MSA = *new MultiSequence;
 		MSA.LoadMFA(FileName);
+		bool IsNuc = MSA.GuessIsNucleo();
+		if (MSAIndex == 0)
+			IsNucleo = IsNuc;
+		else
+			asserta(IsNucleo == IsNuc);
 
 		string MSALabel;
 		GetBaseName(FileName, MSALabel);
@@ -292,15 +282,15 @@ void PProg::AlignAllInputPairs()
 			const MultiSequence &MSA2 = GetMSA(MSAIndex2);
 			const uint SeqCount2 = MSA2.GetSeqCount();
 
-			vector<char> Path;
-			float Score = AlignMSAs(MSALabel1 + "+" + MSALabel2,
+			string Path;
+			float Score = AlignMSAsFlat(MSALabel1 + "+" + MSALabel2,
 			  MSA1, MSA2, m_TargetPairCount, Path);
 
 			const uint ColCount1 = MSA1.GetColCount();
 			const uint ColCount2 = MSA2.GetColCount();
 			ValidatePath(Path, ColCount1, ColCount2);
 
-			vector<char> InvertedPath;
+			string InvertedPath;
 			InvertPath(Path, InvertedPath);
 			ValidatePath(InvertedPath, ColCount2, ColCount1);
 
@@ -347,7 +337,7 @@ void PProg::Join_ByPrecomputedPath(uint Index1, uint Index2)
 	const MultiSequence &MSA1 = GetMSA(Index1);
 	const MultiSequence &MSA2 = GetMSA(Index2);
 	MultiSequence *MSA12 = new MultiSequence;
-	const vector<char> &Path = m_PathMx[Index1][Index2];
+	const string &Path = m_PathMx[Index1][Index2];
 	AlignMSAsByPath(MSA1, MSA2, Path, *MSA12);
 	AssertSeqsEq(MSA1, *MSA12);
 	AssertSeqsEq(MSA2, *MSA12);
@@ -400,11 +390,11 @@ void PProg::AlignNewToPending()
 		const MultiSequence *MSA = &GetMSA(Index);
 
 		const string &MSALabeli = m_MSALabels[i];
-		vector<char> Path;
-		float Score = AlignMSAs(NewMSALabel + "+" + MSALabeli,
+		string Path;
+		float Score = AlignMSAsFlat(NewMSALabel + "+" + MSALabeli,
 		  *NewMSA, *MSA, m_TargetPairCount, Path);
 
-		vector<char> InvertedPath;
+		string InvertedPath;
 		InvertPath(Path, InvertedPath);
 
 		m_ScoreMx[NewIndex][Index] = Score;
@@ -439,9 +429,12 @@ void cmd_pprog()
 	if (optset_paircount)
 		PP.m_TargetPairCount = int(opt(paircount));
 
+	bool IsNucleo;
+	PP.LoadMSAs(MSAFileNames, IsNucleo);
+	SetAlpha(IsNucleo ? ALPHA_Nucleo : ALPHA_Amino);
+
 	InitProbcons();
 
-	PP.LoadMSAs(MSAFileNames);
 	PP.Run();
 
 	asserta(SIZE(PP.m_Pending) == 1);

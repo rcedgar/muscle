@@ -16,7 +16,6 @@ MSA::MSA()
 
 	m_szSeqs = 0;
 	m_szNames = 0;
-	m_Weights = 0;
 
 	m_IdToSeqIndex = 0;
 	m_SeqIndexToId = 0;
@@ -40,7 +39,6 @@ void MSA::Free()
 
 	delete[] m_szSeqs;
 	delete[] m_szNames;
-	delete[] m_Weights;
 	delete[] m_IdToSeqIndex;
 	delete[] m_SeqIndexToId;
 
@@ -49,10 +47,12 @@ void MSA::Free()
 
 	m_szSeqs = 0;
 	m_szNames = 0;
-	m_Weights = 0;
 
 	m_IdToSeqIndex = 0;
 	m_SeqIndexToId = 0;
+
+	m_uCacheSeqLength = 0;
+	m_uCacheSeqCount = 0;
 	}
 
 void MSA::SetSize(unsigned uSeqCount, unsigned uColCount)
@@ -61,21 +61,19 @@ void MSA::SetSize(unsigned uSeqCount, unsigned uColCount)
 
 	m_uSeqCount = uSeqCount;
 	m_uCacheSeqLength = uColCount;
-	m_uColCount = 0;
+	m_uColCount = uColCount;
 
 	if (0 == uSeqCount && 0 == uColCount)
 		return;
 
 	m_szSeqs = new char *[uSeqCount];
 	m_szNames = new char *[uSeqCount];
-	m_Weights = new WEIGHT[uSeqCount];
 
 	for (unsigned uSeqIndex = 0; uSeqIndex < uSeqCount; ++uSeqIndex)
 		{
 		m_szSeqs[uSeqIndex] = new char[uColCount+1];
 		m_szNames[uSeqIndex] = 0;
 #if	DEBUG
-		m_Weights[uSeqIndex] = BTInsane;
 		memset(m_szSeqs[uSeqIndex], '?', uColCount);
 #endif
 		m_szSeqs[uSeqIndex][uColCount] = 0;
@@ -122,10 +120,7 @@ void MSA::LogMe() const
 		for (unsigned uSeqIndex = 0; uSeqIndex < m_uSeqCount; ++uSeqIndex)
 			{
 			Log("%12.12s", m_szNames[uSeqIndex]);
-			if (m_Weights[uSeqIndex] != BTInsane)
-				Log(" (%5.3f)", m_Weights[uSeqIndex]);
-			else
-				Log("        ");
+			Log("        ");
 			Log("   ");
 			for (i = iStart; i < iEnd; ++i)
 				Log("%c", GetChar(uSeqIndex, i));
@@ -141,7 +136,7 @@ char MSA::GetChar(unsigned uSeqIndex, unsigned uIndex) const
 	{
 // TODO: Performance cost?
 	if (uSeqIndex >= m_uSeqCount || uIndex >= m_uColCount)
-		Quit("MSA::GetChar(%u/%u,%u/%u)",
+		Die("MSA::GetChar(%u/%u,%u/%u)",
 		  uSeqIndex, m_uSeqCount, uIndex, m_uColCount);
 
 	char c = m_szSeqs[uSeqIndex][uIndex];
@@ -159,7 +154,7 @@ unsigned MSA::GetLetter(unsigned uSeqIndex, unsigned uIndex) const
 		char c = ' ';
 		if (uSeqIndex < m_uSeqCount && uIndex < m_uColCount)
 			c = m_szSeqs[uSeqIndex][uIndex];
-		Quit("MSA::GetLetter(%u/%u, %u/%u)='%c'/%u",
+		Die("MSA::GetLetter(%u/%u, %u/%u)='%c'/%u",
 		  uSeqIndex, m_uSeqCount, uIndex, m_uColCount, c, uLetter);
 		}
 	return uLetter;
@@ -176,7 +171,7 @@ unsigned MSA::GetLetterEx(unsigned uSeqIndex, unsigned uIndex) const
 void MSA::SetSeqName(unsigned uSeqIndex, const char szName[])
 	{
 	if (uSeqIndex >= m_uSeqCount)
-		Quit("MSA::SetSeqName(%u, %s), count=%u", uSeqIndex, m_uSeqCount);
+		Die("MSA::SetSeqName(%u, %s), count=%u", uSeqIndex, m_uSeqCount);
 	delete[] m_szNames[uSeqIndex];
 	int n = (int) strlen(szName) + 1;
 	m_szNames[uSeqIndex] = new char[n];
@@ -186,7 +181,7 @@ void MSA::SetSeqName(unsigned uSeqIndex, const char szName[])
 const char *MSA::GetSeqName(unsigned uSeqIndex) const
 	{
 	if (uSeqIndex >= m_uSeqCount)
-		Quit("MSA::GetSeqName(%u), count=%u", uSeqIndex, m_uSeqCount);
+		Die("MSA::GetSeqName(%u), count=%u", uSeqIndex, m_uSeqCount);
 	return m_szNames[uSeqIndex];
 	}
 
@@ -205,7 +200,7 @@ bool MSA::IsWildcard(unsigned uSeqIndex, unsigned uIndex) const
 void MSA::SetChar(unsigned uSeqIndex, unsigned uIndex, char c)
 	{
 	if (uSeqIndex >= m_uSeqCount || uIndex > m_uCacheSeqLength)
-		Quit("MSA::SetChar(%u,%u)", uSeqIndex, uIndex);
+		Die("MSA::SetChar(%u,%u)", uSeqIndex, uIndex);
 
 	if (uIndex == m_uCacheSeqLength)
 		{
@@ -255,7 +250,7 @@ void MSA::GetSeq(unsigned uSeqIndex, Seq &seq) const
 			{
 			char c = GetChar(uSeqIndex, n);
 			if (!isalpha(c))
-				Quit("Invalid character '%c' in sequence", c);
+				Die("Invalid character '%c' in sequence", c);
 			c = toupper(c);
 			seq.push_back(c);
 			}
@@ -308,7 +303,8 @@ void MSA::Copy(const MSA &msa)
 		{
 		SetSeqName(uSeqIndex, msa.GetSeqName(uSeqIndex));
 		const unsigned uId = msa.GetSeqId(uSeqIndex);
-		SetSeqId(uSeqIndex, uId);
+		if (uId != UINT_MAX)
+			SetSeqId(uSeqIndex, uId);
 		for (unsigned uColIndex = 0; uColIndex < uColCount; ++uColIndex)
 			{
 			const char c = msa.GetChar(uSeqIndex, uColIndex);
@@ -372,41 +368,6 @@ void MSA::FromFile(TextFile &File)
 	FromFASTAFile(File);
 	}
 
-// Weights sum to 1, WCounts sum to NIC
-WEIGHT MSA::GetSeqWeight(unsigned uSeqIndex) const
-	{
-	assert(uSeqIndex < m_uSeqCount);
-	WEIGHT w = m_Weights[uSeqIndex];
-	if (w == wInsane)
-		Quit("Seq weight not set");
-	return w;
-	}
-
-void MSA::SetSeqWeight(unsigned uSeqIndex, WEIGHT w) const
-	{
-	assert(uSeqIndex < m_uSeqCount);
-	m_Weights[uSeqIndex] = w;
-	}
-
-void MSA::NormalizeWeights(WEIGHT wDesiredTotal) const
-	{
-	WEIGHT wTotal = 0;
-	for (unsigned uSeqIndex = 0; uSeqIndex < m_uSeqCount; ++uSeqIndex)
-		wTotal += m_Weights[uSeqIndex];
-
-	if (0 == wTotal)
-		return;
-
-	const WEIGHT f = wDesiredTotal/wTotal;
-	for (unsigned uSeqIndex = 0; uSeqIndex < m_uSeqCount; ++uSeqIndex)
-		m_Weights[uSeqIndex] *= f;
-	}
-
-void MSA::CalcWeights() const
-	{
-	Quit("Calc weights not implemented");
-	}
-
 static void FmtChar(char c, unsigned uWidth)
 	{
 	Log("%c", c);
@@ -468,7 +429,7 @@ void MSA::FromSequence(const Sequence &s)
 	unsigned uSeqLength = s.GetLength();
 	SetSize(1, uSeqLength);
 	SetSeqName(0, s.GetLabelCStr());
-	const char *CharSeq = s.data->data() + 1;
+	const byte *CharSeq = s.GetBytePtr();
 	for (unsigned n = 0; n < uSeqLength; ++n)
 		SetChar(0, n, CharSeq[n]);
 	}
@@ -530,9 +491,6 @@ void MSA::DeleteSeq(unsigned uSeqIndex)
 		}
 
 	--m_uSeqCount;
-
-	delete[] m_Weights;
-	m_Weights = 0;
 	}
 
 bool MSA::IsEmptyCol(unsigned uColIndex) const
@@ -564,17 +522,8 @@ bool MSA::IsEmptyCol(unsigned uColIndex) const
 
 unsigned MSA::AlignedColIndexToColIndex(unsigned uAlignedColIndex) const
 	{
-	Quit("MSA::AlignedColIndexToColIndex not implemented");
+	Die("MSA::AlignedColIndexToColIndex not implemented");
 	return 0;
-	}
-
-WEIGHT MSA::GetTotalSeqWeight() const
-	{
-	WEIGHT wTotal = 0;
-	const unsigned uSeqCount = GetSeqCount();
-	for (unsigned uSeqIndex = 0; uSeqIndex < uSeqCount; ++uSeqIndex)
-		wTotal += m_Weights[uSeqIndex];
-	return wTotal;
 	}
 
 bool MSA::SeqsEq(const MSA &a1, unsigned uSeqIndex1, const MSA &a2,
@@ -632,12 +581,6 @@ void MSA::GetPWID(unsigned uSeqIndex1, unsigned uSeqIndex2, double *ptrPWID,
 		*ptrPWID = 0;
 	}
 
-void MSA::UnWeight()
-	{
-	for (unsigned uSeqIndex = 0; uSeqIndex < GetSeqCount(); ++uSeqIndex)
-		m_Weights[uSeqIndex] = BTInsane;
-	}
-
 unsigned MSA::UniqueResidueTypes(unsigned uColIndex) const
 	{
 	assert(uColIndex < GetColCount());
@@ -671,20 +614,19 @@ double MSA::GetOcc(unsigned uColIndex) const
 
 void MSA::ToFile(TextFile &File) const
 	{
-	if (g_bMSF)
-		ToMSFFile(File);
-	else if (g_bAln)
-		ToAlnFile(File);
-	else if (g_bHTML)
-		ToHTMLFile(File);
-	else if (g_bPHYS)
-		ToPhySequentialFile(File);
-	else if (g_bPHYI)
-		ToPhyInterleavedFile(File);
-	else
-		ToFASTAFile(File);
-	if (0 != g_pstrScoreFileName)
-		WriteScoreFile(*this);
+	ToFASTAFile(File);
+	}
+
+void MSA::GetUngappedSeqStr(uint SeqIndex, string &SeqStr) const
+	{
+	SeqStr.clear();
+	asserta(SeqIndex < m_uSeqCount);
+	for (uint i = 0; i < m_uColCount; ++i)
+		{
+		char c = m_szSeqs[SeqIndex][i];
+		if (!isgap(c))
+			SeqStr += c;
+		}
 	}
 
 bool MSA::ColumnHasGap(unsigned uColIndex) const
@@ -699,12 +641,12 @@ bool MSA::ColumnHasGap(unsigned uColIndex) const
 void MSA::SetIdCount(unsigned uIdCount)
 	{
 	//if (m_uIdCount != 0)
-	//	Quit("MSA::SetIdCount: may only be called once");
+	//	Die("MSA::SetIdCount: may only be called once");
 
 	if (m_uIdCount > 0)
 		{
 		if (uIdCount > m_uIdCount)
-			Quit("MSA::SetIdCount: cannot increase count");
+			Die("MSA::SetIdCount: cannot increase count");
 		return;
 		}
 	m_uIdCount = uIdCount;
@@ -717,7 +659,7 @@ void MSA::SetSeqId(unsigned uSeqIndex, unsigned uId)
 	if (0 == m_SeqIndexToId)
 		{
 		if (0 == m_uIdCount)
-			Quit("MSA::SetSeqId, SetIdCount has not been called");
+			Die("MSA::SetSeqId, SetIdCount has not been called");
 		m_IdToSeqIndex = new unsigned[m_uIdCount];
 		m_SeqIndexToId = new unsigned[m_uSeqCount];
 
@@ -754,16 +696,11 @@ bool MSA::GetSeqIndex(unsigned uId, unsigned *ptruIndex) const
 unsigned MSA::GetSeqId(unsigned uSeqIndex) const
 	{
 	if (m_SeqIndexToId == 0)
-		return uSeqIndex;
+		return UINT_MAX;
 	assert(uSeqIndex < m_uSeqCount);
 	unsigned uId = m_SeqIndexToId[uSeqIndex];
 	assert(uId == UINT_MAX || uId < m_uIdCount);
 	return uId;
-	}
-
-bool MSA::WeightsSet() const
-	{
-	return BTInsane != m_Weights[0];
 	}
 
 void MSASubsetByIds(const MSA &msaIn, const unsigned Ids[], unsigned uIdCount,
@@ -793,7 +730,7 @@ void MSASubsetByIds(const MSA &msaIn, const unsigned Ids[], unsigned uIdCount,
 void MSA::AppendSeq(char *ptrSeq, unsigned uSeqLength, char *ptrLabel)
 	{
 	if (m_uSeqCount > m_uCacheSeqCount)
-		Quit("Internal error MSA::AppendSeq");
+		Die("Internal error MSA::AppendSeq");
 	if (m_uSeqCount == m_uCacheSeqCount)
 		ExpandCache(m_uSeqCount + 4, uSeqLength);
 	m_szSeqs[m_uSeqCount] = ptrSeq;
@@ -804,20 +741,18 @@ void MSA::AppendSeq(char *ptrSeq, unsigned uSeqLength, char *ptrLabel)
 void MSA::ExpandCache(unsigned uSeqCount, unsigned uColCount)
 	{
 	if (m_IdToSeqIndex != 0 || m_SeqIndexToId != 0 || uSeqCount < m_uSeqCount)
-		Quit("Internal error MSA::ExpandCache");
+		Die("Internal error MSA::ExpandCache");
 
 	if (m_uSeqCount > 0 && uColCount != m_uColCount)
-		Quit("Internal error MSA::ExpandCache, ColCount changed");
+		Die("Internal error MSA::ExpandCache, ColCount changed");
 
 	char **NewSeqs = new char *[uSeqCount];
 	char **NewNames = new char *[uSeqCount];
-	WEIGHT *NewWeights = new WEIGHT[uSeqCount];
 
 	for (unsigned uSeqIndex = 0; uSeqIndex < m_uSeqCount; ++uSeqIndex)
 		{
 		NewSeqs[uSeqIndex] = m_szSeqs[uSeqIndex];
 		NewNames[uSeqIndex] = m_szNames[uSeqIndex];
-		NewWeights[uSeqIndex] = m_Weights[uSeqIndex];
 		}
 
 	for (unsigned uSeqIndex = m_uSeqCount; uSeqIndex < uSeqCount; ++uSeqIndex)
@@ -831,11 +766,9 @@ void MSA::ExpandCache(unsigned uSeqCount, unsigned uColCount)
 
 	delete[] m_szSeqs;
 	delete[] m_szNames;
-	delete[] m_Weights;
 
 	m_szSeqs = NewSeqs;
 	m_szNames = NewNames;
-	m_Weights = NewWeights;
 
 	m_uCacheSeqCount = uSeqCount;
 	m_uCacheSeqLength = uColCount;
@@ -898,8 +831,75 @@ ALPHA MSA::GuessAlpha() const
 			break;
 		}
 	if (uTotal != 0 && ((uRNACount*100)/uTotal) >= MIN_NUCLEO_PCT)
-		return ALPHA_RNA;
+		return ALPHA_Nucleo;
 	if (uTotal != 0 && ((uDNACount*100)/uTotal) >= MIN_NUCLEO_PCT)
-		return ALPHA_DNA;
+		return ALPHA_Nucleo;
 	return ALPHA_Amino;
+	}
+void MSA::GetPosToCol(uint SeqIndex, vector<uint> &PosToCol) const
+	{
+	PosToCol.clear();
+	const uint ColCount = GetColCount();
+	const char *Seq = GetSeqCharPtr(SeqIndex);
+	PosToCol.reserve(ColCount);
+	for (uint Col = 0; Col < ColCount; ++Col)
+		{
+		char c = Seq[Col];
+		if (!isgap(c))
+			PosToCol.push_back(Col);
+		}
+	}
+
+void MSA::GetColToPos(uint SeqIndex, vector<uint> &ColToPos) const
+	{
+	ColToPos.clear();
+	const uint ColCount = GetColCount();
+	const char *Seq = GetSeqCharPtr(SeqIndex);
+	ColToPos.reserve(ColCount);
+	uint Pos = 0;
+	for (uint Col = 0; Col < ColCount; ++Col)
+		{
+		char c = Seq[Col];
+		if (isgap(c))
+			ColToPos.push_back(UINT_MAX);
+		else
+			ColToPos.push_back(Pos++);
+		}
+	}
+
+bool MSA::ColIsUpper(uint ColIndex, double MaxGapFract) const
+	{
+	const uint SeqCount = GetSeqCount();
+	uint UpperCount = 0;
+	uint LowerCount = 0;
+	uint GapCount = 0;
+	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
+		{
+		char c = GetChar(SeqIndex, ColIndex);
+		if (isgap(c))
+			{
+			++GapCount;
+			continue;
+			}
+		if (!isalpha(c))
+			continue;
+		if (isupper(c))
+			++UpperCount;
+		else
+			++LowerCount;
+		}
+
+	if (UpperCount == 0 && LowerCount == 0)
+		return false;
+
+	if (UpperCount > 0 && LowerCount > 0)
+		Die("Column %u has mixed case letters", ColIndex);
+
+	if (double(GapCount)/SeqCount > MaxGapFract)
+		return false;
+
+	if (UpperCount == 0)
+		return false;
+
+	return true;
 	}

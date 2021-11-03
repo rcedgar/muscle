@@ -1,40 +1,36 @@
-#ifndef MULTISEQUENCE_H
-#define MULTISEQUENCE_H
+#pragma once
 
-#include <cctype>
-#include <string>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
 #include <set>
 #include "sequence.h"
+
+class MSA;
 
 class MultiSequence
 	{
 public:
-	vector<Sequence*>* sequences = 0;
+	vector<const Sequence *> m_Seqs;
+	vector<bool> m_Owners;
 
 public:
 	MultiSequence()
 		{
-		sequences = 0;
+		Clear();
 		}
 
 	MultiSequence(FileBuffer& infile)
 		{
-		sequences = 0;
 		LoadMFA(infile);
 		}
 
 	MultiSequence(const string& filename)
 		{
-		sequences = 0;
 		LoadMFA(filename);
 		}
 
-	~MultiSequence();
-	void FreeNonOwner();
+	void Clear();
+//	void DeleteSeqs();
+	~MultiSequence() { Clear(); }
+	void FromStrings(const vector<string> &Labels, const vector<string> &Seqs);
 	void Copy(const MultiSequence &rhs);
 	void LoadMFA(const string& filename, bool stripGaps = false);
 	void LoadMFA(FileBuffer& infile, bool stripGaps = false);
@@ -43,28 +39,22 @@ public:
 		LoadMFA(filename, stripGaps);
 		}
 	uint GetSeqIndex(const string &Label, bool FailOnError = true) const;
+	void ToMSA(MSA &msa) const;
 
-	void AddSequence(Sequence* sequence)
+	void AddSequence(const Sequence *sequence, bool Owner)
 		{
-		assert(sequence);
-
-		// add sequence
-		if (!sequences) sequences = new vector<Sequence*>;
-		sequences->push_back(sequence);
+		m_Seqs.push_back(sequence);
+		m_Owners.push_back(Owner);
 		}
 
 	void WriteMFA(FILE *f) const
 		{
 		if (f == 0)
 			return;
-		if (!sequences)
-			return;
 
-		for (vector<Sequence*>::iterator iter = sequences->begin();
-		  iter != sequences->end(); ++iter)
+		for (uint i = 0; i < SIZE(m_Seqs); ++i)
 			{
-			const Sequence *Seq = *iter;
-			asserta(Seq != 0);
+			const Sequence *Seq = m_Seqs[i];
 			Seq->WriteMFA(f);
 			}
 		}
@@ -78,32 +68,19 @@ public:
 		CloseStdioFile(f);
 		}
 
-	Sequence* GetSequence(int i)
+	const Sequence *GetSequence(int i) const
 		{
-		assert(sequences);
-		assert(0 <= i && i < (int)sequences->size());
-		return (*sequences)[i];
-		}
-
-	const Sequence* GetSequence(int i) const
-		{
-		assert(sequences);
-		assert(0 <= i && i < (int)sequences->size());
-		return (*sequences)[i];
+		return m_Seqs[i];
 		}
 
 	int GetNumSequences() const
 		{
-		if (!sequences)
-			return 0;
-		return (int)sequences->size();
+		return (int) SIZE(m_Seqs);
 		}
 
 	uint GetSeqCount() const
 		{
-		if (sequences == 0)
-			return 0;
-		return SIZE(*sequences);
+		return SIZE(m_Seqs);
 		}
 
 	uint GetChar(uint SeqIndex, uint ZeroBasedPos) const
@@ -121,27 +98,39 @@ public:
 	const string &GetLabelStr(uint SeqIndex) const
 		{
 		const Sequence *seq = GetSequence((int) SeqIndex);
-		return seq->label;
+		return seq->m_Label;
 		}
 
 	const char *GetLabel(uint SeqIndex) const
 		{
 		const Sequence *seq = GetSequence((int) SeqIndex);
-		return seq->label.c_str();
+		return seq->m_Label.c_str();
 		}
 
 	const byte *GetByteSeq(uint SeqIndex, uint &L) const
 		{
 		const Sequence *seq = GetSequence((int) SeqIndex);
-		const byte *ByteSeq = (const byte *) seq->data->data() + 1;
+		const byte *ByteSeq = (const byte *) seq->m_CharVec.data() + 1;
 		L = (uint) seq->GetLength();
 		return ByteSeq;
 		}
+
+	const byte *GetBytePtr(uint SeqIndex) const
+		{
+		const Sequence *seq = GetSequence((int) SeqIndex);
+		const byte *BytePtr = seq->GetBytePtr();
+		return BytePtr;
+		}
+
 	bool GuessIsNucleo() const;
 	void LogGSIs(const char *Msg = 0) const;
+	void AssertGSIs() const;
 	void GetLengthOrder(vector<uint> &SeqIndexes) const;
-	uint GetLength(uint SeqIndex) const;
+	uint GetSeqLength(uint SeqIndex) const;
 	uint GetGSI(uint SeqIndex) const;
+	void LogMe() const;
+#if SEQ_TRACE
+	void AssertSeqIds() const;
+#endif
 	};
 
-#endif

@@ -247,6 +247,32 @@ inline void CountMapToVecs(const map<string, unsigned> &Map,
 	myfree(Order);
 	}
 
+//template<class t> void CountMapToVecsTpl(const map<t, unsigned> &Map,
+//  vector<t> &Keys, vector<unsigned> &Counts)
+//	{
+//	Keys.clear();
+//	Counts.clear();
+//	vector<t> Keys1;
+//	vector<unsigned> Counts1;
+//	for (map<t, unsigned>::const_iterator p = Map.begin(); p != Map.end(); ++p)
+//		{
+//		Keys1.push_back(p->first);
+//		Counts1.push_back(p->second);
+//		}
+//	const unsigned N = SIZE(Keys1);
+//	if (N == 0)
+//		return;
+//	unsigned *Order = myalloc(unsigned, N);
+//	QuickSortOrderDesc(Counts1.data(), N, Order);
+//	for (unsigned k = 0; k < N; ++k)
+//		{
+//		unsigned i = Order[k];
+//		Keys.push_back(Keys1[i]);
+//		Counts.push_back(Counts1[i]);
+//		}
+//	myfree(Order);
+//	}
+
 template<class T, bool Desc> void QuickSortIndexesRecurse(const T *Values, int left, int right, unsigned *Indexes)
 	{
 	int i = left;

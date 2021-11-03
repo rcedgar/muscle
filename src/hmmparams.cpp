@@ -22,6 +22,22 @@ void HMMParams::GetProbs(HMMParams &Probs) const
 	Probs.AssertProbsValid();
 	}
 
+void HMMParams::FromParams(const HMMParams &Params, bool AsProbs)
+	{
+	if (AsProbs)
+		{
+		HMMParams Probs;
+		Params.GetProbs(Probs);
+		*this = Probs;
+		}
+	else
+		{
+		HMMParams Scores;
+		Params.GetProbs(Scores);
+		*this = Scores;
+		}
+	}
+
 void HMMParams::GetScores(HMMParams &Scores) const
 	{
 	if (m_Logs)
@@ -33,26 +49,44 @@ void HMMParams::GetScores(HMMParams &Scores) const
 		}
 	}
 
-void HMMParams::FromProbs(const HMMParams &Probs)
+void HMMParams::ToSingleAffineProbs(HMMParams &Params)
 	{
-	*this = Probs;
-	AssertProbsValid();
-	}
+	GetProbs(Params);
 
-void HMMParams::FromScores(const HMMParams &Scores)
-	{
-	ScoresToProbs(Scores, *this);
-	AssertProbsValid();
+	vector<float> &T = Params.m_Trans;
+
+	float SI = (T[HMMTRANS_START_IS] + T[HMMTRANS_START_IL])/2;
+
+	float MI = (T[HMMTRANS_M_IS] + T[HMMTRANS_M_IL])/2;
+	float IM = (T[HMMTRANS_IS_M] + T[HMMTRANS_IL_M])/2;
+	float II = (T[HMMTRANS_IS_IS] + T[HMMTRANS_IL_IL])/2;
+
+	T[HMMTRANS_START_IS] = SI;
+	T[HMMTRANS_START_IL] = SI;
+
+	T[HMMTRANS_M_IS] = MI;
+	T[HMMTRANS_M_IL] = MI;
+
+	T[HMMTRANS_IS_M] = IM;
+	T[HMMTRANS_IL_M] = IM;
+
+	T[HMMTRANS_IS_IS] = II;
+	T[HMMTRANS_IL_IL] = II;
+
+	Params.AssertProbsValid();
 	}
 
 void HMMParams::ScoresToProbs(const HMMParams &Scores, HMMParams &Probs)
 	{
-	for (uint i = 0; i < HMMTRANS_N; ++i)
-		Probs.m_Trans[i] = EXP(Scores.m_Trans[i]);
+	Probs.m_Alpha = Scores.m_Alpha;
+	const unsigned AlphaSize = Scores.GetAlphaSize();
 
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
-		for (uint j = 0; j < HMM_ALPHASIZE; ++j)
-			Probs.m_Emits[i][j] = EXP(Scores.m_Emits[i][j]);
+	for (uint i = 0; i < HMMTRANS_N; ++i)
+		Probs.m_Trans[i] = exp(Scores.m_Trans[i]);
+
+	for (uint i = 0; i < AlphaSize; ++i)
+		for (uint j = 0; j < AlphaSize; ++j)
+			Probs.m_Emits[i][j] = exp(Scores.m_Emits[i][j]);
 
 	Probs.m_Logs = false;
 	Probs.AssertProbsValid();
@@ -61,13 +95,24 @@ void HMMParams::ScoresToProbs(const HMMParams &Scores, HMMParams &Probs)
 void HMMParams::ProbsToScores(const HMMParams &Probs, HMMParams &Scores)
 	{
 	Probs.AssertProbsValid();
+	Scores.m_Alpha = Probs.m_Alpha;
+	const unsigned AlphaSize = Probs.GetAlphaSize();
+
+	Scores.m_Trans.clear();
+	Scores.m_Trans.resize(HMMTRANS_N);
+
+	Scores.m_Emits.clear();
+	Scores.m_Emits.clear();
+	Scores.m_Emits.resize(AlphaSize);
+	for (uint i = 0; i < AlphaSize; ++i)
+		Scores.m_Emits[i].resize(AlphaSize, FLT_MAX);
 
 	for (uint i = 0; i < HMMTRANS_N; ++i)
-		Scores.m_Trans[i] = LOG(Probs.m_Trans[i]);
+		Scores.m_Trans[i] = log(Probs.m_Trans[i]);
 
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
-		for (uint j = 0; j < HMM_ALPHASIZE; ++j)
-			Scores.m_Emits[i][j] = LOG(Probs.m_Emits[i][j]);
+	for (uint i = 0; i < AlphaSize; ++i)
+		for (uint j = 0; j < AlphaSize; ++j)
+			Scores.m_Emits[i][j] = log(Probs.m_Emits[i][j]);
 
 	Scores.m_Logs = true;
 	}
@@ -75,16 +120,22 @@ void HMMParams::ProbsToScores(const HMMParams &Probs, HMMParams &Scores)
 void HMMParams::AssertProbsValid() const
 	{
 	asserta(!m_Logs);
-	asserta(strlen(HMM_ALPHA) == HMM_ALPHASIZE);
 	asserta(SIZE(m_Trans) == HMMTRANS_N);
-	asserta(SIZE(m_Emits) == HMM_ALPHASIZE);
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
-		asserta(SIZE(m_Emits[i]) == HMM_ALPHASIZE);
+	const uint AlphaSize = GetAlphaSize();
+	asserta(SIZE(m_Emits) == AlphaSize);
+	for (uint i = 0; i < AlphaSize; ++i)
+		asserta(SIZE(m_Emits[i]) == AlphaSize);
 
 	float SumSTART = m_Trans[HMMTRANS_START_M] +
 	  2*m_Trans[HMMTRANS_START_IS] +
 	  2*m_Trans[HMMTRANS_START_IL];
 	asserta(feq(SumSTART, 1.0));
+
+	float SumIS = m_Trans[HMMTRANS_IS_M] + m_Trans[HMMTRANS_IS_IS];
+	asserta(feq(SumIS, 1.0));
+
+	float SumIL = m_Trans[HMMTRANS_IL_M] + m_Trans[HMMTRANS_IL_IL];
+	asserta(feq(SumIL, 1.0));
 
 	float SumM = m_Trans[HMMTRANS_M_M] +
 	  2*m_Trans[HMMTRANS_M_IS] +
@@ -92,12 +143,12 @@ void HMMParams::AssertProbsValid() const
 	asserta(feq(SumM, 1.0));
 
 	float SumEmit = 0;
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
-		for (uint j = 0; j < HMM_ALPHASIZE; ++j)
+	for (uint i = 0; i < AlphaSize; ++i)
+		for (uint j = 0; j < AlphaSize; ++j)
 			SumEmit += m_Emits[i][j];
 	asserta(feq(SumEmit, 1.0));
 
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
+	for (uint i = 0; i < AlphaSize; ++i)
 		for (uint j = 0; j < i; ++j)
 			asserta(feq(m_Emits[i][j], m_Emits[j][i]));
 	}
@@ -107,18 +158,26 @@ void HMMParams::ToFile(const string &FileName) const
 	if (FileName.empty())
 		return;
 
+	const uint AlphaSize = GetAlphaSize();
 	AssertProbsValid();
 	FILE *f = CreateStdioFile(FileName);
+
+	if (m_Alpha == AMINO_ALPHA)
+		fprintf(f, "HMM	aa\n");
+	else if (m_Alpha == NT_ALPHA)
+		fprintf(f, "HMM	nt\n");
+	else
+		Die("HMMParams::ToFile alpha='%'s", m_Alpha.c_str());
 
 #define T(x)	fprintf(f,	"T.%s	%.5g\n", #x, m_Trans[HMMTRANS_##x]);
 #include "hmmtrans.h"
 
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
+	for (uint i = 0; i < AlphaSize; ++i)
 		{
-		char a = HMM_ALPHA[i];
+		char a = m_Alpha[i];
 		for (uint j = 0; j <= i; ++j)
 			{
-			char b = HMM_ALPHA[j];
+			char b = m_Alpha[j];
 			float P = m_Emits[i][j];
 			fprintf(f, "E.%c%c	%.5g\n", a, b, P);
 			}
@@ -164,15 +223,40 @@ void HMMParams::FromStrings(const vector<string> &Lines)
 	m_Lines = Lines;
 	m_LineNr = 0;
 
+	string AlphaLine;
+	bool Ok = GetNextLine(AlphaLine);
+	asserta(Ok);
+
+	vector<string> Fields;
+	Split(AlphaLine, Fields, '\t');
+	if (SIZE(Fields) != 2 || Fields[0] != "HMM")
+		Die("Invalid HMM file");
+	m_Alpha = Fields[1];
+	if (Fields[1] == "aa")
+		m_Alpha = AMINO_ALPHA;
+	else if (Fields[1] == "nt")
+		m_Alpha = NT_ALPHA;
+	else
+		Die("Invalid HMM alphabet '%s'", m_Alpha.c_str());
+
+	m_Trans.clear();
+	m_Trans.resize(HMMTRANS_N, FLT_MAX);
+
 #define T(x)	m_Trans[HMMTRANS_##x] = GetNextProb("T." #x);
 #include "hmmtrans.h"
 
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
+	const uint AlphaSize = SIZE(m_Alpha);
+	m_Emits.clear();
+	m_Emits.resize(AlphaSize);
+	for (uint i = 0; i < AlphaSize; ++i)
+		m_Emits[i].resize(AlphaSize, FLT_MAX);
+
+	for (uint i = 0; i < AlphaSize; ++i)
 		{
-		char a = HMM_ALPHA[i];
+		char a = m_Alpha[i];
 		for (uint j = 0; j <= i; ++j)
 			{
-			char b = HMM_ALPHA[j];
+			char b = m_Alpha[j];
 
 			string Name;
 			Ps(Name, "E.%c%c", a, b);
@@ -185,10 +269,13 @@ void HMMParams::FromStrings(const vector<string> &Lines)
 	AssertProbsValid();
 	}
 
-void HMMParams::FromDefaults()
+void HMMParams::FromDefaults(bool Nucleo)
 	{
 	vector<string> Lines;
-	GetDefaultHMMParams(Lines);
+	if (Nucleo)
+		GetDefaultHMMParams_Nucleo(Lines);
+	else
+		GetDefaultHMMParams_Amino(Lines);
 	FromStrings(Lines);
 	}
 
@@ -200,21 +287,23 @@ void HMMParams::ToPairHMM() const
 	HMMParams Probs;
 	GetProbs(Probs);
 
+	const uint AlphaSize = GetAlphaSize();
+
 	const vector<float> &Trans = Scores.m_Trans;
 	const vector<vector<float> > &Emits = Scores.m_Emits;
 
 	float SumInserts = 0;
 	vector<float> InsertScores;
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
+	for (uint i = 0; i < AlphaSize; ++i)
 		{
 		float MarginalProb = 0;
-		for (uint j = 0; j < HMM_ALPHASIZE; ++j)
+		for (uint j = 0; j < AlphaSize; ++j)
 			{
 			float P = Probs.m_Emits[i][j];
 			MarginalProb += P;
 			}
 
-		float Score = LOG(MarginalProb);
+		float Score = log(MarginalProb);
 		InsertScores.push_back(Score);
 
 		SumInserts += MarginalProb;
@@ -223,11 +312,11 @@ void HMMParams::ToPairHMM() const
 
 	PairHMM::m_StartScore[HMMSTATE_M] = Trans[HMMTRANS_START_M];
 
-	PairHMM::m_StartScore[HMMSTATE_ISX] = Trans[HMMTRANS_START_IS];
-	PairHMM::m_StartScore[HMMSTATE_ISY] = Trans[HMMTRANS_START_IS];
+	PairHMM::m_StartScore[HMMSTATE_IX] = Trans[HMMTRANS_START_IS];
+	PairHMM::m_StartScore[HMMSTATE_IY] = Trans[HMMTRANS_START_IS];
 
-	PairHMM::m_StartScore[HMMSTATE_ILX] = Trans[HMMTRANS_START_IL];
-	PairHMM::m_StartScore[HMMSTATE_ILY] = Trans[HMMTRANS_START_IL];
+	PairHMM::m_StartScore[HMMSTATE_JX] = Trans[HMMTRANS_START_IL];
+	PairHMM::m_StartScore[HMMSTATE_JY] = Trans[HMMTRANS_START_IL];
 
 	for (uint i = 0; i < HMMSTATE_COUNT; ++i)
 		for (uint j = 0; j < HMMSTATE_COUNT; ++j)
@@ -235,30 +324,31 @@ void HMMParams::ToPairHMM() const
 
 	PairHMM::m_TransScore[HMMSTATE_M][HMMSTATE_M] = Trans[HMMTRANS_M_M];
 
-	PairHMM::m_TransScore[HMMSTATE_M][HMMSTATE_ISX] = Trans[HMMTRANS_M_IS];
-	PairHMM::m_TransScore[HMMSTATE_M][HMMSTATE_ISY] = Trans[HMMTRANS_M_IS];
+	PairHMM::m_TransScore[HMMSTATE_M][HMMSTATE_IX] = Trans[HMMTRANS_M_IS];
+	PairHMM::m_TransScore[HMMSTATE_M][HMMSTATE_IY] = Trans[HMMTRANS_M_IS];
 
-	PairHMM::m_TransScore[HMMSTATE_M][HMMSTATE_ILX] = Trans[HMMTRANS_M_IL];
-	PairHMM::m_TransScore[HMMSTATE_M][HMMSTATE_ILY] = Trans[HMMTRANS_M_IL];
+	PairHMM::m_TransScore[HMMSTATE_M][HMMSTATE_JX] = Trans[HMMTRANS_M_IL];
+	PairHMM::m_TransScore[HMMSTATE_M][HMMSTATE_JY] = Trans[HMMTRANS_M_IL];
 
-	PairHMM::m_TransScore[HMMSTATE_ISX][HMMSTATE_ISX] = Trans[HMMTRANS_IS_IS];
-	PairHMM::m_TransScore[HMMSTATE_ISY][HMMSTATE_ISY] = Trans[HMMTRANS_IS_IS];
+	PairHMM::m_TransScore[HMMSTATE_IX][HMMSTATE_IX] = Trans[HMMTRANS_IS_IS];
+	PairHMM::m_TransScore[HMMSTATE_IY][HMMSTATE_IY] = Trans[HMMTRANS_IS_IS];
 
-	PairHMM::m_TransScore[HMMSTATE_ILX][HMMSTATE_ILX] = Trans[HMMTRANS_IL_IL];
-	PairHMM::m_TransScore[HMMSTATE_ILY][HMMSTATE_ILY] = Trans[HMMTRANS_IL_IL];
+	PairHMM::m_TransScore[HMMSTATE_JX][HMMSTATE_JX] = Trans[HMMTRANS_IL_IL];
+	PairHMM::m_TransScore[HMMSTATE_JY][HMMSTATE_JY] = Trans[HMMTRANS_IL_IL];
 
-	PairHMM::m_TransScore[HMMSTATE_ISX][HMMSTATE_M] = Trans[HMMTRANS_IS_M];
-	PairHMM::m_TransScore[HMMSTATE_ISY][HMMSTATE_M] = Trans[HMMTRANS_IS_M];
+	PairHMM::m_TransScore[HMMSTATE_IX][HMMSTATE_M] = Trans[HMMTRANS_IS_M];
+	PairHMM::m_TransScore[HMMSTATE_IY][HMMSTATE_M] = Trans[HMMTRANS_IS_M];
 
-	PairHMM::m_TransScore[HMMSTATE_ILX][HMMSTATE_M] = Trans[HMMTRANS_IL_M];
-	PairHMM::m_TransScore[HMMSTATE_ILY][HMMSTATE_M] = Trans[HMMTRANS_IL_M];
+	PairHMM::m_TransScore[HMMSTATE_JX][HMMSTATE_M] = Trans[HMMTRANS_IL_M];
+	PairHMM::m_TransScore[HMMSTATE_JY][HMMSTATE_M] = Trans[HMMTRANS_IL_M];
 
+	float WildcardInsertProb = 1.0f/AlphaSize;
 	for (uint i = 0; i < 256; ++i)
-		PairHMM::m_InsScore[i] = LOG(WILDCARD_PROB);
+		PairHMM::m_InsScore[i] = log(WildcardInsertProb);
 
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
+	for (uint i = 0; i < AlphaSize; ++i)
 		{
-		char a = HMM_ALPHA[i];
+		char a = m_Alpha[i];
 		byte ia = (byte) tolower(a);
 		byte iA = (byte) toupper(a);
 		float P = InsertScores[i];
@@ -268,18 +358,18 @@ void HMMParams::ToPairHMM() const
 
 	for (uint i = 0; i < 256; ++i)
 		for (uint j = 0; j < 256; ++j)
-			PairHMM::m_MatchScore[i][j] = LOG(WILDCARD_PROB*WILDCARD_PROB);
+			PairHMM::m_MatchScore[i][j] = log(WildcardInsertProb*WildcardInsertProb);
 
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
+	for (uint i = 0; i < AlphaSize; ++i)
 		{
-		char a = HMM_ALPHA[i];
+		char a = m_Alpha[i];
 		byte ia = (byte) tolower(a);
 		byte iA = (byte) toupper(a);
-		for (uint j = 0; j < HMM_ALPHASIZE; ++j)
+		for (uint j = 0; j < AlphaSize; ++j)
 			{
 			float P = Emits[i][j];
 
-			char b = HMM_ALPHA[j];
+			char b = m_Alpha[j];
 			byte ib = (byte) tolower(b);
 			byte iB = (byte) toupper(b);
 
@@ -289,21 +379,38 @@ void HMMParams::ToPairHMM() const
 			PairHMM::m_MatchScore[iA][iB] = P;
 			}
 		}
+
+	if (AlphaSize == 4)
+		PairHMM::FixUT();
 	}
 
-void HMMParams::DeltaEmitProbs(const vector<vector<float> > &Deltas)
+void PairHMM::FixUT()
+	{
+	PairHMM::m_InsScore['U'] = PairHMM::m_InsScore['T'];
+	PairHMM::m_InsScore['u'] = PairHMM::m_InsScore['t'];
+
+	for (uint i = 0; i < 256; ++i)
+		{
+		float P = PairHMM::m_MatchScore['T'][i];
+
+		PairHMM::m_MatchScore['U'][i] = P;
+		PairHMM::m_MatchScore['u'][i] = P;
+		PairHMM::m_MatchScore[i]['U'] = P;
+		PairHMM::m_MatchScore[i]['u'] = P;
+		}
+	}
+
+void HMMParams::NormalizeEmit()
 	{
 	asserta(!m_Logs);
-	asserta(SIZE(Deltas) == HMM_ALPHASIZE);
 
+	const uint AlphaSize = GetAlphaSize();
 	float Sum = 0;
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
+	for (uint i = 0; i < AlphaSize; ++i)
 		{
 		for (uint j = 0; j <= i; ++j)
 			{
-			float d = Deltas[i][j];
-			asserta(d > 0);
-			float P = m_Emits[i][j]*d;
+			float P = m_Emits[i][j];
 			m_Emits[i][j] = P;
 			m_Emits[j][i] = P;
 			Sum += P;
@@ -312,31 +419,13 @@ void HMMParams::DeltaEmitProbs(const vector<vector<float> > &Deltas)
 			}
 		}
 
-	for (uint i = 0; i < HMM_ALPHASIZE; ++i)
-		for (uint j = 0; j < HMM_ALPHASIZE; ++j)
+	for (uint i = 0; i < AlphaSize; ++i)
+		for (uint j = 0; j < AlphaSize; ++j)
 			m_Emits[i][j] /= Sum;
-
-	AssertProbsValid();
 	}
 
-void HMMParams::DeltaTransProbs(float dStartIS, float dStartIL,
-  float dShortOpen, float dShortExtend,
-  float dLongOpen, float dLongExtend)
+void HMMParams::NormalizeStart()
 	{
-	DeltaStartProbs(dStartIS, dStartIL);
-	DeltaShortGapProbs(dShortOpen, dShortExtend);
-	DeltaLongGapProbs(dLongOpen, dLongExtend);
-	}
-
-void HMMParams::DeltaStartProbs(float dIS, float dIL)
-	{
-	asserta(!m_Logs);
-	asserta(dIS >= 0);
-	asserta(dIL >= 0);
-
-	m_Trans[HMMTRANS_START_IS] *= dIS;
-	m_Trans[HMMTRANS_START_IL] *= dIL;
-
 	float Sum = 
 	  m_Trans[HMMTRANS_START_M] +
 	  2*m_Trans[HMMTRANS_START_IS] +
@@ -345,19 +434,10 @@ void HMMParams::DeltaStartProbs(float dIS, float dIL)
 	m_Trans[HMMTRANS_START_M] /= Sum;
 	m_Trans[HMMTRANS_START_IS] /= Sum;
 	m_Trans[HMMTRANS_START_IL] /= Sum;
-
-	AssertProbsValid();
 	}
 
-void HMMParams::DeltaShortGapProbs(float dOpen, float dExtend)
+void HMMParams::NormalizeShortGap()
 	{
-	asserta(!m_Logs);
-	asserta(dOpen > 0);
-	asserta(dExtend >= 0);
-
-	m_Trans[HMMTRANS_M_IS] *= dOpen;
-	m_Trans[HMMTRANS_IS_IS] *= dExtend;
-
 	float SumM = 
 	  m_Trans[HMMTRANS_M_M] +
 	  2*m_Trans[HMMTRANS_M_IS] +
@@ -373,19 +453,10 @@ void HMMParams::DeltaShortGapProbs(float dOpen, float dExtend)
 
 	m_Trans[HMMTRANS_IS_IS] /= SumIS;
 	m_Trans[HMMTRANS_IS_M] /= SumIS;
-
-	AssertProbsValid();
 	}
 
-void HMMParams::DeltaLongGapProbs(float dOpen, float dExtend)
+void HMMParams::NormalizeLongGap()
 	{
-	asserta(!m_Logs);
-	asserta(dOpen > 0);
-	asserta(dExtend >= 0);
-
-	m_Trans[HMMTRANS_M_IL] *= dOpen;
-	m_Trans[HMMTRANS_IL_IL] *= dExtend;
-
 	float SumM = 
 	  m_Trans[HMMTRANS_M_M] +
 	  2*m_Trans[HMMTRANS_M_IS] +
@@ -401,6 +472,25 @@ void HMMParams::DeltaLongGapProbs(float dOpen, float dExtend)
 
 	m_Trans[HMMTRANS_IL_IL] /= SumIL;
 	m_Trans[HMMTRANS_IL_M] /= SumIL;
+	}
+
+void HMMParams::NormalizeMatch()
+	{
+	float SumM = m_Trans[HMMTRANS_M_M] +
+	  2*m_Trans[HMMTRANS_M_IS] +
+	  2*m_Trans[HMMTRANS_M_IL];
+	
+	m_Trans[HMMTRANS_M_M] /= SumM;
+	m_Trans[HMMTRANS_M_IS] /= SumM;
+	m_Trans[HMMTRANS_M_IL] /= SumM;
+	}
+
+void HMMParams::Normalize()
+	{
+	NormalizeStart();
+	NormalizeShortGap();
+	NormalizeLongGap();
+	NormalizeEmit();
 
 	AssertProbsValid();
 	}

@@ -7,31 +7,22 @@
 #include "pprog.h"
 #include "treeperm.h"
 
-TREEPERM StrToTREEPERM(const string &s)
-	{
-	if (s == "none") return TP_None;
-	if (s == "abc") return TP_ABC;
-	if (s == "acb") return TP_ACB;
-	if (s == "bca") return TP_BCA;
-	if (s == "all") return TP_All;
-	Die("Invalid perm '%s'", s.c_str());
-	return TP_None;
-	}
+void LogDistMx(const string &Msg, const vector<vector<float> > &Mx);
+void GetConsensusSequence(const MultiSequence &MSA, string &Seq);
 
-const char *TREEPERMToStr(TREEPERM TP)
+void Super4::ClearTreesAndMSAs()
 	{
-	switch (TP)
-		{
-	case TP_None:	return "none";
-	case TP_ABC:	return "abc";
-	case TP_ACB:	return "acb";
-	case TP_BCA:	return "bca";
-	case TP_All:	return "all";
-	default:
-		break;
-		}
-	asserta(false);
-	return "?";
+	m_FinalMSA.Clear();
+
+	m_GuideTree_None.Clear();
+	m_GuideTree_ABC.Clear();
+	m_GuideTree_ACB.Clear();
+	m_GuideTree_BCA.Clear();
+
+	m_FinalMSA_None.Clear();
+	m_FinalMSA_ABC.Clear();
+	m_FinalMSA_ACB.Clear();
+	m_FinalMSA_BCA.Clear();
 	}
 
 void Super4::MakeGuideTree()
@@ -39,22 +30,7 @@ void Super4::MakeGuideTree()
 	UPGMA5 U;
 	U.Init(m_ClusterLabels, m_DistMx);
 	U.FixEADistMx();
-	U.Run(LINKAGE_Biased, m_GuideTree);
-	PermTree(m_GuideTree, m_TreePerm);
-	}
-
-void Super4::CalcDistMx()
-	{
-	FILE *f = 0;
-	if (m_SaveDir != "")
-		{
-		string FileName;
-		Ps(FileName, "%sdistmx.tsv", m_SaveDir.c_str());
-		f = CreateStdioFile(FileName);
-		}
-
-	CalcEADistMx(f, &m_ConsensusSeqs, m_DistMx);
-	CloseStdioFile(f);
+	U.Run(LINKAGE_Biased, m_GuideTree_None);
 	}
 
 void Super4::SplitBigMFA_Random(MultiSequence &InputMFA, uint MaxSize,
@@ -79,8 +55,8 @@ void Super4::SplitBigMFA_Random(MultiSequence &InputMFA, uint MaxSize,
 		asserta(SplitMFA != 0);
 		for (uint i = 0; i < N; ++i)
 			{
-			Sequence *seq = InputMFA.GetSequence(OutputSeqCount + i);
-			SplitMFA->AddSequence(seq);
+			const Sequence *seq = InputMFA.GetSequence(OutputSeqCount + i);
+			SplitMFA->AddSequence(seq, false);
 			}
 		SplitMFAs.push_back(SplitMFA);
 
@@ -126,15 +102,11 @@ void Super4::SplitBigMFA(MultiSequence &BigMFA, uint MaxSize, float MinEA,
 	AssertSameSeqsVec(BigMFA, SplitMFAs);
 	}
 
-void Super4::ClusterInput(uint MaxClusterSize)
+void Super4::ClusterInput()
 	{
-	const float MIN_EA_PASS1 = 0.7f;
-	const float MIN_EA_PASS2 = 0.9f;
-	const uint MAX_CLUSTER_SIZE = 500;
-
 	const uint InputSeqCount = m_InputSeqs->GetSeqCount();
 
-	m_EC.Run(*m_InputSeqs, MIN_EA_PASS1);
+	m_EC.Run(*m_InputSeqs, m_MinEAPass1);
 	m_EC.GetClusterMFAs(m_ClusterMFAs);
 	AssertSameSeqsVec(*m_InputSeqs, m_ClusterMFAs);
 
@@ -146,10 +118,10 @@ void Super4::ClusterInput(uint MaxClusterSize)
 		AssertSameLabels(*MFA);
 		uint SeqCount = MFA->GetSeqCount();
 		asserta(SeqCount > 0);
-		if (SeqCount > MAX_CLUSTER_SIZE)
+		if (SeqCount > m_MaxClusterSize)
 			{
 			vector<MultiSequence *> *SplitMFAs = new vector<MultiSequence *>;
-			SplitBigMFA(*MFA, MAX_CLUSTER_SIZE, MIN_EA_PASS2, *SplitMFAs);
+			SplitBigMFA(*MFA, m_MaxClusterSize, m_MinEAPass2, *SplitMFAs);
 
 			const uint N = SIZE(*SplitMFAs);
 			asserta(N > 1);
@@ -174,28 +146,11 @@ void Super4::ClusterInput(uint MaxClusterSize)
 		{
 		MultiSequence *MFA = m_ClusterMFAs[ClusterIndex];
 		uint SeqCount = MFA->GetSeqCount();
-		asserta(SeqCount <= MaxClusterSize);
+		asserta(SeqCount <= m_MaxClusterSize);
 
 		string ClusterLabel;
 		Ps(ClusterLabel, "Cluster%u", ClusterIndex);
 		m_ClusterLabels.push_back(ClusterLabel);
-		}
-	}
-
-void Super4::WriteMSAs() const
-	{
-	if (m_SaveDir == "")
-		return;
-
-	uint CentroidCount = SIZE(m_ClusterMSAs);
-	for (uint CentroidIndex = 0; CentroidIndex < CentroidCount; ++CentroidIndex)
-		{
-		ProgressStep(CentroidIndex, CentroidCount, "Write MSAs %s",
-		  m_SaveDir.c_str());
-		const MultiSequence *MSA = m_ClusterMSAs[CentroidIndex];
-		string FileName;
-		Ps(FileName, "%sclust%u.afa", m_SaveDir.c_str(), CentroidIndex);
-		MSA->WriteMFA(FileName);
 		}
 	}
 
@@ -221,16 +176,31 @@ void Super4::AlignClusters()
 			Progress("\n");
 			}
 
-		AssertSameLabels(*m_InputSeqs);
-		MultiSequence *ClusterMSA = RunMPC(ClusterMFA);
-		AssertSameLabels(*m_InputSeqs);
+		m_MPC.m_TreePerm = TP_None;
+		m_MPC.Run(ClusterMFA);
+		MultiSequence *ClusterMSA = new MultiSequence;
+		asserta(ClusterMSA != 0);
+		ClusterMSA->Copy(*m_MPC.m_MSA);
 		AssertSameLabels(*ClusterMSA);
 		m_ClusterMSAs.push_back(ClusterMSA);
 		}
 	}
 
+void Super4::DeleteClusterMSAs()
+	{
+	const uint N = SIZE(m_ClusterMSAs);
+	for (uint i = 0; i < N; ++i)
+		{
+		MultiSequence *MSA = m_ClusterMSAs[i];
+		if (MSA != 0)
+			MSA->Clear();
+		}
+	m_ClusterMSAs.clear();
+	}
+
 void Super4::GetConsensusSeqs()
 	{
+	m_ConsensusSeqs.Clear();
 	uint ClusterCount = SIZE(m_ClusterMSAs);
 	for (uint ClusterIndex = 0; ClusterIndex < ClusterCount; ++ClusterIndex)
 		{
@@ -243,27 +213,22 @@ void Super4::GetConsensusSeqs()
 		string ConsSeq;
 		GetConsensusSequence(*ClusterMSA, ConsSeq);
 
-		Sequence *seq = new Sequence;
+		Sequence *seq = NewSequence();
 		seq->FromString(Label, ConsSeq);
 
-		m_ConsensusSeqs.AddSequence(seq);
+		m_ConsensusSeqs.AddSequence(seq, true);
 
 		asserta(ClusterIndex < SIZE(m_ClusterLabels));
 		const string &ClusterLabel = m_ClusterLabels[ClusterIndex];
 		}
+	if (optset_calnout)
+		{
+		m_MPC.Run(&m_ConsensusSeqs);
+		m_MPC.m_MSA->WriteMFA(opt(calnout));
+		}
 	}
 
-void Super4::WriteConsensusSeqs()
-	{
-	if (m_SaveDir == "")
-		return;
-
-	string FileName;
-	Ps(FileName, "%scons.fa", m_SaveDir.c_str());
-	m_ConsensusSeqs.WriteMFA(FileName);
-	}
-
-void Super4::Final()
+void Super4::InitPP()
 	{
 	vector<const MultiSequence *> MSAs;
 	const uint n = SIZE(m_ClusterMSAs);
@@ -275,86 +240,99 @@ void Super4::Final()
 
 	m_PP.m_TargetPairCount = m_PairCount;
 	m_PP.SetMSAs(MSAs, m_ClusterLabels);
-	m_PP.RunGuideTree(m_GuideTree);
-	const MultiSequence &FinalMSA = m_PP.GetFinalMSA();
-	m_FinalMSA.Copy(FinalMSA);
-
-	//PermuteTree(m_GuideTree, m_GuideTreeABC, m_GuideTreeACB,
-	//  m_GuideTreeBCA, m_LabelsA, m_LabelsB, m_LabelsC);
-
-	//if (m_SaveDir != "")
-	//	{
-	//	m_GuideTreeABC.ToFile(m_SaveDir + "ABC.newick");
-	//	m_GuideTreeACB.ToFile(m_SaveDir + "ACB.newick");
-	//	m_GuideTreeBCA.ToFile(m_SaveDir + "BCA.newick");
-
-	//	StringsToFile(m_SaveDir + "labelsA.txt", m_LabelsA);
-	//	StringsToFile(m_SaveDir + "labelsB.txt", m_LabelsB);
-	//	StringsToFile(m_SaveDir + "labelsC.txt", m_LabelsC);
-	//	}
-
-	//m_PP_ABC.m_TargetPairCount = m_PairCount;
-	//m_PP_ABC.SetMSAs(MSAs, m_ClusterLabels);
-	//m_PP_ABC.RunGuideTree(m_GuideTreeABC);
-	//m_FinalMSA_ABC.Copy(m_PP_ABC.GetFinalMSA());
-
-	//m_PP_ACB.m_TargetPairCount = m_PairCount;
-	//m_PP_ACB.SetMSAs(MSAs, m_ClusterLabels);
-	//m_PP_ACB.RunGuideTree(m_GuideTreeACB);
-	//m_FinalMSA_ACB.Copy(m_PP_ACB.GetFinalMSA());
-
-	//m_PP_BCA.m_TargetPairCount = m_PairCount;
-	//m_PP_BCA.SetMSAs(MSAs, m_ClusterLabels);
-	//m_PP_BCA.RunGuideTree(m_GuideTreeBCA);
-	//m_FinalMSA_BCA.Copy(m_PP_BCA.GetFinalMSA());
-
-	//if (m_SaveDir != "")
-	//	{
-	//	m_FinalMSA_ABC.WriteMFA(m_SaveDir + "ABC.afa");
-	//	m_FinalMSA_ACB.WriteMFA(m_SaveDir + "ACB.afa");
-	//	m_FinalMSA_BCA.WriteMFA(m_SaveDir + "BCA.afa");
-	//	}
 	}
 
-void RunSuper4(MultiSequence &InputSeqs, MultiSequence &MSA, TREEPERM TreePerm)
+void Super4::SetOpts()
 	{
-	const uint PairCount = optd(paircount, DEFAULT_TARGET_PAIR_COUNT);
-	const uint MaxCoarse = optd(maxcoarse, 500);
-	string SaveDir;
-	if (optset_savedir)
+	m_PairCount = optd(paircount, DEFAULT_TARGET_PAIR_COUNT);
+	m_MaxClusterSize = optd(paircount, DEFAULT_MAX_COARSE_SEQS);
+	m_MinEAPass1 = (float) optd(super4_minea1, DEFAULT_MIN_EA_SUPER4_PASS1);
+	m_MinEAPass2 = (float) optd(super4_minea2, DEFAULT_MIN_EA_SUPER4_PASS2);
+	m_MPC.m_ConsistencyIterCount = optd(consiters, 2);
+	m_MPC.m_RefineIterCount = optd(refineiters, 100);
+	}
+
+void Super4::CalcConsensusSeqsDistMx()
+	{
+	FILE *f = 0;
+	CalcEADistMx(f, &m_ConsensusSeqs, m_DistMx);
+	}
+
+void Super4::CoarseAlign()
+	{
+	AssertSameLabels(*m_InputSeqs);
+	ClusterInput();
+	AlignClusters();
+	GetConsensusSeqs();
+	CalcConsensusSeqsDistMx();
+	MakeGuideTree();
+	InitPP();
+	}
+
+void Super4::Run(MultiSequence &InputSeqs, TREEPERM TreePerm)
+	{
+	m_InputSeqs = &InputSeqs;
+	SetOpts();
+	CoarseAlign();
+
+	if (TreePerm == TP_None)
 		{
-		SaveDir = opt(savedir);
-		Dirize(SaveDir);
+		m_PP.RunGuideTree(m_GuideTree_None);
+		const MultiSequence &FinalMSA = m_PP.GetFinalMSA();
+		m_FinalMSA.Copy(FinalMSA);
+		DeleteClusterMSAs();
+		return;
 		}
-	asserta(!optset_minea);
-	AssertSameLabels(InputSeqs);
 
-	SetAlpha(ALPHA_Amino);
+	vector<string> LabelsA;
+	vector<string> LabelsB;
+	vector<string> LabelsC;
+	PermuteTree(m_GuideTree_None,
+	  m_GuideTree_ABC, m_GuideTree_ACB, m_GuideTree_BCA,
+	  LabelsA, LabelsB, LabelsC);
 
-	Super4 S4;
-	S4.m_SaveDir = SaveDir;
-	InitProbcons();
-	S4.m_TreePerm = TreePerm;
-	S4.m_InputSeqs = &InputSeqs;
-	S4.m_fTSV = 0;
-	if (S4.m_SaveDir != "")
-		S4.m_fTSV = CreateStdioFile(S4.m_SaveDir + "super4.tsv");
+	switch (TreePerm)
+		{
+	case TP_ABC:
+		ProgressLog("Guide tree ABC\n");
+		m_PP.RunGuideTree(m_GuideTree_ABC);
+		m_FinalMSA.Copy(m_PP.GetFinalMSA());
+		break;
 
-	S4.m_PairCount = PairCount;
+	case TP_ACB:
+		ProgressLog("Guide tree ACB\n");
+		m_PP.RunGuideTree(m_GuideTree_ACB);
+		m_FinalMSA.Copy(m_PP.GetFinalMSA());
+		break;
 
-	S4.ClusterInput(MaxCoarse);
-	S4.AlignClusters();
-	S4.WriteMSAs();
-	S4.GetConsensusSeqs();
-	S4.WriteConsensusSeqs();
-	S4.CalcDistMx();
-	S4.MakeGuideTree();
-	S4.Final();
-	MSA.Copy(S4.m_FinalMSA);
+	case TP_BCA:
+		ProgressLog("Guide tree BCA\n");
+		m_PP.RunGuideTree(m_GuideTree_BCA);
+		m_FinalMSA.Copy(m_PP.GetFinalMSA());
+		break;
 
-	AssertSameSeqs(InputSeqs, MSA);
+	case TP_All:
+		ProgressLog("Guide tree (default)\n");
+		m_PP.RunGuideTree(m_GuideTree_None);
+		m_FinalMSA_None.Copy(m_PP.GetFinalMSA());
 
-	CloseStdioFile(S4.m_fTSV);
+		ProgressLog("Guide tree ABC\n");
+		m_PP.RunGuideTree(m_GuideTree_ABC);
+		m_FinalMSA_ABC.Copy(m_PP.GetFinalMSA());
+
+		ProgressLog("Guide tree ACB\n");
+		m_PP.RunGuideTree(m_GuideTree_ACB);
+		m_FinalMSA_ACB.Copy(m_PP.GetFinalMSA());
+
+		ProgressLog("Guide tree BCA\n");
+		m_PP.RunGuideTree(m_GuideTree_BCA);
+		m_FinalMSA_BCA.Copy(m_PP.GetFinalMSA());
+		break;
+
+	default:
+		asserta(false);
+		}
+	DeleteClusterMSAs();
 	}
 
 void cmd_super4()
@@ -363,14 +341,22 @@ void cmd_super4()
 	const string &OutputFileName = opt(output);
 
 	MultiSequence &InputSeqs = LoadGlobalInputMS(InputFileName);
+	bool Nucleo = false;
+	if (opt(nt))
+		Nucleo = true;
+	else if (opt(amino))
+		Nucleo = false;
+	else
+		Nucleo = InputSeqs.GuessIsNucleo();
 
 	TREEPERM TP = TP_None;
 	if (optset_perm)
 		TP = StrToTREEPERM(opt(perm));
-	if (TP == TP_All)
-		Die("-perm all not supported, please specify none, abc, acb or bca");
 
-	MultiSequence MSA;
-	RunSuper4(InputSeqs, MSA, TP);
-	MSA.WriteMFA(OutputFileName);
+	SetAlpha(Nucleo ? ALPHA_Nucleo : ALPHA_Amino);
+	InitProbcons();
+
+	Super4 S4;
+	S4.Run(InputSeqs, TP);
+	S4.m_FinalMSA.WriteMFA(OutputFileName);
 	}

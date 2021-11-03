@@ -1,5 +1,46 @@
 #include "muscle.h"
 
+void MakeAlnRows(const string &X, const string &Y,
+  const string &PathXY, string &RowX, string &RowY)
+	{
+	RowX.clear();
+	RowY.clear();
+
+	const byte *XSeq = (const byte *) X.c_str();
+	const byte *YSeq = (const byte *) Y.c_str();
+	const uint ColCount = SIZE(PathXY);
+	const uint LX = SIZE(X);
+	const uint LY = SIZE(Y);
+	uint XPos = 0;
+	uint YPos = 0;
+	for (uint Col = 0; Col < ColCount; ++Col)
+		{
+		char c = PathXY[Col];
+		if (c == 'B')
+			{
+			RowX += XSeq[XPos];
+			RowY += YSeq[YPos];
+			++YPos;
+			++XPos;
+			}
+		else if (c == 'X')
+			{
+			RowX += XSeq[XPos];
+			RowY += '-';
+			++XPos;
+			}
+		else if (c == 'Y')
+			{
+			RowY += YSeq[YPos];
+			RowX += '-';
+			++YPos;
+			}
+		else
+			asserta(false);
+		}
+	asserta(XPos == LX && YPos == LY);
+	}
+
 void MakeAlnRows(const Sequence &X, const Sequence &Y,
   const string &PathXY, string &RowX, string &RowY)
 	{
@@ -39,6 +80,16 @@ void MakeAlnRows(const Sequence &X, const Sequence &Y,
 			asserta(false);
 		}
 	asserta(XPos == LX && YPos == LY);
+	}
+
+void LogAln(const string &X, const string &Y, const string &PathXY)
+	{
+	string RowX;
+	string RowY;
+	MakeAlnRows(X, Y, PathXY, RowX, RowY);
+	Log("\n");
+	Log("%s\n", RowX.c_str());
+	Log("%s\n", RowY.c_str());
 	}
 
 void LogAln(const Sequence &X, const Sequence &Y, const string &PathXY)

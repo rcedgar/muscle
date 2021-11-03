@@ -1,8 +1,5 @@
-/////////////////////////////////////////////////////////////////
-// ScoreType.h
-//
-// Routines for doing math operations in PROBCONS.
-/////////////////////////////////////////////////////////////////
+// scoretype.h
+#pragma once
 
 /***
 Derived from PROBCONS code by Chuong B. Do.
@@ -10,338 +7,143 @@ http://probcons.stanford.edu/download.html
 doi: 10.1101/gr.2821705
 ***/
 
+/***
+https://gasstationwithoutpumps.wordpress.com/2014/05/06/sum-of-probabilities-in-log-prob-space/
 
-#ifndef SCORETYPE_H
-#define SCORETYPE_H
+The problem is mathematically very simple.  We have two non-negative numbers
+(usually probabilities), p and q, that are represented in the computer by
+floating-point numbers for their natural logs: a=\ln p and b=\ln q, and we want
+to represent their sum: \ln(p+q).
 
-#include <cmath>
-#include <algorithm>
-#include <cfloat>
+The brute-force way to do this in code is log(exp(a) + exp(b)), but this can run
+into floating-point problems (underflow, overflow, or loss of precision). It is
+also fairly expensive, as it involves computing three transcendental functions
+(2 exponentiation and 1 logarithm).
 
-typedef float ScoreType;
+We can simplify the problem:
+	\ln(e^{a} + e^{b})
+		= \ln\left( e^{b}(e^{a-b} + 1) \right)
+		= b + \ln(e^{a-b} +1),
+
+so all we need to compute is the function f(x) = \ln(e^{x} +1).  Furthermore,
+if we swap the inputs as needed, we can make sure that b\geq a, so that f(x)
+is only needed for x\leq 0.  This means that we only need two transcendental
+functions (one exponential and one logarithm), and the logarithm is always
+going to be of a number between 1 and 2 (which is generally where logarithm
+implementations are most efficient). We can get much better accuracy by
+eliminating the addition and using library function log1p which computes
+\ln(1+x). Our function f is then computed as log1p(exp(x)).
+
+But we can still run into problems.  If x is very negative, then exp(x)
+could underflow to 0. This is not a serious problem, unless the programming
+language treats that as an exception and throws an error. We can avoid this
+problem by setting a threshold, below which the implementation of f just
+returns 0. The threshold should be set at the most negative value of x
+for which exp(x) still returns a normal floating-point number: that is,
+the natural log of the smallest normalized number, which depends on the
+precision. For the IEEE standard floating-point representations, I believe
+that the smallest normalized numbers are
+
+representation 	smallest +vs float 	approx ln
+float16 	    2^-15 	            -10.397207708
+float32 	    2^-127 	            -88.029691931
+float64 	    2^-1023 	        -709.089565713
+float128 	    2^-16383 	        -11355.8302591
+
+By adding one test for the threshold (appropriately chosen for the precision
+of floating-point number used in the log-prob representation), and returning
+0 from f when below the threshold, we can avoid underflowing on the computation
+of the exponential.
+
+I was going to write up the choice of a slightly higher cutpoint, where we could
+use the Taylor expansion \ln(1+\epsilon) \approx \epsilon + O(\epsilon^2), and
+just return exp(x), but I believe that log1p already handles this correctly.
+So reasonably efficient code that does the sum of probabilities in log-prob 
+representation looks something like this in c++:
+
+inline float log1pexp(float x)
+{   return x<-88.029691931? 0.: log1p(exp(x));
+}
+inline float sum_log_prob(float a, float b)
+{   return a>b? a+log1pexp(b-a):  b+log1pexp(a-b);
+}
+inline double log1pexp(double x)
+{   return x<-709.089565713? 0.: log1p(exp(x));
+}
+inline double sum_log_prob(double a, double b)
+{   return a>b? a+log1pexp(b-a):  b+log1pexp(a-b);
+}
+inline long double log1pexp(long double x)
+{   return x<-11355.8302591? 0.: log1p(exp(x));
+}
+inline long double sum_log_prob(long double a, long double b)
+{   return a>b? a+log1pexp(b-a):  b+log1pexp(a-b);
+}
+
+A careful coder would check exactly where the exp(x) computation underflows,
+rather than relying on the theoretical estimates made here, as there could
+be implementation-dependent details that cause underflow at a higher threshold
+than strictly necessary.
+***/
 
 const float LOG_ZERO = -2e20f;
 const float LOG_ONE = 0.0f;
-
-/////////////////////////////////////////////////////////////////
-// LOG()
-//
-// Compute the logarithm of x.
-/////////////////////////////////////////////////////////////////
-
-inline ScoreType LOG (ScoreType x){
-  return log (x);
-}
-
-/////////////////////////////////////////////////////////////////
-// EXP()
-//
-// Computes exp(x).
-/////////////////////////////////////////////////////////////////
-
-inline ScoreType EXP (ScoreType x){
-  //return exp(x);
-  if (x > -2){
-    if (x > -0.5){
-      if (x > 0)
-	return exp(x);
-      return float((((0.03254409303190190000f*x + 0.16280432765779600000f)*x + 0.49929760485974900000)*x + 0.99995149601363700000)*x + 0.99999925508501600000);
-    }
-    if (x > -1)
-      return float((((0.01973899026052090000*x + 0.13822379685007000000)*x + 0.48056651562365000000)*x + 0.99326940370383500000)*x + 0.99906756856399500000);
-    return float((((0.00940528203591384000*x + 0.09414963667859410000)*x + 0.40825793595877300000)*x + 0.93933625499130400000)*x + 0.98369508190545300000);
-  }
-  if (x > -8){
-    if (x > -4)
-      return float((((0.00217245711583303000*x + 0.03484829428350620000)*x + 0.22118199801337800000)*x + 0.67049462206469500000)*x + 0.83556950223398500000);
-    return float((((0.00012398771025456900*x + 0.00349155785951272000)*x + 0.03727721426017900000)*x + 0.17974997741536900000)*x + 0.33249299994217400000);
-  }
-  if (x > -16)
-    return float((((0.00000051741713416603*x + 0.00002721456879608080)*x + 0.00053418601865636800)*x + 0.00464101989351936000)*x + 0.01507447981459420000);
-  return 0;
-}
-
-/*
-/////////////////////////////////////////////////////////////////
-// LOOKUP()
-//
-// Computes log (exp (x) + 1), for 0 <= x <= 7.5.
-/////////////////////////////////////////////////////////////////
-
-inline ScoreType LOOKUP (ScoreType x){
-  //return log (exp(x) + 1);
-  if (x < 2){
-    if (x < 0.5){
-      if (x < 0)
-	return log (exp(x) + 1);
-      return (((-0.00486373205785640000*x - 0.00020245408813934800)*x + 0.12504222666029800000)*x + 0.49999685320563000000)*x + 0.69314723138948900000;
-    }
-    if (x < 1)
-      return (((-0.00278634205460548000*x - 0.00458097251248546000)*x + 0.12865849880472500000)*x + 0.49862228499205200000)*x + 0.69334810088688000000;
-    return (((0.00059633755154209200*x - 0.01918996666063320000)*x + 0.15288232492093800000)*x + 0.48039958825756900000)*x + 0.69857578503189200000;
-  }
-  if (x < 8){
-    if (x < 4)
-      return (((0.00135958539181047000*x - 0.02329807659316430000)*x + 0.15885799609532100000)*x + 0.48167498563270800000)*x + 0.69276185058669200000;
-    return (((0.00011992394456683500*x - 0.00338464503306568000)*x + 0.03622746366545470000)*x + 0.82481250248383700000)*x + 0.32507892994863100000;
-  }
-  if (x < 16)
-    return (((0.00000051726300753785*x - 0.00002720671238876090)*x + 0.00053403733818413500)*x + 0.99536021775747900000)*x + 0.01507065715532010000;
-  return x;
-}
-
-/////////////////////////////////////////////////////////////////
-// LOOKUP_SLOW()
-//
-// Computes log (exp (x) + 1).
-/////////////////////////////////////////////////////////////////
-
-inline ScoreType LOOKUP_SLOW (ScoreType x){
-  return log (exp (x) + 1);
-}
-
-/////////////////////////////////////////////////////////////////
-// MAX()
-//
-// Compute max of three numbers
-/////////////////////////////////////////////////////////////////
-
-inline ScoreType MAX (ScoreType x, ScoreType y, ScoreType z){
-  if (x >= y){
-    if (x >= z)
-      return x;
-    return z;
-  }
-  if (y >= z)
-    return y;
-  return z;
-}
-
-/////////////////////////////////////////////////////////////////
-// LOG_PLUS_EQUALS()
-//
-// Add two log probabilities and store in the first argument
-/////////////////////////////////////////////////////////////////
-
-inline void LOG_PLUS_EQUALS (ScoreType &x, ScoreType y){
-  if (x < y)
-    x = (x <= LOG_ZERO) ? y : LOOKUP(y-x) + x;
-  else
-    x = (y <= LOG_ZERO) ? x : LOOKUP(x-y) + y;
-}
-
-/////////////////////////////////////////////////////////////////
-// LOG_PLUS_EQUALS_SLOW()
-//
-// Add two log probabilities and store in the first argument
-/////////////////////////////////////////////////////////////////
-
-inline void LOG_PLUS_EQUALS_SLOW (ScoreType &x, ScoreType y){
-  if (x < y)
-    x = (x <= LOG_ZERO) ? y : LOOKUP_SLOW(y-x) + x;
-  else
-    x = (y <= LOG_ZERO) ? x : LOOKUP_SLOW(x-y) + y;
-}
-
-/////////////////////////////////////////////////////////////////
-// LOG_ADD()
-//
-// Add two log probabilities
-/////////////////////////////////////////////////////////////////
-
-inline ScoreType LOG_ADD (ScoreType x, ScoreType y){
-  if (x < y) return (x <= LOG_ZERO) ? y : LOOKUP(y-x) + x;
-  return (y <= LOG_ZERO) ? x : LOOKUP(x-y) + y;
-}
-*/
-
-/*
-/////////////////////////////////////////////////////////////////
-// LOG()
-//
-// Compute the logarithm of x.
-/////////////////////////////////////////////////////////////////
-
-inline float LOG (float x){
-  return log (x);
-}
-
-/////////////////////////////////////////////////////////////////
-// EXP()
-//
-// Computes exp(x), fr -4.6 <= x <= 0.
-/////////////////////////////////////////////////////////////////
-
-inline float EXP (float x){
-  assert (x <= 0.00f);
-  if (x < EXP_UNDERFLOW_THRESHOLD) return 0.0f;
-  return (((0.006349841068584 * x + 0.080775412572352) * x + 0.397982026296272) * x + 0.95279335963787f) * x + 0.995176455837312f;
-  //return (((0.00681169825657f * x + 0.08386267698832f) * x + 0.40413983195844f) * x + 0.95656674979767f) * x + 0.99556744049130f;
-}
-*/
+const float INVALID_LOG = FLT_MAX;
+const float UNINIT_LOG = 9e9f;
+const float OUT_OF_BAND_LOG = 8e8f;
 
 const float EXP_UNDERFLOW_THRESHOLD = -4.6f;
 const float LOG_UNDERFLOW_THRESHOLD = 7.5f;
 
-/////////////////////////////////////////////////////////////////
-// LOOKUP()
-//
 // Computes log (exp (x) + 1), for 0 <= x <= 7.5.
-/////////////////////////////////////////////////////////////////
+// This is 2x faster than the libary function log1p()
+inline float LOGEXP1(float x)
+	{
+	assert(x >= 0.00f);
+	assert(x <= LOG_UNDERFLOW_THRESHOLD);
+	if (x <= 1.00f) return ((-0.009350833524763f * x + 0.130659527668286f) * x + 0.498799810682272f) * x + 0.693203116424741f;
+	if (x <= 2.50f) return ((-0.014532321752540f * x + 0.139942324101744f) * x + 0.495635523139337f) * x + 0.692140569840976f;
+	if (x <= 4.50f) return ((-0.004605031767994f * x + 0.063427417320019f) * x + 0.695956496475118f) * x + 0.514272634594009f;
+	assert(x <= LOG_UNDERFLOW_THRESHOLD);
+	return ((-0.000458661602210f * x + 0.009695946122598f) * x + 0.930734667215156f) * x + 0.168037164329057f;
+	}
 
-inline float LOOKUP (float x){
-  assert (x >= 0.00f);
-  assert (x <= LOG_UNDERFLOW_THRESHOLD);
-  //return ((-0.00653779113685f * x + 0.09537236626558f) * x + 0.55317574459331f) * x + 0.68672959851568f;
-  if (x <= 1.00f) return ((-0.009350833524763f * x + 0.130659527668286f) * x + 0.498799810682272f) * x + 0.693203116424741f;
-  if (x <= 2.50f) return ((-0.014532321752540f * x + 0.139942324101744f) * x + 0.495635523139337f) * x + 0.692140569840976f;
-  if (x <= 4.50f) return ((-0.004605031767994f * x + 0.063427417320019f) * x + 0.695956496475118f) * x + 0.514272634594009f;
-  assert (x <= LOG_UNDERFLOW_THRESHOLD);
-  return ((-0.000458661602210f * x + 0.009695946122598f) * x + 0.930734667215156f) * x + 0.168037164329057f;
+inline void LOG_PLUS_EQUALS(float& x, float y)
+	{
+	if (x < y)
+		x = (x == LOG_ZERO || y - x >= LOG_UNDERFLOW_THRESHOLD) ? y : LOGEXP1(y - x) + x;
+	else
+		x = (y == LOG_ZERO || x - y >= LOG_UNDERFLOW_THRESHOLD) ? x : LOGEXP1(x - y) + y;
+	}
 
-  //return (((0.00089738532761f * x - 0.01859488697982f) * x + 0.14415772028626f) * x + 0.49515490689159f) * x + 0.69311928966454f;
-}
+inline float LOG_ADD(float x, float y)
+	{
+	if (x < y)
+		return (x == LOG_ZERO || y - x >= LOG_UNDERFLOW_THRESHOLD) ? y : LOGEXP1(y - x) + x;
+	return (y == LOG_ZERO || x - y >= LOG_UNDERFLOW_THRESHOLD) ? x : LOGEXP1(x - y) + y;
+	}
 
-/////////////////////////////////////////////////////////////////
-// LOOKUP_SLOW()
-//
-// Computes log (exp (x) + 1).
-/////////////////////////////////////////////////////////////////
+inline float LOG_ADD(float x1, float x2, float x3)
+	{
+	return LOG_ADD(x1, LOG_ADD(x2, x3));
+	}
 
-inline float LOOKUP_SLOW (float x){
-  return log (exp (x) + 1);
-}
+inline float LOG_ADD(float x1, float x2, float x3, float x4)
+	{
+	return LOG_ADD(x1, LOG_ADD(x2, LOG_ADD(x3, x4)));
+	}
 
-/////////////////////////////////////////////////////////////////
-// MAX()
-//
-// Compute max of three numbers
-/////////////////////////////////////////////////////////////////
+inline float LOG_ADD(float x1, float x2, float x3, float x4, float x5)
+	{
+	return LOG_ADD(x1, LOG_ADD(x2, LOG_ADD(x3, LOG_ADD(x4, x5))));
+	}
 
-inline float MAX (float x, float y, float z){
-  if (x >= y){
-    if (x >= z)
-      return x;
-    return z;
-  }
-  if (y >= z)
-    return y;
-  return z;
-}
+inline float LOG_ADD(float x1, float x2, float x3, float x4, float x5, float x6)
+	{
+	return LOG_ADD(x1, LOG_ADD(x2, LOG_ADD(x3, LOG_ADD(x4, LOG_ADD(x5, x6)))));
+	}
 
-/////////////////////////////////////////////////////////////////
-// LOG_PLUS_EQUALS()
-//
-// Add two log probabilities and store in the first argument
-/////////////////////////////////////////////////////////////////
-
-inline void LOG_PLUS_EQUALS (float &x, float y){
-  if (x < y)
-    x = (x == LOG_ZERO || y - x >= LOG_UNDERFLOW_THRESHOLD) ? y : LOOKUP(y-x) + x;
-  else
-    x = (y == LOG_ZERO || x - y >= LOG_UNDERFLOW_THRESHOLD) ? x : LOOKUP(x-y) + y;
-}
-
-/////////////////////////////////////////////////////////////////
-// LOG_PLUS_EQUALS_SLOW()
-//
-// Add two log probabilities and store in the first argument
-/////////////////////////////////////////////////////////////////
-
-inline void LOG_PLUS_EQUALS_SLOW (float &x, float y){
-  if (x < y)
-    x = (x == LOG_ZERO) ? y : LOOKUP_SLOW(y-x) + x;
-  else
-    x = (y == LOG_ZERO) ? x : LOOKUP_SLOW(x-y) + y;
-}
-
-/////////////////////////////////////////////////////////////////
-// LOG_ADD()
-//
-// Add two log probabilities
-/////////////////////////////////////////////////////////////////
-
-inline float LOG_ADD (float x, float y){
-  if (x < y) return (x == LOG_ZERO || y - x >= LOG_UNDERFLOW_THRESHOLD) ? y : LOOKUP(y-x) + x;
-  return (y == LOG_ZERO || x - y >= LOG_UNDERFLOW_THRESHOLD) ? x : LOOKUP(x-y) + y;
-}
-
-
-/////////////////////////////////////////////////////////////////
-// LOG_ADD()
-//
-// Add three log probabilities
-/////////////////////////////////////////////////////////////////
-
-inline float LOG_ADD (float x1, float x2, float x3){
-  return LOG_ADD (x1, LOG_ADD (x2, x3));
-}
-
-/////////////////////////////////////////////////////////////////
-// LOG_ADD()
-//
-// Add four log probabilities
-/////////////////////////////////////////////////////////////////
-
-inline float LOG_ADD (float x1, float x2, float x3, float x4){
-  return LOG_ADD (x1, LOG_ADD (x2, LOG_ADD (x3, x4)));
-}
-
-/////////////////////////////////////////////////////////////////
-// LOG_ADD()
-//
-// Add five log probabilities
-/////////////////////////////////////////////////////////////////
-
-inline float LOG_ADD (float x1, float x2, float x3, float x4, float x5){
-  return LOG_ADD (x1, LOG_ADD (x2, LOG_ADD (x3, LOG_ADD (x4, x5))));
-}
-
-/////////////////////////////////////////////////////////////////
-// LOG_ADD()
-//
-// Add siz log probabilities
-/////////////////////////////////////////////////////////////////
-
-inline float LOG_ADD (float x1, float x2, float x3, float x4, float x5, float x6){
-  return LOG_ADD (x1, LOG_ADD (x2, LOG_ADD (x3, LOG_ADD (x4, LOG_ADD (x5, x6)))));
-}
-
-/////////////////////////////////////////////////////////////////
-// LOG_ADD()
-//
-// Add seven log probabilities
-/////////////////////////////////////////////////////////////////
-
-inline float LOG_ADD (float x1, float x2, float x3, float x4, float x5, float x6, float x7){
-  return LOG_ADD (x1, LOG_ADD (x2, LOG_ADD (x3, LOG_ADD (x4, LOG_ADD (x5, LOG_ADD (x6, x7))))));
-}
-
-/////////////////////////////////////////////////////////////////
-// ChooseBestOfThree()
-//
-// Store the largest of three values x1, x2, and x3 in *x.  Also
-// if xi is the largest value, then store bi in *b.
-/////////////////////////////////////////////////////////////////
-
-inline void ChooseBestOfThree (float x1, float x2, float x3, char b1, char b2, char b3, float *x, char *b){
-  if (x1 >= x2){
-    if (x1 >= x3){
-      *x = x1;
-      *b = b1;
-      return;
-    }
-    *x = x3;
-    *b = b3;
-    return;
-  }
-  if (x2 >= x3){
-    *x = x2;
-    *b = b2;
-    return;
-  }
-  *x = x3;
-  *b = b3;
-}
-
-#endif
+inline float LOG_ADD(float x1, float x2, float x3, float x4, float x5, float x6, float x7)
+	{
+	return LOG_ADD(x1, LOG_ADD(x2, LOG_ADD(x3, LOG_ADD(x4, LOG_ADD(x5, LOG_ADD(x6, x7))))));
+	}

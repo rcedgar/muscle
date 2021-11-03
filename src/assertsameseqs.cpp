@@ -2,6 +2,48 @@
 
 static uint g_AssertOkCount = 0;
 
+void _AssertSeqsEq(const char *FileName, uint LineNr,
+  const MultiSequence &MSA1, const MultiSequence &MSA2)
+	{
+	const uint SeqCount1 = MSA1.GetSeqCount();
+	for (uint SeqIndex1 = 0; SeqIndex1 < SeqCount1; ++SeqIndex1)
+		{
+		const Sequence *Seq1 = MSA1.GetSequence((int) SeqIndex1);
+		const string &Label = Seq1->m_Label;
+		uint SeqIndex2 = MSA2.GetSeqIndex(Label);
+		const Sequence *Seq2 = MSA2.GetSequence((int) SeqIndex2);
+
+		uint GSI1 = Seq1->GetGSI();
+		uint GSI2 = Seq2->GetGSI();
+
+		Sequence *uSeq1 = Seq1->DeleteGaps();
+		Sequence *uSeq2 = Seq2->DeleteGaps();
+		int Length1 = uSeq1->GetLength();
+		int Length2 = uSeq2->GetLength();
+
+		const vector<char> &v1 = uSeq1->m_CharVec;
+		const vector<char> &v2 = uSeq2->m_CharVec;
+		if (v1 != v2 || GSI1 != GSI2)
+			{
+			Log("\n");
+			Log("AssertSeqsEq >%s\n", Label.c_str());
+			Log("GI1 %u, GI2 %u\n", GSI1, GSI2);
+			Log("Seq1[%d]  ", Length1);
+			for (int i = 1; i < Length1; ++i)
+				Log("%c", v1[i]);
+			Log("\n");
+			Log("Seq2[%d]  ", Length2);
+			for (int i = 1; i < Length2; ++i)
+				Log("%c", v2[i]);
+			Log("\n");
+			Die("AssertSeqsEq %s:%u", FileName, LineNr);
+			}
+
+		DeleteSequence(uSeq1);
+		DeleteSequence(uSeq2);
+		}
+	}
+
 void _AssertSeqsEqInput(const char *File, uint Line, const MultiSequence &MS)
 	{
 	const MultiSequence &GlobalMS = GetGlobalInputMS();
@@ -29,7 +71,7 @@ void _AssertSeqsEqInput(const char *File, uint Line, const MultiSequence &MS)
 
 		const Sequence *InputSeq = GlobalMS.GetSequence(GSI);
 		const string &Label = string(MS.GetLabel(i));
-		const string &GlobalLabel = InputSeq->label;
+		const string &GlobalLabel = InputSeq->m_Label;
 		if (GlobalLabel != Label)
 			{
 			MS.LogGSIs();
@@ -56,36 +98,55 @@ void _AssertSeqsEqInput(const char *File, uint Line, const MultiSequence &MS)
 				  File, Line, i, GSI, Pos, Char, InputChar, Label.c_str());
 			}
 
-		delete UngappedInputSeq;
-		delete UngappedSeq;
+		DeleteSequence(UngappedInputSeq);
+		DeleteSequence(UngappedSeq);
 		}
 	}
 
 void _AssertSameSeqsVec(const char *File, uint Line, 
-  MultiSequence &MS, vector<MultiSequence *> &v)
+  const MultiSequence &MS, vector<const MultiSequence *> &v)
 	{
 	MultiSequence *CombinedMS = new MultiSequence;
 	const uint N = SIZE(v);
 	for (uint i = 0; i < N; ++i)
 		{
-		MultiSequence *MS = v[i];
+		const MultiSequence *MS = v[i];
 		const uint n = MS->GetSeqCount();
 		for (uint j = 0; j < n; ++j)
 			{
-			Sequence *Seq = MS->GetSequence(j);
-			CombinedMS->AddSequence(Seq);
+			const Sequence *Seq = MS->GetSequence(j);
+			CombinedMS->AddSequence(Seq, false);
 			}
 		}
 	_AssertSameSeqs(File, Line, MS, *CombinedMS);
-	CombinedMS->FreeNonOwner();
-	delete CombinedMS;
 	++g_AssertOkCount;
+	delete CombinedMS;
+	}
+
+void _AssertSameSeqsVec(const char *File, uint Line, 
+  const MultiSequence &MS, vector<MultiSequence *> &v)
+	{
+	MultiSequence *CombinedMS = new MultiSequence;
+	const uint N = SIZE(v);
+	for (uint i = 0; i < N; ++i)
+		{
+		const MultiSequence *MS = v[i];
+		const uint n = MS->GetSeqCount();
+		for (uint j = 0; j < n; ++j)
+			{
+			const Sequence *Seq = MS->GetSequence(j);
+			CombinedMS->AddSequence(Seq, false);
+			}
+		}
+	_AssertSameSeqs(File, Line, MS, *CombinedMS);
+	++g_AssertOkCount;
+	delete CombinedMS;
 	}
 
 void _AssertSameSeqsJoin(const char *File, uint Line, 
-  MultiSequence &MS1, MultiSequence &MS2, MultiSequence &MS12)
+  const MultiSequence &MS1, const MultiSequence &MS2, const MultiSequence &MS12)
 	{
-	vector<MultiSequence *> v;
+	vector<const MultiSequence *> v;
 	v.push_back(&MS1);
 	v.push_back(&MS2);
 	_AssertSameSeqsVec(File, Line, MS12, v);
@@ -96,7 +157,7 @@ uint GetAssertSameSeqsOkCount()
 	return g_AssertOkCount;
 	}
 
-void _AssertSameLabels(const char *File, uint Line, MultiSequence &MS)
+void _AssertSameLabels(const char *File, uint Line, const MultiSequence &MS)
 	{
 	const MultiSequence &GlobalMS = GetGlobalInputMS();
 	const uint GN = GetGlobalMSSeqCount();
@@ -135,7 +196,7 @@ void _AssertSameLabels(const char *File, uint Line, MultiSequence &MS)
 	}
 
 void _AssertSameSeqs(const char *File, uint Line, 
-  MultiSequence &MS1, MultiSequence &MS2)
+  const MultiSequence &MS1, const MultiSequence &MS2)
 	{
 	const MultiSequence &GlobalMS = GetGlobalInputMS();
 	const uint GN = GetGlobalMSSeqCount();

@@ -61,7 +61,7 @@ void cmd_qscore()
 			{
 			uint RefSeqIndex = p->second;
 			if (RefSeqIndex == UINT_MAX)
-				Quit("UINT_MAX");
+				Die("UINT_MAX");
 			RefToTestSeqIndex[RefSeqIndex] = TestSeqIndex;
 			++FoundCount;
 			}
@@ -132,7 +132,7 @@ void cmd_qscore()
 						cRef,
 						cTest);
 					}
-				if (isalpha(cRef) && isupper(cRef))
+				if (isalpha(cRef) && (isupper(cRef) || cRef == 'x'))
 					{
 					RefColIsAligned = true;
 					++NonGappedCount;
@@ -160,7 +160,7 @@ void cmd_qscore()
 						for (uint RefSeqIndex = 0; RefSeqIndex < RefSeqCount; RefSeqIndex++)
 							fprintf(stderr, "%c", msaRef.GetChar(RefSeqIndex, RefColIndex));
 						fprintf(stderr, "\n");
-						Quit("Ref col %u has both upper- and lower-case letters",
+						Die("Ref col %u has both upper- and lower-case letters",
 						  RefColIndex);
 						}
 					}

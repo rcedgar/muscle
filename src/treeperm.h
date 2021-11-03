@@ -2,11 +2,11 @@
 
 enum TREEPERM
 	{
-	TP_None,
-	TP_ABC,
-	TP_ACB,
-	TP_BCA,
-	TP_All
+	TP_None = 0,
+	TP_ABC = 1,
+	TP_ACB = 2,
+	TP_BCA = 3,
+	TP_All = 4
 	};
 
 TREEPERM StrToTREEPERM(const string &s);

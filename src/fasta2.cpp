@@ -8,6 +8,7 @@ const int CR = '\r';
 const int NL = '\n';
 
 bool g_FASTA_Upper = true;
+bool g_FASTA_AllowDigits = false;
 
 #define ADD(c)															\
 		{																\
@@ -34,13 +35,13 @@ char *GetFastaSeq(FILE *f, unsigned *ptrSeqLength, char **ptrLabel, bool DeleteG
 	if (EOF == c)
 		return 0;
 	if ('>' != c)
-		Quit("Invalid file format, expected '>' to start FASTA label");
+		Die("Invalid file format, expected '>' to start FASTA label");
 
 	for (;;)
 		{
 		int c = fgetc(f);
 		if (EOF == c)
-			Quit("End-of-file or input error in FASTA label");
+			Die("End-of-file or input error in FASTA label");
 
 	// NL or CR terminates label
 		if (NL == c || CR == c)
@@ -66,10 +67,10 @@ char *GetFastaSeq(FILE *f, unsigned *ptrSeqLength, char **ptrLabel, bool DeleteG
 			if (feof(f))
 				break;
 			else if (ferror(f))
-				Quit("Error reading FASTA file, ferror=TRUE feof=FALSE errno=%d %s",
+				Die("Error reading FASTA file, ferror=TRUE feof=FALSE errno=%d %s",
 				  errno, strerror(errno));
 			else
-				Quit("Error reading FASTA file, fgetc=EOF feof=FALSE ferror=FALSE errno=%d %s",
+				Die("Error reading FASTA file, fgetc=EOF feof=FALSE ferror=FALSE errno=%d %s",
 				  errno, strerror(errno));
 			}
 
@@ -81,20 +82,26 @@ char *GetFastaSeq(FILE *f, unsigned *ptrSeqLength, char **ptrLabel, bool DeleteG
 				break;
 				}
 			else
-				Quit("Unexpected '>' in FASTA sequence data");
+				Die("Unexpected '>' in FASTA sequence data");
 			}
 		else if (isspace(c))
 			;
 		else if (IsGapChar(c))
 			{
 			if (!DeleteGaps)
-				ADD(c)
+				{
+				ADD(c);
+				}
 			}
 		else if (isalpha(c))
 			{
 			if (g_FASTA_Upper)
 				c = toupper(c);
 			ADD(c)
+			}
+		else if (g_FASTA_AllowDigits && isdigit(c))
+			{
+			ADD(c);
 			}
 		else if (isprint(c))
 			{

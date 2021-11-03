@@ -64,6 +64,15 @@ void PermuteTree(const Tree &InputTree,
 	LabelsB.clear();
 	LabelsC.clear();
 
+	const uint InputLeafCount = InputTree.GetLeafCount();
+	if (InputLeafCount < 10)
+		{
+		TreeABC.Copy(InputTree);
+		TreeACB.Copy(InputTree);
+		TreeBCA.Copy(InputTree);
+		return;
+		}
+
 	const float NewEdgeLength = 0.1f;
 
 	Tree TreeA;

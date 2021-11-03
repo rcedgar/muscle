@@ -2,12 +2,12 @@
 #include "myutils.h"
 #include "alpha3.h"
 
-unsigned char g_AminoAcidChars[20] =
+byte g_AminoAcidChars[20] =
 	{
 	'A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y',
 	};
 
-unsigned char g_CharToLetterAminoStop[256] =
+byte g_CharToLetterAminoStop[256] =
 	{
 	INVALID_LETTER, // [  0] 0x00
 	INVALID_LETTER, // [  1] 0x01
@@ -266,7 +266,7 @@ unsigned char g_CharToLetterAminoStop[256] =
 	INVALID_LETTER, // [254] 0xfe
 	INVALID_LETTER, // [255] 0xff
 	};
-unsigned char g_CharToLetterAminoGap[256] =
+byte g_CharToLetterAminoGap[256] =
 	{
 	INVALID_LETTER, // [  0] 0x00
 	INVALID_LETTER, // [  1] 0x01
@@ -526,7 +526,7 @@ unsigned char g_CharToLetterAminoGap[256] =
 	INVALID_LETTER, // [255] 0xff
 	};
 
-unsigned char g_CharToLetterAmino[256] =
+byte g_CharToLetterAmino[256] =
 	{
 	INVALID_LETTER, // [  0] 0x00
 	INVALID_LETTER, // [  1] 0x01
@@ -786,7 +786,7 @@ unsigned char g_CharToLetterAmino[256] =
 	INVALID_LETTER, // [255] 0xff
 	};
 
-unsigned char g_LetterToCharAmino[256] =
+byte g_LetterToCharAmino[256] =
 	{
 	'A', // [0] 
 	'C', // [1] 
@@ -1046,7 +1046,7 @@ unsigned char g_LetterToCharAmino[256] =
 	INVALID_CHAR, // [255]
 	};
 
-unsigned char g_LetterToCharAminoGap[256] =
+byte g_LetterToCharAminoGap[256] =
 	{
 	'A', // [0] 
 	'C', // [1] 
@@ -1306,7 +1306,7 @@ unsigned char g_LetterToCharAminoGap[256] =
 	INVALID_CHAR, // [255]
 	};
 
-unsigned char g_CharToLetterNucleo[256] =
+byte g_CharToLetterNucleo[256] =
 	{
 	INVALID_LETTER, // [  0] = 0x00
 	INVALID_LETTER, // [  1] = 0x01
@@ -1566,7 +1566,7 @@ unsigned char g_CharToLetterNucleo[256] =
 	INVALID_LETTER, // [255] = 0xff
 	};
 
-unsigned char g_CharToLetterNucleoGap[256] =
+byte g_CharToLetterNucleoGap[256] =
 	{
 	INVALID_LETTER, // [  0] = 0x00
 	INVALID_LETTER, // [  1] = 0x01
@@ -1826,7 +1826,7 @@ unsigned char g_CharToLetterNucleoGap[256] =
 	INVALID_LETTER, // [255] = 0xff
 	};
 
-unsigned char g_CharToLetterNucleoMasked[256] =
+byte g_CharToLetterNucleoMasked[256] =
 	{
 	INVALID_LETTER, // [  0] = 0x00
 	INVALID_LETTER, // [  1] = 0x01
@@ -2086,7 +2086,7 @@ unsigned char g_CharToLetterNucleoMasked[256] =
 	INVALID_LETTER, // [255] = 0xff
 	};
 
-unsigned char g_CharToLetterNucleoW[256] =
+byte g_CharToLetterNucleoW[256] =
 	{
 	0  ,            // [  0] = 0x00
 	0  ,            // [  1] = 0x01
@@ -2346,7 +2346,7 @@ unsigned char g_CharToLetterNucleoW[256] =
 	0  ,            // [255] = 0xff
 	};
 
-unsigned char g_LetterToCharNucleo[256] =
+byte g_LetterToCharNucleo[256] =
 	{
 	'A', // [0]
 	'C', // [1]
@@ -2606,7 +2606,7 @@ unsigned char g_LetterToCharNucleo[256] =
 	INVALID_CHAR, // [255]
 	};
 
-unsigned char g_LetterToCharNucleoGap[256] =
+byte g_LetterToCharNucleoGap[256] =
 	{
 	'A', // [0]
 	'C', // [1]
@@ -2866,7 +2866,7 @@ unsigned char g_LetterToCharNucleoGap[256] =
 	INVALID_CHAR, // [255]
 	};
 
-unsigned char g_CodonWordToAminoLetter[4*4*4] =
+byte g_CodonWordToAminoLetter[4*4*4] =
 	{
 	8 , // [ 0] = AAA K (Lys)
 	11, // [ 1] = AAC N (Asn)
@@ -2934,7 +2934,7 @@ unsigned char g_CodonWordToAminoLetter[4*4*4] =
 	4 , // [63] = TTT F (Phe)
 	};
 
-unsigned char g_CodonWordToAminoChar[4*4*4] =
+byte g_CodonWordToAminoChar[4*4*4] =
 	{
 	'K', // [ 0] = AAA (Lys)
 	'N', // [ 1] = AAC (Asn)
@@ -3002,7 +3002,7 @@ unsigned char g_CodonWordToAminoChar[4*4*4] =
 	'F', // [63] = TTT (Phe)
 	};
 
-unsigned char g_CharToCompChar[256] =
+byte g_CharToCompChar[256] =
 	{
 	'?',          // [  0] 0x00 invalid nt
 	'?',          // [  1] 0x01 invalid nt
@@ -3262,7 +3262,7 @@ unsigned char g_CharToCompChar[256] =
 	'?',          // [255] 0xff invalid nt
 };
 
-unsigned char g_LetterToCompLetter[256] =
+byte g_LetterToCompLetter[256] =
 	{
 	3,           // 0(A) -> 3(T)
 	2,           // 1(C) -> 2(G)
@@ -3522,7 +3522,7 @@ unsigned char g_LetterToCompLetter[256] =
 	INVALID_LETTER, // [255]
 };
 
-unsigned char g_CharToCompLetter[256] =
+byte g_CharToCompLetter[256] =
 	{
 	INVALID_LETTER, // [  0]
 	INVALID_LETTER, // [  1]

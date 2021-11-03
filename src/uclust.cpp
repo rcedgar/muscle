@@ -2,30 +2,29 @@
 #include "uclust.h"
 #include "pwpath.h"
 
-float UClust::AlignSeqPair(uint SeqIndex1, uint SeqIndex2,
-  vector<char> &Path)
+float UClust::AlignSeqPair(uint SeqIndex1, uint SeqIndex2, string &Path)
 	{
 	Path.clear();
-	Sequence *Seq1 = m_InputSeqs->GetSequence(SeqIndex1);
-	Sequence *Seq2 = m_InputSeqs->GetSequence(SeqIndex2);
+	const Sequence *Seq1 = m_InputSeqs->GetSequence(SeqIndex1);
+	const Sequence *Seq2 = m_InputSeqs->GetSequence(SeqIndex2);
 	asserta(Seq1 != 0);
 	asserta(Seq2 != 0);
-	float EA = PairHMM::AlignPair(Seq1, Seq2, &Path);
+	float EA = AlignPairFlat(Seq1, Seq2, Path);
 	return EA;
 	}
 
 void UClust::AddSeqToIndex(uint SeqIndex)
 	{
 	const Sequence *Seq = m_InputSeqs->GetSequence(SeqIndex);
-	const byte *ByteSeq = (const byte *) (Seq->data->data() + 1);
+	const byte *ByteSeq = Seq->GetBytePtr();
 	const uint L = Seq->GetLength();
 	m_US.AddSeq(ByteSeq, L, SeqIndex);
 	}
 
-uint UClust::Search(uint SeqIndex, vector<char> &Path)
+uint UClust::Search(uint SeqIndex, string &Path)
 	{
 	const Sequence *Seq = m_InputSeqs->GetSequence(SeqIndex);
-	const byte *ByteSeq = (const byte *) (Seq->data->data() + 1);
+	const byte *ByteSeq = Seq->GetBytePtr();
 	const uint L = Seq->GetLength();
 
 	vector<uint> TopSeqIndexes;
@@ -55,7 +54,6 @@ uint UClust::Search(uint SeqIndex, vector<char> &Path)
 
 void UClust::Run(MultiSequence &InputSeqs, float MinEA)
 	{
-	SetPPScore();
 	m_InputSeqs = &InputSeqs;
 	m_MinEA = MinEA;
 	m_US.Init();
@@ -95,7 +93,7 @@ void UClust::Run(MultiSequence &InputSeqs, float MinEA)
 		asserta(Done[SeqIndex] == false);
 		Done[SeqIndex] = true;
 #endif
-		const uint L = (uint) InputSeqs.GetLength(SeqIndex);
+		const uint L = (uint) InputSeqs.GetSeqLength(SeqIndex);
 		asserta(L <= LastLength);
 		LastLength = L;
 
@@ -103,7 +101,7 @@ void UClust::Run(MultiSequence &InputSeqs, float MinEA)
 		  "UCLUST %u seqs EE<%.2f, %u centroids, %u members",
 		  InputSeqCount, MinEE, CentroidCount, MemberCount);
 
-		vector<char> &Path = m_SeqIndexToPath[SeqIndex];
+		string &Path = m_SeqIndexToPath[SeqIndex];
 		uint RepSeqIndex = Search(SeqIndex, Path);
 		if (RepSeqIndex == UINT_MAX)
 			{
@@ -126,8 +124,8 @@ void UClust::GetCentroidSeqs(MultiSequence &CentroidSeqs) const
 	for (uint i = 0; i < CentroidCount; ++i)
 		{
 		uint SeqIndex = m_CentroidSeqIndexes[i];
-		Sequence *Seq = m_InputSeqs->GetSequence(SeqIndex);
-		CentroidSeqs.AddSequence(Seq);
+		const Sequence *Seq = m_InputSeqs->GetSequence(SeqIndex);
+		CentroidSeqs.AddSequence(Seq, false);
 		}
 	AssertSameLabels(CentroidSeqs);
 	}
@@ -164,7 +162,7 @@ void UClust::GetGSIs(
 		if (CentroidSeqIndex == MemberSeqIndex)
 			continue;
 
-		const vector<char> &Path = m_SeqIndexToPath[MemberSeqIndex];
+		const string &Path = m_SeqIndexToPath[MemberSeqIndex];
 		const Sequence *MemberSeq = m_InputSeqs->GetSequence(MemberSeqIndex);
 		const Sequence *CentroidSeq = m_InputSeqs->GetSequence(CentroidSeqIndex);
 
@@ -175,7 +173,7 @@ void UClust::GetGSIs(
 		MemberCentroidGSIs.push_back(MemberCentroidGSI);
 
 		asserta(!Path.empty());
-		CharVecToStr(Path, GSIToMemberCentroidPath[MemberGSI]);
+		GSIToMemberCentroidPath[MemberGSI] = Path;
 		}
 	}
 
@@ -190,7 +188,7 @@ void cmd_uclust()
 
 	bool IsNucleo = InputSeqs.GuessIsNucleo();
 	if (IsNucleo)
-		SetAlpha(ALPHA_DNA);
+		SetAlpha(ALPHA_Nucleo);
 	else
 		SetAlpha(ALPHA_Amino);
 

@@ -1,6 +1,4 @@
-#include "myutils.h"
-#include "probcons.h"
-#include "hmmparams.h"
+#include "muscle.h"
 
 void ProgressLogInputSummary(const string &FileName, const MultiSequence &Seqs)
 	{
@@ -41,32 +39,23 @@ void ProgressLogMSASummary(const string &Str, const MultiSequence &MSA)
 	ProgressLog("\n");
 	}
 
-void RunMTProbcons(MultiSequence &InputSeqs)
-	{
-	bool IsNucleo = InputSeqs.GuessIsNucleo();
-	if (IsNucleo)
-		Warning("Input may be nucleotide, a.a. required for pair HMM alignments");
-
-	const string &OutputFileName = opt(output);
-
-	InitProbcons();
-
-	MultiSequence* alignment = RunMPC(&InputSeqs);
-
-	alignment->WriteMFA(opt(output));
-
-	string s;
-	Psa(s, "MSA %s", OutputFileName.c_str());
-	ProgressLogMSASummary(s, *alignment);
-	}
-
-void cmd_mpc()
-	{
-	const string &InputFileName = opt(mpc);
-
-	MultiSequence InputSeqs;
-	InputSeqs.LoadMFA(InputFileName, true);
-	ProgressLogInputSummary(InputFileName, InputSeqs);
-
-	RunMTProbcons(InputSeqs);
-	}
+//void RunMTProbcons(MultiSequence &InputSeqs)
+//	{
+//	bool IsNucleo = InputSeqs.GuessIsNucleo();
+//	if (IsNucleo)
+//		SetAlpha(ALPHA_Nucleo);
+//	else
+//		SetAlpha(ALPHA_Amino);
+//
+//	const string &OutputFileName = opt(output);
+//
+//	InitProbcons();
+//
+//	MultiSequence* alignment = RunMPC(&InputSeqs);
+//
+//	alignment->WriteMFA(opt(output));
+//
+//	string s;
+//	Psa(s, "MSA %s", OutputFileName.c_str());
+//	ProgressLogMSASummary(s, *alignment);
+//	}

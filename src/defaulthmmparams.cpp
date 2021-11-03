@@ -1,21 +1,31 @@
 #include "myutils.h"
 #include "hmmparams.h"
 
-void HMMParams::GetDefaultHMMParams(vector<string> &Lines)
+void HMMParams::GetDefaultHMMParams(bool Nucleo, vector<string> &Lines)
+	{
+	if (Nucleo)
+		GetDefaultHMMParams_Nucleo(Lines);
+	else
+		GetDefaultHMMParams_Amino(Lines);
+	}
+
+void HMMParams::GetDefaultHMMParams_Amino(vector<string> &Lines)
 	{
 	Lines.clear();
 #define ADD_STR(s)	Lines.push_back(s);
 
+ADD_STR("HMM	aa")
 ADD_STR("T.START_M	0.6")
 ADD_STR("T.START_IS	0.02")
 ADD_STR("T.START_IL	0.18")
 ADD_STR("T.M_M	0.96")
 ADD_STR("T.M_IS	0.012")
 ADD_STR("T.M_IL	0.008")
-ADD_STR("T.IS_IS	0.34")
-ADD_STR("T.IS_M	0.60")
+ADD_STR("T.IS_IS	0.35")
+ADD_STR("T.IS_M	0.65")
 ADD_STR("T.IL_IL	0.90")
 ADD_STR("T.IL_M	0.10")
+
 ADD_STR("E.AA	0.023731")
 ADD_STR("E.CA	0.0014551")
 ADD_STR("E.CC	0.010135")
@@ -226,6 +236,43 @@ ADD_STR("E.YT	0.00094759")
 ADD_STR("E.YV	0.00148")
 ADD_STR("E.YW	0.00069226")
 ADD_STR("E.YY	0.0099931")
+
+#undef ADD_STR
+	}
+
+void HMMParams::GetDefaultHMMParams_Nucleo(vector<string> &Lines)
+	{
+	Lines.clear();
+#define ADD_STR(s)	Lines.push_back(s);
+
+ADD_STR("HMM	nt")
+ADD_STR("T.START_M	0.6")
+ADD_STR("T.START_IS	0.02")
+ADD_STR("T.START_IL	0.18")
+ADD_STR("T.M_M	0.96")
+ADD_STR("T.M_IS	0.012")
+ADD_STR("T.M_IL	0.008")
+ADD_STR("T.IS_IS	0.35")
+ADD_STR("T.IS_M	0.65")
+ADD_STR("T.IL_IL	0.90")
+ADD_STR("T.IL_M	0.10")
+
+#define Diag	"0.12"
+#define Other	"0.044"
+
+ADD_STR("E.AA	" Diag)
+
+ADD_STR("E.CA	" Other)
+ADD_STR("E.CC	" Diag)
+
+ADD_STR("E.GA	" Other)
+ADD_STR("E.GC	" Other)
+ADD_STR("E.GG	" Diag)
+
+ADD_STR("E.TA	" Other)
+ADD_STR("E.TC	" Other)
+ADD_STR("E.TG	" Other)
+ADD_STR("E.TT	" Diag)
 
 #undef ADD_STR
 	}

@@ -1,11 +1,26 @@
 #include "muscle.h"
 #include "myutils.h"
 
-void SetProbconsParams();
-void ProcessMuscleOptions();
-
 int main(int argc, char **argv)
 	{
+	for (int i = 1; i < argc; ++i)
+		{
+		string s = string(argv[i]);
+		if (s == "-h")
+			{
+			void Usage(FILE *f);
+			Usage(stdout);
+			return 0;
+			}
+
+		if (s == "-help" || s == "--help")
+			{
+			void Help();
+			Help();
+			return 0;
+			}
+		}
+
 	MyCmdLine(argc, argv);
 	if (!opt(quiet))
 		{
@@ -14,20 +29,8 @@ int main(int argc, char **argv)
 			return 0;
 		}
 
-	if (optset_output)
-		{
-		opt_out = opt(output);
-		optset_out = true;
-		}
-	if (optset_out)
-		{
-		opt_output = opt(out);
-		optset_output = true;
-		}
-
 	SetLogFileName(opt(log));
 	LogProgramInfoAndCmdLine();
-	SetStartTime();
 
 	uint CmdCount = 0;
 #define C(x)	if (optset_##x) ++CmdCount;
@@ -45,11 +48,7 @@ int main(int argc, char **argv)
 		return 0; \
 		}
 #include "cmds.h"
+#undef C
 
-	SetNewHandler();
-	ProcessMuscleOptions();
-	SetParams();
-	DoMuscle();
-
-	exit(EXIT_Success);
+	return 0;
 	}

@@ -1,5 +1,4 @@
 #include "muscle.h"
-#include <ctype.h>
 
 /***
 From Bioperl docs:
@@ -86,11 +85,10 @@ static unsigned GetAlphaSize(ALPHA Alpha)
 	case ALPHA_Amino:
 		return 20;
 
-	case ALPHA_RNA:
-	case ALPHA_DNA:
+	case ALPHA_Nucleo:
 		return 4;
 		}
-	Quit("Invalid Alpha=%d", Alpha);
+	Die("Invalid Alpha=%d", Alpha);
 	return 0;
 	}
 
@@ -116,6 +114,27 @@ static void SetGapChar(char c)
 	g_LetterExToChar[AX_GAP] = u;
 	g_AlignChar[u] = u;
 	g_UnalignChar[u] = u;
+	}
+
+static void SetAlphaNucleo()
+	{
+	Res('A', NX_A)
+	Res('C', NX_C)
+	Res('G', NX_G)
+	Res('T', NX_T)
+	Res('U', NX_T)
+	Wild('M', NX_M)
+	Wild('R', NX_R)
+	Wild('W', NX_W)
+	Wild('S', NX_S)
+	Wild('Y', NX_Y)
+	Wild('K', NX_K)
+	Wild('V', NX_V)
+	Wild('H', NX_H)
+	Wild('D', NX_D)
+	Wild('B', NX_B)
+	Wild('X', NX_X)
+	Wild('N', NX_N)
 	}
 
 static void SetAlphaDNA()
@@ -200,22 +219,16 @@ void SetAlpha(ALPHA Alpha)
 		SetAlphaAmino();
 		break;
 
-	case ALPHA_DNA:
-		SetAlphaDNA();
-
-	case ALPHA_RNA:
-		SetAlphaRNA();
+	case ALPHA_Nucleo:
+		SetAlphaNucleo();
 		break;
 
 	default:
-		Quit("Invalid Alpha=%d", Alpha);
+		Die("Invalid Alpha=%d", Alpha);
 		}
 
 	g_AlphaSize = GetAlphaSize(Alpha);
 	g_Alpha = Alpha;
-
-	if (g_bVerbose)
-		Log("Alphabet %s\n", ALPHAToStr(g_Alpha));
 	}
 
 char GetWildcardChar()
@@ -225,12 +238,11 @@ char GetWildcardChar()
 	case ALPHA_Amino:
 		return 'X';
 
-	case ALPHA_DNA:
-	case ALPHA_RNA:
+	case ALPHA_Nucleo:
 		return 'N';
 
 	default:
-		Quit("Invalid Alpha=%d", g_Alpha);
+		Die("Invalid Alpha=%d", g_Alpha);
 		}
 	return '?';
 	}
@@ -278,6 +290,5 @@ void ReportInvalidLetters()
 		if (InvalidLetters[i])
 			Str[n++] = (char) i;
 		}
-	Warning("Assuming %s (see -seqtype option), invalid letters found: %s",
-	  ALPHAToStr(g_Alpha), Str);
+	Warning("Invalid letters found: %s", Str);
 	}

@@ -2,25 +2,23 @@
 #define pairhmm_h
 
 #include "scoretype.h"
-#include "sparsematrix.h"
 #include "multisequence.h"
 #include "hmmparams.h"
 
-using namespace std;
+static const uint DEFAULT_CONSISTENCY_ITERS = 2;
+static const uint DEFAULT_REFINE_ITERS = 100;
 
 enum HMMSTATE
 	{
 	HMMSTATE_M = 0,
-	HMMSTATE_ISX = 1,
-	HMMSTATE_ISY = 2,
-	HMMSTATE_ILX = 3,
-	HMMSTATE_ILY = 4,
+	HMMSTATE_IX = 1,
+	HMMSTATE_IY = 2,
+	HMMSTATE_JX = 3,
+	HMMSTATE_JY = 4,
 	HMMSTATE_COUNT = 5
 	};
 
 static const uint InsertStateCount = 2;
-
-static const float WILDCARD_PROB = 1e-5f;
 
 class PairHMM
 	{
@@ -40,38 +38,9 @@ public:
 	  const vector<vector<float> > &transMat, const vector<float>& emitSingle,
 	  const vector<vector<float> > &emitPairs);
 
-	static vector<float>* ComputeForwardMatrix(Sequence* seq1, Sequence* seq2);
-
-	static vector<float>* ComputeBackwardMatrix(Sequence* seq1, Sequence* seq2);
-
-	static float ComputeTotalProbability(int seq1Length, int seq2Length,
-		const vector<float>& forward, const vector<float>& backward);
-
-	static vector<float>* ComputePosteriorMatrix(Sequence* seq1, Sequence* seq2,
-		const vector<float>& forward, const vector<float>& backward);
-
-	static pair<vector<char>*, float> ComputeAlignment(int seq1Length, int seq2Length,
-		const vector<float>& posterior);
-
-	static vector<float>* BuildPosterior(MultiSequence* align1, MultiSequence* align2,
-		const vector<vector<SparseMatrix*> >& sparseMatrices);
-
-	static vector<float>* BuildPosterior2(const MultiSequence* align1,
-	  const MultiSequence* align2,
-	  const vector<vector<SparseMatrix*> >& sparseMatrices);
-
-	static vector<float>* BuildPosterior3(
-	  const MultiSequence* align1,
-	  const MultiSequence* align2,
-	  const vector<int> &SeqIndexes1,
-	  const vector<int> &SeqIndexes2,
-	  const vector<SparseMatrix*>& sparseMatrices);
-
-	static float AlignPair(Sequence *X, Sequence *Y, vector<char> *Path = 0);
-	static float AlignPair_StrPath(Sequence *X, Sequence *Y, string &Path);
-
 	static void WriteParamsReport(const string &FileName);
 	static void WriteParamsReport(FILE *f);
+	static void FixUT();
 	};
 
 #endif

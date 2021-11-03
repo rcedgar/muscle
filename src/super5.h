@@ -3,22 +3,35 @@
 #include "derep.h"
 #include "uclust.h"
 #include "transaln.h"
+#include "super4.h"
+
+static const float DEFAULT_MIN_EA_SUPER5_PASS1 = 0.99f;
 
 class Super5
 	{
 public:
-	float m_UClustEA = 0.99f;
+	float m_MinEAPass1 = DEFAULT_MIN_EA_SUPER5_PASS1;
 	MultiSequence *m_InputSeqs = 0;
 	MultiSequence *m_UniqueSeqs = 0;
 	MultiSequence *m_CentroidSeqs = 0;
 	MultiSequence *m_CentroidMSA = 0;
 	MultiSequence *m_ExtendedMSA = 0;
 	MultiSequence *m_FinalMSA = 0;
-	TREEPERM m_TreePerm = TP_None;
+
+	Tree m_GuideTree_None;
+	Tree m_GuideTree_ABC;
+	Tree m_GuideTree_ACB;
+	Tree m_GuideTree_BCA;
+
+	MultiSequence m_FinalMSA_None;
+	MultiSequence m_FinalMSA_ABC;
+	MultiSequence m_FinalMSA_ACB;
+	MultiSequence m_FinalMSA_BCA;
 
 	Derep m_D;
 	UClust m_U;
 	TransAln m_TA;
+	Super4 m_S4;
 
 	vector<bool> m_IsDupe;
 	vector<bool> m_IsCentroid;
@@ -41,7 +54,10 @@ public:
 	vector<string> m_GSIToMemberCentroidPath;
 
 public:
-	void Run(MultiSequence &InputSeqs);
+	void SetOpts();
+	void Run(MultiSequence &InputSeqs, TREEPERM Perm);
+	void MakeCentroidSeqs(MultiSequence &InputSeqs);
+	void AlignCentroidSeqs(TREEPERM Perm, MultiSequence &MSA);
 	void SetDupeVecs();
 	void SetCentroidVecs();
 	void SetCentroidSeqsVecs();
@@ -49,4 +65,5 @@ public:
 	void AlignMembers();
 	void AlignDupes();
 	void ValidateVecs() const;
+	void ClearTreesAndMSAs();
 	};

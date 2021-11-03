@@ -20,7 +20,7 @@ TextFile::TextFile(const char szFileName[], bool bWrite)
 			ptrFile = fopen(szFileName, "rb");
 		}
 	if (0 == ptrFile)
-		Quit("Cannot open '%s' errno=%d\n", szFileName, errno);
+		Die("Cannot open '%s' errno=%d\n", szFileName, errno);
 	Init(ptrFile, szFileName);
 	}
 
@@ -43,7 +43,7 @@ TextFile::TextFile(const string &FileName, bool bWrite)
 			ptrFile = fopen(szFileName, "rb");
 		}
 	if (0 == ptrFile)
-		Quit("Cannot open '%s' errno=%d\n", szFileName, errno);
+		Die("Cannot open '%s' errno=%d\n", szFileName, errno);
 	Init(ptrFile, szFileName);
 	}
 
@@ -78,7 +78,7 @@ TextFile::~TextFile()
 bool TextFile::GetLine(char szLine[], unsigned uBytes)
 	{
 	if (0 == uBytes)
-		Quit("TextFile::GetLine, buffer zero size");
+		Die("TextFile::GetLine, buffer zero size");
 
 	
 	int FillVal = 0; // suppress warning from gcc that I don't understand
@@ -100,7 +100,7 @@ bool TextFile::GetLine(char szLine[], unsigned uBytes)
 		if (uBytesCopied < uBytes - 1)
 			szLine[uBytesCopied++] = (char) c;
 		else
-			Quit("TextFile::GetLine: input buffer too small, line %u",
+			Die("TextFile::GetLine: input buffer too small, line %u",
 			  m_uLineNr);
 		}
 	}
@@ -108,17 +108,7 @@ bool TextFile::GetLine(char szLine[], unsigned uBytes)
 // As GetLine, but trim leading and trailing blanks; skip empty lines
 bool TextFile::GetTrimLine(char szLine[], unsigned uBytes)
 	{
-	if (uBytes == 0)
-		Quit("GetTrimLine");
-	for (;;)
-		{
-		bool bEOF = GetLine(szLine, uBytes);
-		if (bEOF)
-			return true;
-		TrimBlanks(szLine);
-		if (0 != szLine[0])
-			break;
-		}
+	Die("GetTrimLine");
 	return false;
 	}
 
@@ -160,10 +150,10 @@ void TextFile::PutFormat(const char szFormat[], ...)
 void TextFile::GetLineX(char szLine[], unsigned uBytes)
 	{
 	if (uBytes == 0)
-		Quit("GetLineX");
+		Die("GetLineX");
 	bool bEof = GetLine(szLine, uBytes);
 	if (bEof)
-		Quit("end-of-file in GetLineX");
+		Die("end-of-file in GetLineX");
 	}
 
 bool TextFile::GetToken(char szToken[], unsigned uBytes, const char szCharTokens[])
@@ -195,7 +185,7 @@ bool TextFile::GetToken(char szToken[], unsigned uBytes, const char szCharTokens
 		if (uBytesCopied < uBytes - 1)
 			szToken[uBytesCopied++] = c;
 		else
-			Quit("TextFile::GetToken: input buffer too small, line %u",
+			Die("TextFile::GetToken: input buffer too small, line %u",
 			  m_uLineNr);
 		bool bEof = GetChar(c);
 		if (bEof)
@@ -224,7 +214,7 @@ void TextFile::GetTokenX(char szToken[], unsigned uBytes, const char szCharToken
 	{
 	bool bEof = GetToken(szToken, uBytes, szCharTokens);
 	if (bEof)
-		Quit("End-of-file in GetTokenX");
+		Die("End-of-file in GetTokenX");
 	}
 
 void TextFile::Skip()
@@ -307,7 +297,7 @@ bool TextFile::GetChar(char &c)
 				}
 			return true;
 			}
-		Quit("TextFile::GetChar, error %s", strerror(errno));
+		Die("TextFile::GetChar, error %s", strerror(errno));
 		}
 	c = (char) ic;
 	if ('\n' == c)
@@ -328,7 +318,7 @@ void TextFile::GetCharX(char &c)
 	{
 	bool bEof = GetChar(c);
 	if (bEof)
-		Quit("End-of-file in GetCharX");
+		Die("End-of-file in GetCharX");
 	}
 
 void TextFile::GetNonblankChar(char &c)
@@ -337,7 +327,7 @@ void TextFile::GetNonblankChar(char &c)
 		{
 		bool bEof = GetChar(c);
 		if (bEof)
-			Quit("End-of-file in GetCharX");
+			Die("End-of-file in GetCharX");
 		}
 	while (isspace(c));
 	}
@@ -351,7 +341,7 @@ void TextFile::SkipLine()
 		char c;
 		bool bEof = GetChar(c);
 		if (bEof)
-			Quit("End-of-file in SkipLine");
+			Die("End-of-file in SkipLine");
 		if ('\n' == c)
 			break;
 		}
@@ -361,7 +351,7 @@ void TextFile::SkipWhite()
 	{
 	bool bEof = SkipWhiteX();
 	if (bEof)
-		Quit("End-of-file skipping white space");
+		Die("End-of-file skipping white space");
 	}
 
 bool TextFile::SkipWhiteX()

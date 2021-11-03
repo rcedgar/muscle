@@ -24,14 +24,14 @@ public:
 	unsigned *m_IdToSeqIndex;
 	unsigned *m_SeqIndexToId;
 
-	WEIGHT *m_Weights;
-
 public:
 	MSA();
 	virtual ~MSA();
 
 public:
 // Ways to create an MSA
+	void FromStrings(const vector<string> &Strings);
+	void FromStrings2(const vector<string> &Labels, vector<string> &Seqs);
 	void FromFile(TextFile &File);
 	void FromFASTAFile(const string &FileName);
 	void FromFASTAFile_PreserveCase(const string &FileName);
@@ -43,12 +43,8 @@ public:
 
 	void ToFile(TextFile &File) const;
 	void ToFASTAFile(TextFile &File) const;
+	void ToFASTAFile(FILE *f) const;
 	void ToFASTAFile(const string &FileName) const;
-	void ToMSFFile(TextFile &File, const char *ptrComment = 0) const;
-	void ToAlnFile(TextFile &File) const;
-	void ToHTMLFile(TextFile &File) const;
-	void ToPhySequentialFile(TextFile &File) const;
-	void ToPhyInterleavedFile(TextFile &File) const;
 
 	void SetSize(unsigned uSeqCount, unsigned uColCount);
 	void SetSeqCount(unsigned uSeqCount);
@@ -60,16 +56,13 @@ public:
 	unsigned GetSeqIndex(unsigned uId) const;
 	bool GetSeqIndex(unsigned uId, unsigned *ptruIndex) const;
 	double GetOcc(unsigned uColIndex) const;
-	void GetFractionalWeightedCounts(unsigned uColIndex, bool bNormalize,
-	  FCOUNT fcCounts[], FCOUNT *ptrfcGapStart, FCOUNT *ptrfcGapEnd,
-	  FCOUNT *fcGapExtend, FCOUNT *ptrfOcc,
-	  FCOUNT *fcLL, FCOUNT *fcLG, FCOUNT *fcGL, FCOUNT *fcGG) const;
 	bool IsGap(unsigned uSeqIndex, unsigned uColIndex) const;
 	bool IsWildcard(unsigned uSeqIndex, unsigned uColIndex) const;
 	bool IsGapColumn(unsigned uColIndex) const;
 	uint GetGapCount(uint ColIndex) const;
 	bool ColumnHasGap(unsigned uColIndex) const;
 	bool IsGapSeq(unsigned uSeqIndex) const;
+	void GetUngappedSeqStr(uint SeqIndex, string &SeqStr) const;
 
 	void SetChar(unsigned uSeqIndex, unsigned uColIndex, char c);
 	void SetSeqName(unsigned uSeqIndex, const char szName[]);
@@ -91,23 +84,11 @@ public:
 	void DeleteSeq(unsigned uSeqIndex);
 	bool IsEmptyCol(unsigned uColIndex) const;
 
-	WEIGHT GetSeqWeight(unsigned uSeqIndex) const;
-	WEIGHT GetTotalSeqWeight() const;
-	void SetSeqWeight(unsigned uSeqIndex, WEIGHT w) const;
-	void NormalizeWeights(WEIGHT wTotal) const;
-	bool WeightsSet() const;
-
-	unsigned GetGCGCheckSum(unsigned uSeqIndex) const;
-
 	ALPHA GuessAlpha() const;
 	void FixAlpha();
 
 	unsigned UniqueResidueTypes(unsigned uColIndex) const;
 
-	void UnWeight();
-
-	//void GetNodeCounts(unsigned uAlignedColIndex, NodeCounts &Counts) const;
-	//void ValidateBreakMatrices() const;
 	unsigned GetCharCount(unsigned uSeqIndex, unsigned uColIndex) const;
 	const char *GetSeqBuffer(unsigned uSeqIndex) const;
 	unsigned AlignedColIndexToColIndex(unsigned uAlignedColIndex) const;
@@ -116,7 +97,6 @@ public:
 	  unsigned *ptruPosCount) const;
 
 	void LogMe() const;
-	void ListWeights() const;
 
 	double GetPctGroupIdentityPair(unsigned uSeqIndex1, unsigned uSeqIndex2) const;
 
@@ -137,37 +117,19 @@ public:
 	  unsigned uSeqIndex2);
 	void GetPosToCol(uint SeqIndex, vector<uint> &PosToCol) const;
 	void GetColToPos(uint SeqIndex, vector<uint> &ColToPos) const;
-	bool ColIsUpper(uint ColIndex) const;
+	bool ColIsUpper(uint ColIndex, double MaxGapFract) const;
 
 	static void SetIdCount(unsigned uIdCount);
 
 private:
-	friend void SetMSAWeightsMuscle(MSA &msa);
-	friend void SetThreeWayWeightsMuscle(MSA &msa);
-	void SetHenikoffWeightsPB() const;
-	void SetHenikoffWeights() const;
-	void SetGSCWeights() const;
-	void SetUniformWeights() const;
-	void SetClustalWWeights(const Tree &tree);
-
 	void Free();
 	void AppendSeq(char *ptrSeq, unsigned uSeqLength, char *ptrLabel);
 	void ExpandCache(unsigned uSeqCount, unsigned uColCount);
-	void CalcWeights() const;
 	void GetNameFromFASTAAnnotationLine(const char szLine[],
 	  char szName[], unsigned uBytes);
 	void CopyCol(unsigned uFromCol, unsigned uToCol);
-	unsigned CalcBLOSUMWeights(ClusterTree &BlosumCluster) const;
-	void SetBLOSUMSubtreeWeight(const ClusterNode *ptrNode, double dWeight) const;
-	unsigned SetBLOSUMNodeWeight(const ClusterNode *ptrNode, double dMinDist) const;
-	void SetSubtreeWeight2(const ClusterNode *ptrNode) const;
-	void SetSubtreeGSCWeight(ClusterNode *ptrNode) const;
-
-	void CalcHenikoffWeightsColPB(unsigned uColIndex) const;
-	void CalcHenikoffWeightsCol(unsigned uColIndex) const;
 	};
 
-void SeqVectFromMSA(const MSA &msa, SeqVect &v);
 void DeleteGappedCols(MSA &msa);
 void MSAFromColRange(const MSA &msaIn, unsigned uFromColIndex, unsigned uColCount,
   MSA &msaOut);

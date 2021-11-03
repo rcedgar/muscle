@@ -102,7 +102,7 @@ void UPGMA5::Run(LINKAGE Linkage, Tree &tree)
 		m_NodeIndex[i] = i;
 		m_NearestNeighbor[i] = UINT_MAX;
 		Ids[i] = i;
-		Names[i] = strsave(m_Labels[i].c_str());
+		Names[i] = mystrsave(m_Labels[i].c_str());
 		}
 
 	for (uint i = 0; i < m_InternalNodeCount; ++i)
@@ -226,7 +226,7 @@ void UPGMA5::Run(LINKAGE Linkage, Tree &tree)
 				break;
 
 			case LINKAGE_Biased:
-				dtNewDist = g_dSUEFF*AVG(dL, dR) + (1 - g_dSUEFF)*min(dL, dR);
+				dtNewDist = 0.1f*AVG(dL, dR) + (1 - 0.1f)*min(dL, dR);
 				break;
 
 			default:
@@ -315,14 +315,30 @@ void UPGMA5::Run(LINKAGE Linkage, Tree &tree)
 		free(Names[i]);
 	delete[] Names;
 	delete[] Ids;
+
+	m_Dist = 0;
+	m_NodeIndex = 0;
+	m_NearestNeighbor = 0;
+	m_MinDist = 0;
+	m_Height = 0;
+	m_Left = 0;
+	m_LeftLength = 0;
+	m_RightLength = 0;
+	Names = 0;
+	Ids = 0;
+	}
+
+void UPGMA5::Clear()
+	{
+	m_Labels.clear();
+	m_DistMx.clear();
+	m_LabelToIndex.clear();
 	}
 
 void UPGMA5::Init(const vector<string> &Labels,
   const vector<vector<float> > &DistMx)
 	{
-	asserta(m_Labels.empty());
-	asserta(m_DistMx.empty());
-	asserta(m_LabelToIndex.empty());
+	Clear();
 
 	m_DistMx = DistMx;
 	m_Labels = Labels;

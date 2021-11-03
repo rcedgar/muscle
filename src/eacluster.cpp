@@ -1,14 +1,15 @@
 #include "muscle.h"
 #include "eacluster.h"
+#include "locallock.h"
 
-void MakeFileName(const string &Pattern, uint N, string &FileName)
+void MakeReplicateFileName_N(const string &Pattern, uint N, string &FileName)
 	{
 	FileName.clear();
 	bool Found = false;
 	for (uint i = 0; i < SIZE(Pattern); ++i)
 		{
 		char c = Pattern[i];
-		if (c == '%')
+		if (c == '@')
 			{
 			string s;
 			Ps(s, "%u", N);
@@ -56,7 +57,7 @@ void EACluster::Run(MultiSequence &InputSeqs, float MinEA)
 		  "UCLUST %u seqs EE<%.2f, %u centroids, %u members",
 		  InputSeqCount, MinEE, ClusterCount, MemberCount);
 
-		const char *Label = m_InputSeqs->GetSequence(SeqIndex)->label.c_str();
+		const char *Label = m_InputSeqs->GetSequence(SeqIndex)->m_Label.c_str();
 		float BestEA;
 		uint CentroidIndex = GetBestCentroid(SeqIndex, MinEA, BestEA);
 		m_SeqIndexToCentroidIndex[SeqIndex] = CentroidIndex;
@@ -80,7 +81,7 @@ void EACluster::Run(MultiSequence &InputSeqs, float MinEA)
 			asserta(CentroidIndex < SIZE(m_CentroidIndexToSeqIndexes));
 			asserta(CentroidIndex < SIZE(m_CentroidSeqIndexes));
 			uint CentroidSeqIndex = m_CentroidSeqIndexes[CentroidIndex];
-			const char *CentroidLabel = m_InputSeqs->GetSequence(CentroidSeqIndex)->label.c_str();
+			const char *CentroidLabel = m_InputSeqs->GetSequence(CentroidSeqIndex)->m_Label.c_str();
 			m_CentroidIndexToSeqIndexes[CentroidIndex].push_back(SeqIndex);
 			}
 
@@ -109,8 +110,6 @@ uint EACluster::GetBestCentroid(uint SeqIndex, float MinEA, float &BestEA)
 	uint ThreadCount = GetRequestedThreadCount();
 	BestEA = 0;
 	uint BestCentroidIndex = UINT_MAX;
-	omp_lock_t Lock;
-	omp_init_lock(&Lock);
 	bool Done = false;
 #pragma omp parallel for num_threads(ThreadCount)
 	for (int TopIndex = 0; TopIndex < (int) TopCount; ++TopIndex)
@@ -119,7 +118,7 @@ uint EACluster::GetBestCentroid(uint SeqIndex, float MinEA, float &BestEA)
 			continue;
 		uint TopSeqIndex = TopSeqIndexes[TopIndex];
 		float EA = AlignSeqPair(SeqIndex, TopSeqIndex);
-		omp_set_lock(&Lock);
+		Lock();
 		if (EA > MinEA && EA > BestEA)
 			{
 			BestEA = EA;
@@ -137,7 +136,7 @@ uint EACluster::GetBestCentroid(uint SeqIndex, float MinEA, float &BestEA)
 			}
 		if (BestEA < MinEA - 0.3 && TopIndex > 20)
 			Done = true;
-		omp_unset_lock(&Lock);
+		Unlock();
 		}
 	return BestCentroidIndex;
 	}
@@ -165,7 +164,7 @@ void EACluster::WriteMFAs(const string &FileNamePattern) const
 		asserta(MFA != 0);
 
 		string FileName;
-		MakeFileName(FileNamePattern, CentroidIndex+1, FileName);
+		MakeReplicateFileName_N(FileNamePattern, CentroidIndex+1, FileName);
 
 		MFA->WriteMFA(FileName);
 		}
@@ -188,8 +187,8 @@ void EACluster::MakeClusterMFAs()
 		for (uint i = 0; i < MemberCount; ++i)
 			{
 			uint SeqIndex = SeqIndexes[i];
-			Sequence *seq = m_InputSeqs->GetSequence(SeqIndex);
-			ClusterMFA->AddSequence(seq);
+			const Sequence *seq = m_InputSeqs->GetSequence(SeqIndex);
+			ClusterMFA->AddSequence(seq, false);
 			}
 		AssertSameLabels(*ClusterMFA);
 		m_ClusterMFAs.push_back(ClusterMFA);
@@ -199,10 +198,11 @@ void EACluster::MakeClusterMFAs()
 
 float EACluster::AlignSeqPair(uint SeqIndex1, uint SeqIndex2)
 	{
-	Sequence *Seq1 = m_InputSeqs->GetSequence(SeqIndex1);
-	Sequence *Seq2 = m_InputSeqs->GetSequence(SeqIndex2);
+	const Sequence *Seq1 = m_InputSeqs->GetSequence(SeqIndex1);
+	const Sequence *Seq2 = m_InputSeqs->GetSequence(SeqIndex2);
 
-	float EA = PairHMM::AlignPair(Seq1, Seq2);
+	string Path;
+	float EA = AlignPairFlat(Seq1, Seq2, Path);
 	return EA;
 	}
 

@@ -1,8 +1,4 @@
 #include "muscle.h"
-#include <stdio.h>
-#include <ctype.h>
-#include "msa.h"
-#include "textfile.h"
 
 const unsigned FASTA_BLOCK = 60;
 
@@ -13,11 +9,12 @@ void MSA::FromFASTAFile(TextFile &File)
 	FILE *f = File.GetStdioFile();
 	
 	unsigned uSeqCount = 0;
-	unsigned uColCount = uInsane;
+	unsigned uColCount = UINT_MAX;
 	for (;;)
 		{
 		char *Label;
 		unsigned uSeqLength;
+		char *GetFastaSeq(FILE *f, unsigned *ptrSeqLength, char **ptrLabel, bool DeleteGaps);
 		char *SeqData = GetFastaSeq(f, &uSeqLength, &Label, false);
 		if (0 == SeqData)
 			break;
@@ -34,8 +31,70 @@ void MSA::FromFASTAFile_PreserveCase(const string &FileName)
 	g_FASTA_Upper = true;
 	}
 
+void MSA::FromStrings(const vector<string> &Strings)
+	{
+	Clear();
+	if (Strings.empty())
+		Die("MSA::FromStrings, no data");
+
+	vector<string> Labels;
+	vector<string> Seqs;
+
+	string CurrSeq;
+	for (uint i = 0; i < SIZE(Strings); ++i)
+		{
+		const string &s = Strings[i];
+		char s0 = s.c_str()[0];
+		if (s0 == '>')
+			{
+			if (!Labels.empty())
+				Seqs.push_back(CurrSeq);
+			Labels.push_back(s.substr(1));
+			CurrSeq.clear();
+			}
+		else
+			{
+			for (uint i = 0; i < SIZE(s); ++i)
+				{
+				char c = s[i];
+				if (!isspace(c))
+					CurrSeq.push_back(c);
+				}
+			}
+		}
+	Seqs.push_back(CurrSeq);
+	FromStrings2(Labels, Seqs);
+	}
+
+void MSA::FromStrings2(const vector<string> &Labels, vector<string> &Seqs)
+	{
+	const uint SeqCount = SIZE(Labels);
+	if (SIZE(Seqs) != SeqCount)
+		Die("Invalid FASTA, %u labels %u seqs", SIZE(Labels), SIZE(Seqs));
+	if (SeqCount == 0)
+		Die("Empty FASTA");
+
+	const uint ColCount = SIZE(Seqs[0]);
+	SetSize(SeqCount, ColCount);
+
+	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
+		{
+		const char *Label = Labels[SeqIndex].c_str();
+		const string &Str = Seqs[SeqIndex];
+		const uint n = SIZE(Str);
+		if (n != ColCount)
+			Die("MSA not aligned, seq lengths %u, %u", ColCount, n);
+			  
+		const char *S = Str.c_str();
+
+		m_szNames[SeqIndex] = mystrsave(Label);
+		m_szSeqs[SeqIndex] = mystrsave(S);
+		}
+	}
+
 void MSA::FromFASTAFile(const string &FileName)
 	{
+	Clear();
 	TextFile TF(FileName);
 	FromFASTAFile(TF);
 	TF.Close();
@@ -43,9 +102,23 @@ void MSA::FromFASTAFile(const string &FileName)
 
 void MSA::ToFASTAFile(const string &FileName) const
 	{
+	if (FileName.empty())
+		return;
 	TextFile TF(FileName, true);
 	ToFASTAFile(TF);
 	TF.Close();
+	}
+
+void MSA::ToFASTAFile(FILE *f) const
+	{
+	if (f == 0)
+		return;
+	for (uint SeqIndex = 0; SeqIndex < m_uSeqCount; ++SeqIndex)
+		{
+		const byte *S = (const byte *) m_szSeqs[SeqIndex];
+		const char *Label = m_szNames[SeqIndex];
+		SeqToFasta(f, S, m_uColCount, Label);
+		}
 	}
 
 void MSA::ToFASTAFile(TextFile &File) const

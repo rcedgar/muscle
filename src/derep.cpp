@@ -113,8 +113,8 @@ void Derep::GetUniqueSeqs(MultiSequence &UniqueSeqs)
 	for (uint i = 0; i < UniqueCount; ++i)
 		{
 		uint SeqIndex = m_RepSeqIndexes[i];
-		Sequence *Seq = m_InputSeqs->GetSequence(SeqIndex);
-		UniqueSeqs.AddSequence(Seq);
+		const Sequence *Seq = m_InputSeqs->GetSequence(SeqIndex);
+		UniqueSeqs.AddSequence(Seq, false);
 		}
 	AssertSameLabels(UniqueSeqs);
 	}

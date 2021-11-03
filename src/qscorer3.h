@@ -23,7 +23,8 @@ public:
 public:
 	void Run(const string &TestFileName1,
 	  const string &TestFileName2,
-	  const string &RefFileName);
+	  const string &RefFileName,
+	  double MaxGapFract);
 	void ToTSV(const string &FileName) const;
 	void ToTSV(FILE *f) const;
 

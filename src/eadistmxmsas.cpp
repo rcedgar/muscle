@@ -13,8 +13,11 @@ void cmd_eadistmx_msas()
 	PProg PP;
 	if (optset_paircount)
 		PP.m_TargetPairCount = opt(paircount);
+	bool IsNucleo;
+	PP.LoadMSAs(MSAFileNames, IsNucleo);
+	SetAlpha(IsNucleo ? ALPHA_Nucleo : ALPHA_Amino);
+
 	InitProbcons();
-	PP.LoadMSAs(MSAFileNames);
 	PP.AlignAllInputPairs();
 
 	vector<vector<float> > &ScoreMx = PP.m_ScoreMx;

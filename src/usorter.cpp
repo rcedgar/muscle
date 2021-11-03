@@ -5,21 +5,57 @@
 void USorter::Init()
 	{
 	asserta(g_AlphaSize > 0);
-	asserta(g_Alpha == ALPHA_Amino);
+	if (g_Alpha == ALPHA_Amino)
+		{
+		m_WordLength = 3;
+		m_DictSize = myipow(20, m_WordLength);
+		}
+	else if (g_Alpha == ALPHA_Nucleo)
+		{
+		m_WordLength = 8;
+		m_DictSize = myipow(4, m_WordLength);
+		}
+	else
+		asserta(false);
+
 	m_Rows.clear();
 	m_Rows.resize(m_DictSize);
 	}
 
 uint USorter::CharsToWord(const byte *Chars)
 	{
+	if (g_Alpha == ALPHA_Amino)
+		return CharsToWord_Amino(Chars);
+	else if (g_Alpha == ALPHA_Nucleo)
+		return CharsToWord_Nucleo(Chars);
+	asserta(false);
+	return UINT_MAX;
+	}
+
+uint USorter::CharsToWord_Amino(const byte *Chars)
+	{
 	uint Word = 0;
 	for (uint i = 0; i < m_WordLength; ++i)
 		{
 		char c = Chars[i];
 		uint Letter = g_CharToLetter[c];
-		if (Letter >= g_AlphaSize)
+		if (Letter >= 20)
 			return UINT_MAX;
 		Word = Word*20 + Letter;
+		}
+	return Word;
+	}
+
+uint USorter::CharsToWord_Nucleo(const byte *Chars)
+	{
+	uint Word = 0;
+	for (uint i = 0; i < m_WordLength; ++i)
+		{
+		char c = Chars[i];
+		uint Letter = g_CharToLetter[c];
+		if (Letter >= 4)
+			return UINT_MAX;
+		Word = Word*4 + Letter;
 		}
 	return Word;
 	}
@@ -108,7 +144,7 @@ void cmd_usorter()
 	for (uint DBSeqIndex = 0; DBSeqIndex < DBSeqCount; ++DBSeqIndex)
 		{
 		const Sequence *seq = DB.GetSequence(DBSeqIndex);
-		const byte *SeqChars = (const byte *) seq->data->data() + 1; 
+		const byte *SeqChars = (const byte *) seq->GetBytePtr();
 		uint L = (uint) seq->GetLength();
 		US.AddSeq(SeqChars, L, DBSeqIndex);
 		}
@@ -117,7 +153,7 @@ void cmd_usorter()
 	for (uint QuerySeqIndex = 0; QuerySeqIndex < QuerySeqCount; ++QuerySeqIndex)
 		{
 		const Sequence *seq = Query.GetSequence(QuerySeqIndex);
-		const byte *SeqChars = (const byte *) seq->data->data() + 1; 
+		const byte *SeqChars = (const byte *) seq->GetBytePtr();
 		uint L = (uint) seq->GetLength();
 
 		vector<uint> TopSeqIndexes;

@@ -60,19 +60,21 @@ public:
 		m_uNodeCount = 0;
 		m_uCacheCount = 0;
 
-		delete[] m_uNeighbor1;
-		delete[] m_uNeighbor2;
-		delete[] m_uNeighbor3;
-		delete[] m_dEdgeLength1;
-		delete[] m_dEdgeLength2;
-		delete[] m_dEdgeLength3;
-		delete[] m_bHasEdgeLength1;
-		delete[] m_bHasEdgeLength2;
-		delete[] m_bHasEdgeLength3;
-		delete[] m_ptrName;
-		delete[] m_Ids;
-		delete[] m_bHasHeight;
-		delete[] m_dHeight;
+#define del(x)	if (x != 0) delete[] x; x = 0;
+		del(m_uNeighbor1)
+		del(m_uNeighbor2)
+		del(m_uNeighbor3)
+		del(m_dEdgeLength1)
+		del(m_dEdgeLength2)
+		del(m_dEdgeLength3)
+		del(m_bHasEdgeLength1)
+		del(m_bHasEdgeLength2)
+		del(m_bHasEdgeLength3)
+		del(m_ptrName)
+		del(m_Ids)
+		del(m_bHasHeight)
+		del(m_dHeight)
+#undef del
 
 		m_uNeighbor1 = 0;
 		m_uNeighbor2 = 0;
@@ -114,7 +116,6 @@ public:
 	  double dLength);
 
 	void RootUnrootedTree(unsigned uNodeIndex1, unsigned uNodeIndex2);
-	void RootUnrootedTree(ROOT Method);
 	void UnrootByDeletingRoot();
 	uint Ladderize(bool Right);
 
@@ -340,36 +341,5 @@ struct PhyEnumEdgeState
 	};
 
 const unsigned NODE_CHANGED = (unsigned) (~0);
-
-extern bool PhyEnumBiParts(const Tree &tree, PhyEnumEdgeState &ES,
-  unsigned Leaves1[], unsigned *ptruCount1,
-  unsigned Leaves2[], unsigned *ptruCount2);
-extern bool PhyEnumBiPartsR(const Tree &tree, PhyEnumEdgeState &ES,
-  unsigned Leaves1[], unsigned *ptruCount1,
-  unsigned Leaves2[], unsigned *ptruCount2);
-extern void ClusterByHeight(const Tree &tree, double dMaxHeight, unsigned Subtrees[],
-  unsigned *ptruSubtreeCount);
-void ClusterBySubfamCount(const Tree &tree, unsigned uSubfamCount,
-  unsigned Subfams[], unsigned *ptruSubfamCount);
-void GetLeaves(const Tree &tree, unsigned uNodeIndex, unsigned Leaves[],
-  unsigned *ptruLeafCount);
-void GetLeavesExcluding(const Tree &tree, unsigned uNodeIndex,
-  unsigned uExclude, unsigned Leaves[], unsigned *ptruCount);
-void GetInternalNodesInHeightOrder(const Tree &tree, unsigned NodeIndexes[]);
-void ApplyMinEdgeLength(Tree &tree, double dMinEdgeLength);
-void LeafIndexesToLeafNames(const Tree &tree, const unsigned Leaves[], unsigned uCount,
- char *Names[]);
-void LeafIndexesToIds(const Tree &tree, const unsigned Leaves[], unsigned uCount,
- unsigned Ids[]);
-void MSASeqSubset(const MSA &msaIn, char *Names[], unsigned uSeqCount,
-  MSA &msaOut);
-void DiffTrees(const Tree &Tree1, const Tree &Tree2, Tree &Diffs,
-  unsigned IdToDiffsLeafNodeIndex[]);
-void DiffTreesE(const Tree &NewTree, const Tree &OldTree,
-  unsigned NewNodeIndexToOldNodeIndex[]);
-void FindRoot(const Tree &tree, unsigned *ptruNode1, unsigned *ptruNode2,
-  double *ptrdLength1, double *ptrdLength2,
-  ROOT RootMethod);
-void FixRoot(Tree &tree, ROOT RootMethod);
 
 #endif // tree_h

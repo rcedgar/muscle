@@ -1,6 +1,5 @@
 #include "myutils.h"
 #include "muscle.h"
-#include "probcons.h"
 #include "textfile.h"
 #include "tree.h"
 #include "pprog.h"

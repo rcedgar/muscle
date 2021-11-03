@@ -3,6 +3,7 @@
 #include "tree.h"
 
 static const uint DEFAULT_TARGET_PAIR_COUNT = 2000;
+static const uint DEFAULT_MAX_COARSE_SEQS = 500;
 
 class PProg
 	{
@@ -11,6 +12,7 @@ public:
 	uint m_JoinCount = 0;
 	uint m_NodeCount = 0;
 	uint m_TargetPairCount = DEFAULT_TARGET_PAIR_COUNT;
+	uint m_MaxCoarseSeqs = DEFAULT_MAX_COARSE_SEQS;
 
 	map<string, uint> m_MSALabelToIndex;
 	vector<string> m_MSALabels;
@@ -18,14 +20,14 @@ public:
 
 	vector<uint> m_Pending;
 	vector<vector<float> > m_ScoreMx;
-	vector<vector<vector<char> > > m_PathMx;
+	vector<vector<string> > m_PathMx;
 	uint m_JoinIndex = 0;
 
 	vector<uint> m_JoinMSAIndexes1;
 	vector<uint> m_JoinMSAIndexes2;
 
 public:
-	void LoadMSAs(const vector<string> &FileNames);
+	void LoadMSAs(const vector<string> &FileNames, bool &IsNucleo);
 	void SetMSAs(const vector<const MultiSequence *> &MSAs,
 	  const vector<string> &MSALabels);
 
