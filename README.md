@@ -1,5 +1,5 @@
 # muscle
-Multiple sequence alignment with MSA ensemble bootstrap
+Multiple sequence alignment generating high-accuracy ensemble of replicates
 
 ## Downloads
 
