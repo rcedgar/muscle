@@ -1,3 +1,5 @@
+![Muscle5](http://drive5.com/images/muscle5_header.jpg)
+
 # muscle
 Multiple sequence alignment generating high-accuracy ensemble of replicates
 
