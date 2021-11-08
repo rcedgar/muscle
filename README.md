@@ -1,7 +1,7 @@
 ![Muscle5](http://drive5.com/images/muscle5_header.jpg)
 
 # muscle
-Multiple sequence alignment generating high-accuracy ensemble of replicates
+Multiple sequence alignment algorithm. Version 5 of Muscle achieves highest scores on Balibase, Bralibase and Balifam benchmark tests. This version supports variant replicate alignments with the same high accuracy as default paramters. By comparing downstream predictions from different alignments, such as trees, a biologist can evaluation the robustness of conclusions against alignment errors.
 
 ## Downloads
 
