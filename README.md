@@ -76,10 +76,6 @@ Windows [muscle.exe](https://github.com/rcedgar/muscle/raw/main/binaries/muscle.
         -jalview aln.features
             Jalview feature file with LC values and colors.
 
-More documentation at:
-    [https://drive5.com/muscle](https://drive5.com/muscle)
-
-
 # Reference
 R.C. Edgar (2021) "MUSCLE v5 enables improved estimates of phylogenetic tree confidence by ensemble bootstrapping"    
 [https://www.biorxiv.org/content/10.1101/2021.06.20.449169v1.full.pdf](https://www.biorxiv.org/content/10.1101/2021.06.20.449169v1.full.pdf)
