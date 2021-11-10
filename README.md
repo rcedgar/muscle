@@ -1,7 +1,7 @@
 ![Muscle5](http://drive5.com/images/muscle5_header.jpg)
 
 # muscle
-Multiple sequence alignment generating high-accuracy ensemble of replicates
+Multiple sequence alignment algorithm. Version 5 of Muscle achieves highest scores on Balibase, Bralibase and Balifam benchmark tests. This version supports variant replicate alignments with the same high accuracy as default paramters. By comparing downstream predictions from different alignments, such as trees, a biologist can evaluation the robustness of conclusions against alignment errors.
 
 ## Downloads
 
@@ -75,10 +75,6 @@ Windows [muscle.exe](https://github.com/rcedgar/muscle/raw/main/binaries/muscle.
 
         -jalview aln.features
             Jalview feature file with LC values and colors.
-
-More documentation at:
-    [https://drive5.com/muscle](https://drive5.com/muscle)
-
 
 # Reference
 R.C. Edgar (2021) "MUSCLE v5 enables improved estimates of phylogenetic tree confidence by ensemble bootstrapping"    
