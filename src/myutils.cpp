@@ -2055,7 +2055,7 @@ void Split(const string &Str, vector<string> &Fields, char Sep)
 void GetVersionString(string &s)
 	{
 	const int counter = 
-#include "../ver/counter.h"
+#include "ver_counter.h"
 	;
 	const char *Flags = ""
 
