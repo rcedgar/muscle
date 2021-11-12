@@ -15,6 +15,6 @@ Windows [muscle.exe](https://github.com/rcedgar/muscle/raw/main/binaries/muscle.
 [Manual](https://drive5.com/muscle5/manual)   
 
 
-# Reference
+### Reference
 R.C. Edgar (2021) "MUSCLE v5 enables improved estimates of phylogenetic tree confidence by ensemble bootstrapping"    
 [https://www.biorxiv.org/content/10.1101/2021.06.20.449169v1.full.pdf](https://www.biorxiv.org/content/10.1101/2021.06.20.449169v1.full.pdf)
