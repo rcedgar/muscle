@@ -70,6 +70,10 @@ using namespace std;
 #define	_DEBUG	1
 #endif
 
+#if defined(__APPLE__)
+#define byte __mybyte__
+#endif
+
 typedef unsigned char byte;
 typedef unsigned short uint16;
 typedef unsigned uint32;

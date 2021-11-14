@@ -1,11 +1,11 @@
-CPP = g++
+CPP = gcc-11
 CPPOPTS = -fopenmp -ffast-math -msse -mfpmath=sse -O3 -DNDEBUG -c
 
-CC = gcc
+CC = gcc-11
 CCOPTS = -fopenmp -ffast-math -msse -mfpmath=sse -O3 -DNDEBUG -c
 
-LNK = g++
-LNKOPTS = -O3 -fopenmp -pthread -lpthread
+LNK = gcc-11
+LNKOPTS = -O3 -fopenmp -pthread -lpthread -framework CoreFoundation
 
 HDRS = \
   alpha.h \
