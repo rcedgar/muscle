@@ -6,8 +6,7 @@ MUSCLE is widely-used software for making multiple alignments of biological sequ
 
 Binary files are self-contained, no dependencies.
 
-Linux [muscle](https://github.com/rcedgar/muscle/raw/main/binaries/muscle)   
-Windows [muscle.exe](https://github.com/rcedgar/muscle/raw/main/binaries/muscle.exe)   
+https://github.com/rcedgar/muscle/releases
 
 ### Documentation
 
