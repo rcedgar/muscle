@@ -135,6 +135,8 @@ void MultiSequence::LoadMFA(FileBuffer& infile, bool stripGaps)
 	if (infile.fail())
 		Die("LoadMFA read error");
 
+	set<string> Labels;
+	unsigned DupeCount = 0;
 	for (;;)
 		{
 		Sequence *seq = Sequence::NewSequence();
@@ -145,9 +147,27 @@ void MultiSequence::LoadMFA(FileBuffer& infile, bool stripGaps)
 			break;
 			}
 
+		string Label = seq->m_Label;
+		bool Dupe = false;
+		for (uint i = 1; i < 100; ++i)
+			{
+			if (Labels.find(Label) == Labels.end())
+				break;
+			Dupe = true;
+			Ps(Label, "%s dupelabel%u", seq->m_Label.c_str(), i);
+			}
+		if (Dupe)
+			{
+			Log("Duplicate label >%s", seq->m_Label.c_str());
+			seq->m_Label = Label;
+			++DupeCount;
+			}
+		Labels.insert(Label);
 		m_Seqs.push_back(seq);
 		m_Owners.push_back(true);
 		}
+	if (DupeCount > 0)
+		Warning("%u duplicate labels", DupeCount);
 	}
 
 uint MultiSequence::GetColCount() const

@@ -922,7 +922,7 @@ void Die_(const char *Format, ...)
 	Log("Elapsed time: %s\n", sstr);
 
 	const char *szStr = Msg.c_str();
-	fprintf(stderr, "Elapsed time %s\n", SecsToHHMMSS((int) ElapsedSeconds));
+	fprintf(stderr, "Elapsed time %s\n", SecsToHHMMSS(ElapsedSeconds));
 	fprintf(stderr, "Max memory %s\n", MemBytesToStr(g_PeakMemUseBytes));
 	fprintf(stderr, "\n---Fatal error---\n%s\n", szStr);
 	Log("\n---Fatal error---\n%s\n", szStr); 
@@ -1147,22 +1147,22 @@ double GetPeakMemUseBytes()
 	return g_PeakMemUseBytes;
 	}
 
-const char *SecsToHHMMSS(int Secs)
+const char *SecsToHHMMSS(unsigned Secs)
 	{
-	int HH = Secs/3600;
-	int MM = (Secs - HH*3600)/60;
-	int SS = Secs%60;
+	unsigned HH = Secs/3600;
+	unsigned MM = (Secs - HH*3600)/60;
+	unsigned SS = Secs%60;
 	if (HH == 0)
-		sprintf(g_TmpStr, "%02d:%02d", MM, SS);
+		sprintf(g_TmpStr, "%02u:%02d", MM, SS);
 	else
-		sprintf(g_TmpStr, "%02d:%02d:%02d", HH, MM, SS);
+		sprintf(g_TmpStr, "%02u:%02u:%02u", HH, MM, SS);
 	return g_TmpStr;
 	}
 
 const char *SecsToStr(double Secs)
 	{
 	if (Secs >= 60.0)
-		return SecsToHHMMSS((int) Secs);
+		return SecsToHHMMSS((unsigned) Secs);
 
 	if (Secs < 1e-6)
 		sprintf(g_TmpStr, "%.2gs", Secs);
@@ -1633,7 +1633,7 @@ void LogElapsedTimeAndRAM()
 
 	Log("\n");
 	Log("Finished %s", s); // there is a newline in s
-	Log("Elapsed time %s\n", SecsToHHMMSS((int) Secs));
+	Log("Elapsed time %s\n", SecsToHHMMSS((unsigned) Secs));
 	Log("Max memory %s\n", MemBytesToStr(g_PeakMemUseBytes));
 #if	WIN32 && DEBUG
 // Skip exit(), which can be very slow in DEBUG build

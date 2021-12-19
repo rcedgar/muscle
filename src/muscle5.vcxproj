@@ -25,7 +25,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -35,7 +35,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -214,6 +214,7 @@
     <ClCompile Include="alpha3.cpp" />
     <ClCompile Include="assertsameseqs.cpp" />
     <ClCompile Include="calcalnscoresparse.cpp" />
+    <ClCompile Include="eesort.cpp" />
     <ClCompile Include="heatmapcolors.cpp" />
     <ClCompile Include="jalview.cpp" />
     <ClCompile Include="letterconf.cpp" />
@@ -244,6 +245,7 @@
     <ClCompile Include="letterconfhtml.cpp" />
     <ClCompile Include="logdistmx.cpp" />
     <ClCompile Include="logmx.cpp" />
+    <ClCompile Include="make_a2m.cpp" />
     <ClCompile Include="maxcc.cpp" />
     <ClCompile Include="mpcflat.cpp" />
     <ClCompile Include="eadistmx.cpp" />

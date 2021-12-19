@@ -178,6 +178,11 @@ void MSA::SetSeqName(unsigned uSeqIndex, const char szName[])
 	memcpy(m_szNames[uSeqIndex], szName, n);
 	}
 
+void MSA::GetSeqLabel(uint SeqIndex, string &Label) const
+	{
+	Label = string(GetSeqName(SeqIndex));
+	}
+
 const char *MSA::GetSeqName(unsigned uSeqIndex) const
 	{
 	if (uSeqIndex >= m_uSeqCount)
@@ -329,6 +334,16 @@ bool MSA::IsGapColumn(unsigned uColIndex) const
 		if (!IsGap(uSeqIndex, uColIndex))
 			return false;
 	return true;
+	}
+
+uint MSA::GetSeqIndex(const string &Label, bool FailOnError) const
+	{
+	for (unsigned uSeqIndex = 0; uSeqIndex < GetSeqCount(); ++uSeqIndex)
+		if (0 == stricmp(Label.c_str(), GetSeqName(uSeqIndex)))
+			return uSeqIndex;
+	if (FailOnError)
+		Die("Not found >%s", Label.c_str());
+	return UINT_MAX;
 	}
 
 bool MSA::GetSeqIndex(const char *ptrSeqName, unsigned *ptruSeqIndex) const
@@ -836,6 +851,7 @@ ALPHA MSA::GuessAlpha() const
 		return ALPHA_Nucleo;
 	return ALPHA_Amino;
 	}
+
 void MSA::GetPosToCol(uint SeqIndex, vector<uint> &PosToCol) const
 	{
 	PosToCol.clear();

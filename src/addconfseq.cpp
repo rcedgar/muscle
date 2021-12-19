@@ -84,7 +84,7 @@ void cmd_addconfseq()
 		asserta(MSASeqCount == SeqCount);
 
 		Do1(fOut, E, MSAIndex, ConfLabel, 1);
-		Do1(fOut, E, MSAIndex, ConfLabel + "tenths", 2);
+		Do1(fOut, E, MSAIndex, ConfLabel + "2", 2);
 		for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
 			{
 			const char *S = M.m_szSeqs[SeqIndex];
