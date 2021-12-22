@@ -12,4 +12,11 @@ jobs:
       - name: Build
         run: |
           cd src
+          dir 'C:\Program Files\'
+          dir 'C:\Program Files\Microsoft Visual Studio\'
+          dir 'C:\Program Files\Microsoft Visual Studio\2022\'
+          dir 'C:\Program Files\Microsoft Visual Studio\2022\Community'
+          dir 'C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild'
+          dir 'C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current'
+          dir 'C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin'
           dir 'C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\MSBuild.exe'
