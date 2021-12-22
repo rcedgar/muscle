@@ -397,3 +397,7 @@ StyleCopReport.xml
 *.scc
 
 # Chutzpah Test 
+
+CYGWIN_NT-10.0/
+linux/
+Darwin/

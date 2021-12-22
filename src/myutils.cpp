@@ -1614,7 +1614,8 @@ void LogProgramInfoAndCmdLine()
 	string Ver;
 	GetVersionString(Ver);
 	Log("%s", Ver.c_str());
-	Log(" started %s", TimeStr); // there is a newline in TimeStr
+	Log(" built %s %s\n", __DATE__, __TIME__);
+	Log("Started %s", TimeStr); // there is a newline in TimeStr
 
 #ifdef	_MSC_VER
 	const char *e = getenv("CYGTZ");
@@ -2054,9 +2055,9 @@ void Split(const string &Str, vector<string> &Fields, char Sep)
 
 void GetVersionString(string &s)
 	{
-	const int counter = 
-#include "ver_counter.h"
-	;
+	const char *GIT_VER =
+#include "gitver.txt"
+		;
 	const char *Flags = ""
 
 #if	DEBUG
@@ -2067,7 +2068,7 @@ void GetVersionString(string &s)
 #endif
 	;
 
-	Ps(s, "%s %s.%u_%s%s", PROGRAM_NAME, MY_VERSION, counter, GetPlatform(), Flags);
+	Ps(s, "%s %s.%s%s [%s]", PROGRAM_NAME, MY_VERSION, GetPlatform(), Flags, GIT_VER);
 	}
 
 void PrintVersion(FILE *f)
@@ -2078,6 +2079,7 @@ void PrintVersion(FILE *f)
 	GetVersionString(s);
 	fputs(s.c_str(), f);
 	fputc('\n', f);
+	fprintf(f, "Built %s %s\n", __DATE__, __TIME__);
 	}
 
 void cmd_version()
@@ -2100,6 +2102,7 @@ void PrintBanner(FILE *f)
 	fprintf(f, "%s", s.c_str());
 	fprintf(f, "  %s RAM", MemBytesToStr(RAM));
 	fprintf(f, ", %u cores\n", GetCPUCoreCount());
+	fprintf(f, "Built %s %s\n", __DATE__, __TIME__);
 	fprintf(f, "(C) Copyright 2004-2021 Robert C. Edgar.\n");
 	fprintf(f, "https://drive5.com\n\n");
 	}

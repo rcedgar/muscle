@@ -12,9 +12,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{57FBAB99-B961-4B38-B846-CA26D63384F2}</ProjectGuid>
-    <RootNamespace>muscle5</RootNamespace>
+    <RootNamespace>muscle</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>muscle</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -90,7 +91,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>psapi.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)muscle5.exe</OutputFile>
+      <OutputFile>$(OutDir)muscle.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)muscle.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -102,9 +103,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
-      <Message>SVN version</Message>
-      <Command>
-      </Command>
+      <Message>gitver.bash</Message>
+      <Command>c:\cygwin64\bin\bash -c d:/vsrepos/muscle/src/gitver.bash</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -121,7 +121,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>psapi.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)muscle5.exe</OutputFile>
+      <OutputFile>$(OutDir)muscle.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)muscle.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -155,7 +155,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>psapi.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)muscle5.exe</OutputFile>
+      <OutputFile>$(OutDir)muscle.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -168,9 +168,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
-      <Message>SVN version</Message>
-      <Command>
-      </Command>
+      <Message>gitver.bash</Message>
+      <Command>c:\cygwin64\bin\bash -c d:/vsrepos/muscle/src/gitver.bash</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
@@ -192,7 +191,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>psapi.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)muscle5.exe</OutputFile>
+      <OutputFile>$(OutDir)muscle.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
