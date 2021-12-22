@@ -1,0 +1,7 @@
+name: build_linux
+
+on:
+  # Enable manual run from the Actions tab
+  workflow_dispatch:
+
+# placeholder
