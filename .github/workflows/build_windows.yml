@@ -12,7 +12,4 @@ jobs:
       - name: Build
         run: |
           cd src
-          dotnet build
-          
-      - name: Run tests
-        run: dotnet test
+          MSBuild muscle.sln /t:muscle /p:Platform=x64 /p:Configuration=Release
