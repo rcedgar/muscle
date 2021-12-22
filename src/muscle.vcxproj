@@ -103,8 +103,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
-      <Message>gitver.bash</Message>
-      <Command>c:\cygwin64\bin\bash -c d:/vsrepos/muscle/src/gitver.bash</Command>
+      <Message>gitver</Message>
+      <Command>gitver.bat</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -168,8 +168,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
-      <Message>gitver.bash</Message>
-      <Command>c:\cygwin64\bin\bash -c d:/vsrepos/muscle/src/gitver.bash</Command>
+      <Message>gitver</Message>
+      <Command>gitver.bat</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
