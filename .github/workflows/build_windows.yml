@@ -12,12 +12,4 @@ jobs:
       - name: Build
         run: |
           cd src
-          dir 'C:\Program Files\'
-          dir 'C:\Program Files\Microsoft Visual Studio\'
-          dir 'C:\Program Files\Microsoft Visual Studio\2022\'
-          dir 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise'
-          dir 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild'
-          dir 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild\Current'
-          dir 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild\Current\Bin'
-          dir 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild\Current\Bin\MSBuild.exe'
-          # 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild\Current\Bin\MSBuild.exe' muscle.sln /t:muscle /p:Platform=x64 /p:Configuration=Release
+          cmd /c "C:\Program Files\Microsoft Visual Studio\2022\Community\Msbuild\Current\Bin\MSBuild.exe" 'muscle.sln'  /p:Platform=x64 /p:Configuration=Release
