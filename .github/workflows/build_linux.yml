@@ -21,4 +21,5 @@ jobs:
           cd $GITHUB_WORKSPACE
           ls -lh
           cd src
+          chmod +x gitver.bash
           make
