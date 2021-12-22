@@ -26,3 +26,5 @@ jobs:
           uname -a
           cd $GITHUB_WORKSPACE
           ls -lh
+          cd src
+          make
