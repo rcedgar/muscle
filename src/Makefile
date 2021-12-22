@@ -44,7 +44,7 @@ $(OS)/muscle : gitver.txt $(OS)/ $(OBJS)
 	strip $(OS)/muscle
 
 gitver.txt : $(SRCS)
-	./gitver.bash
+	bash ./gitver.bash
 
 $(OS)/ :
 	mkdir -p $(OS)/
