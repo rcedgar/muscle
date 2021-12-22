@@ -22,9 +22,3 @@ jobs:
           ls -lh
           cd src
           make
-      - name: Upload Linux binary
-          uses: actions/upload-artifact@v2
-          with:
-            name: muscle-bin-linux
-            path: src/Linux/muscle
-            retention-days: 5
