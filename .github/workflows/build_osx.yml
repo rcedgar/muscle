@@ -15,12 +15,14 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
 
       # Runs a set of commands using the runners shell
       - name: Build-commands
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo Starting Build-commands
+          echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
           uname -a
+          cd $GITHUB_WORKSPACE
+          ls -lh
