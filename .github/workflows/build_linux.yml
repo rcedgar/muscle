@@ -28,4 +28,3 @@ jobs:
         with:
           name: muscle-linux-binary
           path: src/Linux/muscle
-          
