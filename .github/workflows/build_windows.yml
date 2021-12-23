@@ -14,7 +14,10 @@ jobs:
           cd src
           $msbuild = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild\Current\Bin\MSBuild.exe"
           $a = @("muscle.sln", "/p:Platform=x64", "/p:Configuration=Release")
-          
           & $msbuild $a
           
-          # "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild\Current\Bin\MSBuild.exe" 'muscle.sln'  /p:Platform=x64 /p:Configuration=Release
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: muscle-windows-exe
+          path: src/x64/Release/muscle.exe
