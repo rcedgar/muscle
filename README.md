@@ -5,7 +5,7 @@ MUSCLE is widely-used software for making multiple alignments of biological sequ
 
 Version 5 of MUSCLE achieves highest scores on Balibase, Bralibase and Balifam benchmark tests and scales to thousands of sequences on a commodity desktop computer.
 
-This version supports generating an ensemble of alternative alignments with the same high accuracy obtained with default paramters. By comparing downstream predictions from different alignments, such as trees, a biologist can evaluation the robustness of conclusions against alignment errors.
+This version supports generating an ensemble of alternative alignments with the same high accuracy obtained with default parameters. By comparing downstream predictions from different alignments, such as trees, a biologist can evaluation the robustness of conclusions against alignment errors.
 
 ### Downloads
 
