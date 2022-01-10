@@ -86,6 +86,7 @@ unsigned GetRequestedThreadCount()
 		return N;
 	unsigned MaxN = omp_get_max_threads();
 	unsigned CoreCount = GetCPUCoreCount();
+	static bool MessageShown = false;
 	if (optset_threads)
 		N = opt(threads);
 	else
@@ -93,6 +94,7 @@ unsigned GetRequestedThreadCount()
 		if (CoreCount > 20)
 			{
 			Progress("CPU has %u cores, defaulting to 20 threads\n", CoreCount);
+			MessageShown = true;
 			N = 20;
 			}
 		else
@@ -106,6 +108,11 @@ unsigned GetRequestedThreadCount()
 	if (N == 0)
 		N = 1;
 	Done = true;
+	if (!MessageShown)
+		{
+		Progress("CPU has %u cores, running %u threads\n", CoreCount, N);
+		MessageShown = true;
+		}
 	return N;
 	}
 
@@ -126,6 +133,8 @@ const char *GetPlatform()
 	asserta(sizeof(void *) == 8);
 #ifdef _MSC_VER
 	return "win64";
+#elif defined(__arm64__)
+	return "osxarm64";
 #elif defined(__APPLE__)
 	return "osx64";
 #elif defined(__GNUC__)

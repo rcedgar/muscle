@@ -24,10 +24,10 @@ ifeq ($(OS),Darwin)
 	CXX := g++-11
 endif
 
-CXXFLAGS := $(CXXFLAGS) -O3 -fopenmp -ffast-math -msse -mfpmath=sse
+CXXFLAGS := $(CXXFLAGS) -O3 -fopenmp -ffast-math
 
 LDFLAGS := $(LDFLAGS) -O3 -fopenmp -pthread -lpthread
-ifeq ($(OS),linux)
+ifeq ($(OS),Linux)
     LDFLAGS += -static
 endif
 
