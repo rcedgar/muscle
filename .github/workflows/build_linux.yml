@@ -21,4 +21,10 @@ jobs:
           cd $GITHUB_WORKSPACE
           ls -lh
           cd src
+          chmod +x gitver.bash
           make
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: muscle-linux-binary
+          path: src/Linux/muscle

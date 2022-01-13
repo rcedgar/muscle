@@ -11,7 +11,7 @@
 #define TRACK_ALLOC		0
 #define ALLOC_TOTALS	0
 
-#if defined(__x86_64__) || defined(_M_X64)
+#if defined(__x86_64__) || defined(_M_X64) || defined(__arm64__)
 #define	BITS			64
 #else
 #define	BITS			32
@@ -70,9 +70,7 @@ using namespace std;
 #define	_DEBUG	1
 #endif
 
-#if defined(__APPLE__)
 #define byte __mybyte__
-#endif
 
 typedef unsigned char byte;
 typedef unsigned short uint16;
@@ -414,7 +412,7 @@ double mylog10(double x);
 void LogInt(unsigned i, unsigned w = UINT_MAX);
 void Logu(unsigned u, unsigned w, unsigned prefixspaces = 2);
 void Logf(float x, unsigned w, unsigned prefixspaces = 2);
-const char *SecsToHHMMSS(int Secs);
+const char *SecsToHHMMSS(unsigned Secs);
 unsigned GetCPUCoreCount();
 
 void MyCmdLine(int argc, char **argv);

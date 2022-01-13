@@ -1,6 +1,5 @@
 ![Muscle5](http://drive5.com/images/muscle5_header.jpg)
 
-
 MUSCLE is widely-used software for making multiple alignments of biological sequences. 
 
 Version 5 of MUSCLE achieves highest scores on Balibase, Bralibase and Balifam benchmark tests and scales to thousands of sequences on a commodity desktop computer.

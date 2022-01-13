@@ -16,7 +16,7 @@ MultiSequence &LoadGlobalInputMS(const string &FileName)
 	asserta(g_GlobalMS == 0);
 	g_GlobalMS = new MultiSequence;
 	asserta(g_GlobalMS != 0);
-	g_GlobalMS->FromFASTA(FileName);
+	g_GlobalMS->FromFASTA(FileName, true);
 	g_GlobalMSSeqCount = g_GlobalMS->GetSeqCount();
 	for (uint GSI = 0; GSI < g_GlobalMSSeqCount; ++GSI)
 		{

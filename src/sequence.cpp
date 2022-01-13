@@ -144,10 +144,6 @@ bool Sequence::FromFileBuffer(FileBuffer& infile, bool stripGaps)
 	return true;
 	}
 
-// Writes the sequence to outfile in MFA format.  Uses numColumns
-// columns per line.  If useIndex is set to false, then the
-// m_Label is printed as normal, but if useIndex is true, then
-// ">S###" is printed where ### represents the sequence m_Label.
 void Sequence::WriteMFA(FILE *f) const
 	{
 	const vector<char> &v = m_CharVec;

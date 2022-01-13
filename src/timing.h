@@ -9,6 +9,13 @@ typedef unsigned __int64 TICKS;
 
 #define	GetClockTicks	__rdtsc
 
+#elif defined(__APPLE__)
+typedef uint64_t TICKS;
+__inline__ uint64_t GetClockTicks()
+	{
+	return 0;
+	}
+
 #elif __GNUC__
 
 typedef uint64_t TICKS;
