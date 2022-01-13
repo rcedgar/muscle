@@ -57,6 +57,13 @@ void cmd_align()
 	if (OutputPattern.empty())
 		Die("Must set -output");
 
+	double MeanSeqLength = InputSeqs.GetMeanSeqLength();
+	uint MaxSeqLength = InputSeqs.GetMaxSeqLength();
+	ProgressLog("Input: %u seqs, avg length %.0f, max %u\n\n",
+	  InputSeqCount, MeanSeqLength, MaxSeqLength);
+	if (InputSeqCount > 1000)
+		Warning(">1k sequences, may be slow or use excessive memory, consider using -super5");
+
 	bool OutputWildcard = OutputPattern.find('@') != string::npos;
 	FILE *fOut = 0;
 

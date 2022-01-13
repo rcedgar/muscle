@@ -83,6 +83,9 @@ public:
 		return SIZE(m_Seqs);
 		}
 
+	double GetMeanSeqLength() const;
+	uint GetMaxSeqLength() const;
+
 	uint GetChar(uint SeqIndex, uint ZeroBasedPos) const
 		{
 		const Sequence *seq = GetSequence((int) SeqIndex);

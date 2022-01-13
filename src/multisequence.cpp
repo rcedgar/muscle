@@ -269,3 +269,23 @@ void MultiSequence::ToMSA(MSA &msa) const
 		msa.m_szNames[SeqIndex] = mystrsave(Label);
 		}
 	}
+
+double MultiSequence::GetMeanSeqLength() const
+	{
+	const uint SeqCount = GetSeqCount();
+	if (SeqCount == 0)
+		return 0;
+	double SumSeqLength = 0;
+	for (uint i = 0; i < SeqCount; ++i)
+		SumSeqLength += GetSequence(i)->GetLength();
+	return SumSeqLength/SeqCount;
+	}
+
+uint MultiSequence::GetMaxSeqLength() const
+	{
+	const uint SeqCount = GetSeqCount();
+	uint MaxSeqLength = 0;
+	for (uint i = 0; i < SeqCount; ++i)
+		MaxSeqLength = max(MaxSeqLength, GetSequence(i)->GetLength());
+	return MaxSeqLength;
+	}

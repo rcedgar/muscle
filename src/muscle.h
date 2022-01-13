@@ -57,6 +57,8 @@ void MakeReplicateFileName(const string &Pattern, TREEPERM TP,
   uint PerturbSeed, string &FileName);
 MultiSequence &LoadGlobalInputMS(const string &FileName);
 MultiSequence &GetGlobalInputMS();
+void ShowGlobalInputSeqStats();
+double GetGlobalMSMeanSeqLength();
 uint GetGlobalMSSeqCount();
 uint GetGSICount();
 uint GetAssertSameSeqsOkCount();
