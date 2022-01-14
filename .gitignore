@@ -239,6 +239,8 @@ StyleCopReport.xml
 
 # Chutzpah Test 
 
-CYGWIN_NT-10.0/
-linux/
+CYGWIN*/
+[lL]inux/
 Darwin/
+
+gitver.txt
