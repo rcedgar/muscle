@@ -3,11 +3,12 @@
 PATH=$PATH:/usr/bin
 
 git describe --abbrev=6 --dirty --long --always \
-  | sed '-es/^\(.*\)$/"\1"/' \
-  > gitver.txt
+  > gitver.tmp
 
-if [ $? != 0 ] ; then
-	echo unknown > gitver.txt
-fi
+sed -i '-es/"//g' gitver.tmp
+
+echo \"`cat gitver.tmp`\" > gitver.txt
+
+rm -f gitver.tmp
 
 cat gitver.txt
