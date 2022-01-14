@@ -155,11 +155,11 @@ void cmd_qscore()
 					{
 					if (RefColIsAligned)
 						{
-						fprintf(stderr, "\n");
-						fprintf(stderr, "Ref col: ");
+						Log("\n");
+						Log("Ref col: ");
 						for (uint RefSeqIndex = 0; RefSeqIndex < RefSeqCount; RefSeqIndex++)
-							fprintf(stderr, "%c", msaRef.GetChar(RefSeqIndex, RefColIndex));
-						fprintf(stderr, "\n");
+							Log("%c", msaRef.GetChar(RefSeqIndex, RefColIndex));
+						Log("\n");
 						Die("Ref col %u has both upper- and lower-case letters",
 						  RefColIndex);
 						}

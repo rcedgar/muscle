@@ -48,5 +48,7 @@ C(labels2randomchaintree)
 C(maxcc)
 C(letterconf)
 C(letterconf_html)
+C(make_a2m)
+C(eesort)
 
 #undef C

@@ -52,6 +52,7 @@ public:
 	unsigned GetLetter(unsigned uSeqIndex, unsigned uIndex) const;
 	unsigned GetLetterEx(unsigned uSeqIndex, unsigned uIndex) const;
 	const char *GetSeqName(unsigned uSeqIndex) const;
+	void GetSeqLabel(uint SeqIndex, string &Label) const;
 	unsigned GetSeqId(unsigned uSeqIndex) const;
 	unsigned GetSeqIndex(unsigned uId) const;
 	bool GetSeqIndex(unsigned uId, unsigned *ptruIndex) const;
@@ -78,6 +79,7 @@ public:
 	double GetPctIdentityPair(unsigned uSeqIndex1, unsigned uSeqIndex2) const;
 	double GetPctIdentityPair2(unsigned uSeqIndex1, unsigned uSeqIndex2) const;
 	bool GetSeqIndex(const char *ptrSeqName, unsigned *ptruSeqIndex) const;
+	uint GetSeqIndex(const string &Label, bool FailOnError = true) const;
 	void DeleteCol(unsigned uColIndex);
 	void DeleteColumns(unsigned uColIndex, unsigned uColCount);
 	void CopySeq(unsigned uToSeqIndex, const MSA &msaFrom, unsigned uFromSeqIndex);

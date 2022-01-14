@@ -86,6 +86,7 @@ unsigned GetRequestedThreadCount()
 		return N;
 	unsigned MaxN = omp_get_max_threads();
 	unsigned CoreCount = GetCPUCoreCount();
+	static bool MessageShown = false;
 	if (optset_threads)
 		N = opt(threads);
 	else
@@ -93,6 +94,7 @@ unsigned GetRequestedThreadCount()
 		if (CoreCount > 20)
 			{
 			Progress("CPU has %u cores, defaulting to 20 threads\n", CoreCount);
+			MessageShown = true;
 			N = 20;
 			}
 		else
@@ -106,6 +108,11 @@ unsigned GetRequestedThreadCount()
 	if (N == 0)
 		N = 1;
 	Done = true;
+	if (!MessageShown)
+		{
+		Progress("CPU has %u cores, running %u threads\n", CoreCount, N);
+		MessageShown = true;
+		}
 	return N;
 	}
 
@@ -126,6 +133,8 @@ const char *GetPlatform()
 	asserta(sizeof(void *) == 8);
 #ifdef _MSC_VER
 	return "win64";
+#elif defined(__arm64__)
+	return "osxarm64";
 #elif defined(__APPLE__)
 	return "osx64";
 #elif defined(__GNUC__)
@@ -922,7 +931,7 @@ void Die_(const char *Format, ...)
 	Log("Elapsed time: %s\n", sstr);
 
 	const char *szStr = Msg.c_str();
-	fprintf(stderr, "Elapsed time %s\n", SecsToHHMMSS((int) ElapsedSeconds));
+	fprintf(stderr, "Elapsed time %s\n", SecsToHHMMSS(ElapsedSeconds));
 	fprintf(stderr, "Max memory %s\n", MemBytesToStr(g_PeakMemUseBytes));
 	fprintf(stderr, "\n---Fatal error---\n%s\n", szStr);
 	Log("\n---Fatal error---\n%s\n", szStr); 
@@ -1147,22 +1156,22 @@ double GetPeakMemUseBytes()
 	return g_PeakMemUseBytes;
 	}
 
-const char *SecsToHHMMSS(int Secs)
+const char *SecsToHHMMSS(unsigned Secs)
 	{
-	int HH = Secs/3600;
-	int MM = (Secs - HH*3600)/60;
-	int SS = Secs%60;
+	unsigned HH = Secs/3600;
+	unsigned MM = (Secs - HH*3600)/60;
+	unsigned SS = Secs%60;
 	if (HH == 0)
-		sprintf(g_TmpStr, "%02d:%02d", MM, SS);
+		sprintf(g_TmpStr, "%02u:%02d", MM, SS);
 	else
-		sprintf(g_TmpStr, "%02d:%02d:%02d", HH, MM, SS);
+		sprintf(g_TmpStr, "%02u:%02u:%02u", HH, MM, SS);
 	return g_TmpStr;
 	}
 
 const char *SecsToStr(double Secs)
 	{
 	if (Secs >= 60.0)
-		return SecsToHHMMSS((int) Secs);
+		return SecsToHHMMSS((unsigned) Secs);
 
 	if (Secs < 1e-6)
 		sprintf(g_TmpStr, "%.2gs", Secs);
@@ -1614,7 +1623,8 @@ void LogProgramInfoAndCmdLine()
 	string Ver;
 	GetVersionString(Ver);
 	Log("%s", Ver.c_str());
-	Log(" started %s", TimeStr); // there is a newline in TimeStr
+	Log(" built %s %s\n", __DATE__, __TIME__);
+	Log("Started %s", TimeStr); // there is a newline in TimeStr
 
 #ifdef	_MSC_VER
 	const char *e = getenv("CYGTZ");
@@ -1633,7 +1643,7 @@ void LogElapsedTimeAndRAM()
 
 	Log("\n");
 	Log("Finished %s", s); // there is a newline in s
-	Log("Elapsed time %s\n", SecsToHHMMSS((int) Secs));
+	Log("Elapsed time %s\n", SecsToHHMMSS((unsigned) Secs));
 	Log("Max memory %s\n", MemBytesToStr(g_PeakMemUseBytes));
 #if	WIN32 && DEBUG
 // Skip exit(), which can be very slow in DEBUG build
@@ -2054,9 +2064,9 @@ void Split(const string &Str, vector<string> &Fields, char Sep)
 
 void GetVersionString(string &s)
 	{
-	const int counter = 
-#include "ver_counter.h"
-	;
+	const char *GIT_VER =
+#include "gitver.txt"
+		;
 	const char *Flags = ""
 
 #if	DEBUG
@@ -2067,7 +2077,7 @@ void GetVersionString(string &s)
 #endif
 	;
 
-	Ps(s, "%s %s.%u_%s%s", PROGRAM_NAME, MY_VERSION, counter, GetPlatform(), Flags);
+	Ps(s, "%s %s.%s%s [%s]", PROGRAM_NAME, MY_VERSION, GetPlatform(), Flags, GIT_VER);
 	}
 
 void PrintVersion(FILE *f)
@@ -2078,6 +2088,7 @@ void PrintVersion(FILE *f)
 	GetVersionString(s);
 	fputs(s.c_str(), f);
 	fputc('\n', f);
+	fprintf(f, "Built %s %s\n", __DATE__, __TIME__);
 	}
 
 void cmd_version()
@@ -2100,6 +2111,7 @@ void PrintBanner(FILE *f)
 	fprintf(f, "%s", s.c_str());
 	fprintf(f, "  %s RAM", MemBytesToStr(RAM));
 	fprintf(f, ", %u cores\n", GetCPUCoreCount());
+	fprintf(f, "Built %s %s\n", __DATE__, __TIME__);
 	fprintf(f, "(C) Copyright 2004-2021 Robert C. Edgar.\n");
 	fprintf(f, "https://drive5.com\n\n");
 	}
