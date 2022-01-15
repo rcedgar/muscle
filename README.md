@@ -17,6 +17,10 @@ https://github.com/rcedgar/muscle/releases
 [Muscle v5 home page](https://drive5.com/muscle5)   
 [Manual](https://drive5.com/muscle5/manual)   
 
+### Building MUSCLE from source
+
+[https://github.com/rcedgar/muscle/wiki/Building-MUSCLE](https://github.com/rcedgar/muscle/wiki/Building-MUSCLE)
+
 
 ### Reference
 R.C. Edgar (2021) "MUSCLE v5 enables improved estimates of phylogenetic tree confidence by ensemble bootstrapping"    
