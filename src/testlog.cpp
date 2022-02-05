@@ -1,6 +1,10 @@
 #include "muscle.h"
 #include "timing.h"
 
+void cmd_testlog() {}
+
+#if 0
+
 inline float HACK(float x)
 	{
 	assert(x >= 0.00f);
@@ -151,3 +155,4 @@ Next:
 	ProgressLog("LOG_ADD %.3g sum_log_prob %.3g lookup %.3g\n",
 	  double(t2 - t1), double(t4 - t3), double(t6 - t5));
 	}
+#endif // 0

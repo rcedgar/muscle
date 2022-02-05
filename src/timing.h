@@ -1,6 +1,8 @@
 #ifndef getticks_h
 #define getticks_h
 
+#if 0
+
 // ~3 x 10^9 ticks/sec
 
 #ifdef _MSC_VER
@@ -29,6 +31,8 @@ __inline__ uint64_t GetClockTicks()
 
 #else
 #error	"getticks_h, unknown compiler"
+#endif
+
 #endif
 
 #endif // getticks_h
