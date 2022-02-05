@@ -2076,7 +2076,8 @@ void GetVersionString(string &s)
 	"T"
 #endif
 	;
-
+	if (GIT_VER == 0)
+		GIT_VER = "-";
 	Ps(s, "%s %s.%s%s [%s]", PROGRAM_NAME, MY_VERSION, GetPlatform(), Flags, GIT_VER);
 	}
 
