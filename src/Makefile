@@ -26,10 +26,7 @@ endif
 
 CXXFLAGS := $(CXXFLAGS) -O3 -fopenmp -ffast-math
 
-LDFLAGS := $(LDFLAGS) -O3 -fopenmp -pthread -lpthread
-ifeq ($(OS),Linux)
-    LDFLAGS += -static
-endif
+LDFLAGS := $(LDFLAGS) -O3 -fopenmp -pthread -lpthread ${LDFLAGS2}
 
 HDRS := $(shell echo *.h)
 OBJS := $(shell echo *.cpp | sed "-es/^/$(OS)\//" | sed "-es/ / $(OS)\//g" | sed "-es/\.cpp/.o/g")
