@@ -21,7 +21,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           ls -lh
           cd src
-          make
+          make LDFLAGS2=-static
       - name: Upload binary artifact
         uses: actions/upload-artifact@v2
         with:
