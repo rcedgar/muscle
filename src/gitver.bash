@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! -d ../.git ] ; then
-  if [ ! -f gitver.txt ] then
+  if [ ! -f gitver.txt ] ; then
     echo "0" > gitver.txt
   fi
   echo "Repo not found, git hash set to zero"
