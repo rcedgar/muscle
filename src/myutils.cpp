@@ -807,7 +807,7 @@ static char *GetThreadStr()
 		{
 		unsigned NewThreadStrCount = ThreadIndex + 4;
 		char **NewThreadStrs = myalloc(char *, NewThreadStrCount);
-		zero(NewThreadStrs, NewThreadStrCount);
+		memset_zero(NewThreadStrs, NewThreadStrCount);
 		if (g_ThreadStrCount > 0)
 			memcpy(NewThreadStrs, g_ThreadStrs, g_ThreadStrCount*sizeof(char *));
 		g_ThreadStrs = NewThreadStrs;
@@ -898,6 +898,8 @@ void Log(const char *Format, ...)
 
 void Die_(const char *Format, ...)
 	{
+	va_list ArgList;
+	va_start(ArgList, Format);
 #pragma omp critical
 	{
 	static bool InDie = false;
@@ -908,10 +910,7 @@ void Die_(const char *Format, ...)
 
 	if (g_fLog != 0)
 		setbuf(g_fLog, 0);
-	va_list ArgList;
-	va_start(ArgList, Format);
 	myvstrprintf(Msg, Format, ArgList);
-	va_end(ArgList);
 
 	fprintf(stderr, "\n\n");
 	Log("\n");
@@ -944,6 +943,7 @@ void Die_(const char *Format, ...)
 
 	exit(1);
 	}
+	va_end(ArgList);
 	}
 
 void Warning_(const char *Format, ...)
