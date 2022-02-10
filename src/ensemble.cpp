@@ -41,7 +41,7 @@ void Ensemble::SortMSA(MSA &M)
 	M.GetLabelToSeqIndex(Labels2, LabelToSeqIndex2);
 
 	char **szSeqsSorted = myalloc(char *, SeqCount);
-	zero(szSeqsSorted, SeqCount);
+	memset_zero(szSeqsSorted, SeqCount);
 	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
 		{
 		const string &Label = Labels2[SeqIndex];

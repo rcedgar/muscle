@@ -807,7 +807,7 @@ static char *GetThreadStr()
 		{
 		unsigned NewThreadStrCount = ThreadIndex + 4;
 		char **NewThreadStrs = myalloc(char *, NewThreadStrCount);
-		zero(NewThreadStrs, NewThreadStrCount);
+		memset_zero(NewThreadStrs, NewThreadStrCount);
 		if (g_ThreadStrCount > 0)
 			memcpy(NewThreadStrs, g_ThreadStrs, g_ThreadStrCount*sizeof(char *));
 		g_ThreadStrs = NewThreadStrs;
