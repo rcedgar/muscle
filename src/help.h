@@ -49,7 +49,7 @@
 "\n"
 "Update ensemble by adding two sequences of digits to each replicate, digits\n"
 "are column confidence (CC) values, e.g. \"73\" means CC=0.73, \"++\" is CC=1.0:\n"
-"    muscle -addconfseqs ensemble.efa -output ensemble_cc.efa\n"
+"    muscle -addconfseq ensemble.efa -output ensemble_cc.efa\n"
 "\n"
 "Calculate letter confidence (LC) values, -ref specifies the alignment to\n"
 "compare against the ensemble (e.g. from -maxcc), output is in aligned\n"
