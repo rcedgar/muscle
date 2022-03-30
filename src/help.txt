@@ -49,7 +49,7 @@ Convert FASTA to EFA, input has one filename per line:
 
 Update ensemble by adding two sequences of digits to each replicate, digits
 are column confidence (CC) values, e.g. "73" means CC=0.73, "++" is CC=1.0:
-    muscle -addconfseqs ensemble.efa -output ensemble_cc.efa
+    muscle -addconfseq ensemble.efa -output ensemble_cc.efa
 
 Calculate letter confidence (LC) values, -ref specifies the alignment to
 compare against the ensemble (e.g. from -maxcc), output is in aligned
