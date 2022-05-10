@@ -4,12 +4,9 @@
 void cmd_resample()
 	{
 	MWCG rng;
-	uint32_t Seed = 1;
-	if (optset_randseed) {
-		Seed = opt(randseed);
-		if (Seed == 0)
-			Seed = (uint32_t) (time(0)*getpid());
-	}
+	uint32_t Seed = optd(randseed, 1);
+	if (Seed == 0)
+		Seed = (uint32_t) (time(0)*getpid());
 	rng.srand(Seed);
 
 	const string &FileName = opt(resample);

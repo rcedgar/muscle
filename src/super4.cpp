@@ -250,6 +250,11 @@ void Super4::SetOpts()
 	m_MinEAPass2 = (float) optd(super4_minea2, DEFAULT_MIN_EA_SUPER4_PASS2);
 	m_MPC.m_ConsistencyIterCount = optd(consiters, 2);
 	m_MPC.m_RefineIterCount = optd(refineiters, 100);
+        uint32_t Seed = optd(randseed, 1);
+	if (Seed == 0)
+		Seed = (uint32_t) (time(0)*getpid());
+	m_MPC.m_rng.srand(Seed);
+	m_PP.m_rng.srand(Seed);
 	}
 
 void Super4::CalcConsensusSeqsDistMx()
@@ -338,12 +343,9 @@ void Super4::Run(MultiSequence &InputSeqs, TREEPERM TreePerm)
 void cmd_super4()
 	{
 	MWCG rng;
-	uint32_t Seed = 1;
-	if (optset_randseed) {
-		Seed = opt(randseed);
-		if (Seed == 0)
-			Seed = (uint32_t) (time(0)*getpid());
-	}
+	uint32_t Seed = optd(randseed, 1);
+	if (Seed == 0)
+		Seed = (uint32_t) (time(0)*getpid());
 	rng.srand(Seed);
 
 	const string &InputFileName = opt(super4);
