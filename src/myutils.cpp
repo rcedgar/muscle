@@ -2207,107 +2207,6 @@ void Logf(float x, unsigned w, unsigned prefixspaces)
 		Log("%*.2f", w, x);
 	}
 
-static uint32 g_SLCG_state = 1;
-
-// Simple Linear Congruential Generator
-// Bad properties; used just to initialize the better generator.
-// Numerical values used by Microsoft C, according to wikipedia:
-// http://en.wikipedia.org/wiki/Linear_congruential_generator
-static uint32 g_SLCG_a = 214013;
-static uint32 g_SLCG_c = 2531011;
-
-static uint32 SLCG_rand()
-	{
-	g_SLCG_state = g_SLCG_state*g_SLCG_a + g_SLCG_c;
-	return g_SLCG_state;
-	}
-
-static void SLCG_srand(uint32 Seed)
-	{
-	g_SLCG_state = Seed;
-	for (int i = 0; i < 10; ++i)
-		SLCG_rand();
-	}
-
-/***
-A multiply-with-carry random number generator, see:
-http://en.wikipedia.org/wiki/Multiply-with-carry
-
-The particular multipliers used here were found on
-the web where they are attributed to George Marsaglia.
-***/
-
-static bool g_InitRandDone = false;
-static uint32 g_X[5];
-
-static void InitRand()
-	{
-	if (g_InitRandDone)
-		return;
-// Do this first to avoid recursion
-	g_InitRandDone = true;
-
-	unsigned Seed = 1;
-	if (optset_randseed)
-		{
-		Seed = opt(randseed);
-		if (Seed == 0)
-			Seed = (unsigned) (time(0)*getpid());
-		}
-	Log("Random number seed %u\n", Seed);
-	ResetRand(Seed);
-	}
-
-static void IncrementRand()
-	{
-	uint64 Sum = 2111111111*(uint64) g_X[3] + 1492*(uint64) g_X[2] +
-	  1776*(uint64) g_X[1] + 5115*(uint64) g_X[0] + g_X[4];
-	g_X[3] = g_X[2];
-	g_X[2] = g_X[1];
-	g_X[1] = g_X[0];
-	g_X[4] = (uint32) (Sum >> 32);
-	g_X[0] = (uint32) Sum;
-	}
-
-uint32 RandInt32()
-	{
-	InitRand();
-	IncrementRand();
-	return g_X[0];
-	}
-
-unsigned randu32()
-	{
-	return (unsigned) RandInt32();
-	}
-
-uint64 randu64()
-	{
-	union
-		{
-		struct
-			{
-			uint32 u32[2];
-			};
-		uint64 u64;
-		} x;
-	x.u32[0] = randu32();
-	x.u32[1] = randu32();
-	return x.u64;
-	}
-
-void ResetRand(unsigned Seed)
-	{
-	g_InitRandDone = true;
-	SLCG_srand(Seed);
-
-	for (unsigned i = 0; i < 5; i++)
-		g_X[i] = SLCG_rand();
-
-	for (unsigned i = 0; i < 100; i++)
-		IncrementRand();
-	}
-
 unsigned GetCPUCoreCount()
 	{
 #ifdef _MSC_VER
@@ -2751,12 +2650,12 @@ void SeqToFasta(FILE *f, const byte *Seq, unsigned L, const char *Label)
 //  for i from n - 1 downto 1 do
 //       j := random integer with 0 <= j <= i
 //       exchange a[j] and a[i]
-void Shuffle(vector<unsigned> &v)
+void Shuffle(vector<unsigned> &v, RNG &rng)
 	{
 	const unsigned N = SIZE(v);
 	for (unsigned i = N - 1; i >= 1; --i)
 		{
-		unsigned j = randu32()%(i + 1);
+		unsigned j = rng.randu32()%(i + 1);
 		
 		unsigned vi = v[i];
 		unsigned vj = v[j];
