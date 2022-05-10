@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include "rng.h"
 
 class Ensemble
 	{
@@ -57,9 +58,9 @@ public:
 	void GetIxSubset(double MaxGapFract, vector<uint> &Ixs) const;
 	double GetGapFract(uint Ix) const;
 	void SubsampleWithReplacement(double MaxGapFract,
-	  uint ColCount, MSA &M) const;
+	  uint ColCount, MSA &M, RNG &rng) const;
 	void SubsampleWithReplacement(const vector<uint> &Ixs,
-	  uint ColCount, MSA &M) const;
+	  uint ColCount, MSA &M, RNG &rng) const;
 	void GetAbToCountAll(vector<uint> &AbToCount);
 	void GetAbToCount(uint MSAIndex, vector<uint> &AbToCount);
 	uint GetUniqueIx(uint MSAIndex, uint ColIndex) const;
