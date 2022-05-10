@@ -223,7 +223,7 @@ void Super5::SetCentroidVecs()
 		bool IsDupe = m_IsDupe[MemberGSI];
 		bool IsMember = m_IsMember[MemberGSI];
 		bool IsCentroid = m_IsCentroid[MemberGSI];
-		
+
 		if (IsDupe || IsMember || IsCentroid)
 			Die("Super5::SetCentroidVecs(), MemberGSI=%u dupe=%c mem=%c cent=%c",
 			   MemberGSI, tof(IsDupe), tof(IsMember), tof(IsCentroid));
@@ -341,6 +341,15 @@ void Super5::AlignDupes()
 
 void cmd_super5()
 	{
+	MWCG rng;
+	uint32_t Seed = 1;
+	if (optset_randseed) {
+		Seed = opt(randseed);
+		if (Seed == 0)
+			Seed = (uint32_t) (time(0)*getpid());
+	}
+	rng.srand(Seed);
+
 	LoadGlobalInputMS(opt(super5));
 
 	string &OutputPattern = opt(output);
@@ -358,7 +367,7 @@ void cmd_super5()
 	else if (opt(amino))
 		Nucleo = false;
 	else
-		Nucleo = InputSeqs.GuessIsNucleo();
+		Nucleo = InputSeqs.GuessIsNucleo(rng);
 
 	SetAlpha(Nucleo ? ALPHA_Nucleo : ALPHA_Amino);
 	InitProbcons();

@@ -46,7 +46,7 @@ void Super4::SplitBigMFA_Random(MultiSequence &InputMFA, uint MaxSize,
 		uint RemainingSeqCount = InputSeqCount - OutputSeqCount;
 		if (RemainingSeqCount == 0)
 			break;
-		
+
 		uint N = RemainingSeqCount;
 		if (N > MaxSize)
 			N = MaxSize;
@@ -337,6 +337,15 @@ void Super4::Run(MultiSequence &InputSeqs, TREEPERM TreePerm)
 
 void cmd_super4()
 	{
+	MWCG rng;
+	uint32_t Seed = 1;
+	if (optset_randseed) {
+		Seed = opt(randseed);
+		if (Seed == 0)
+			Seed = (uint32_t) (time(0)*getpid());
+	}
+	rng.srand(Seed);
+
 	const string &InputFileName = opt(super4);
 	const string &OutputFileName = opt(output);
 
@@ -347,7 +356,7 @@ void cmd_super4()
 	else if (opt(amino))
 		Nucleo = false;
 	else
-		Nucleo = InputSeqs.GuessIsNucleo();
+		Nucleo = InputSeqs.GuessIsNucleo(rng);
 
 	TREEPERM TP = TP_None;
 	if (optset_perm)
