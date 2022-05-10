@@ -21,7 +21,7 @@ void PProg::AlignAndJoin(uint Index1, uint Index2)
 	Ps(ProgressStr, "Join %u / %u", m_JoinIndex+1, m_JoinCount);
 
 	string Path;
-	AlignMSAsFlat(ProgressStr, MSA1, MSA2, m_TargetPairCount, Path);
+	AlignMSAsFlat(ProgressStr, MSA1, MSA2, m_TargetPairCount, Path, m_rng);
 
 	string MSALabel12;
 	Ps(MSALabel12, "Join_%u", m_JoinIndex+1);
@@ -81,6 +81,14 @@ void cmd_pprog2()
 	PProg PP;
 	vector<string> MSAFileNames;
 	ReadStringsFromFile(opt(pprog2), MSAFileNames);
+
+	uint32_t Seed = 1;
+	if (optset_randseed) {
+		Seed = opt(randseed);
+		if (Seed == 0)
+			Seed = (uint32_t) (time(0)*getpid());
+	}
+	PP.m_rng.srand(Seed);
 
 	const uint MSACount = SIZE(MSAFileNames);
 	asserta(MSACount > 1);

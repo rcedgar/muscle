@@ -37,6 +37,14 @@ void cmd_pprogt()
 	if (optset_paircount)
 		PP.m_TargetPairCount = int(opt(paircount));
 
+	uint32_t Seed = 1;
+	if (optset_randseed) {
+		Seed = opt(randseed);
+		if (Seed == 0)
+			Seed = (uint32_t) (time(0)*getpid());
+	}
+	PP.m_rng.srand(Seed);
+
 	bool IsNucleo;
 	PP.LoadMSAs(MSAFileNames, IsNucleo);
 	SetAlpha(IsNucleo ? ALPHA_Nucleo : ALPHA_Amino);

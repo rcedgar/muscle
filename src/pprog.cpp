@@ -1,5 +1,6 @@
 #include "muscle.h"
 #include "pprog.h"
+#include "rng.h"
 
 void ReadStringsFromFile(const string &FileName,
   vector<string> &Strings)
@@ -213,7 +214,7 @@ void PProg::LoadMSAs(const vector<string> &FileNames, bool &IsNucleo)
 		ProgressStep(MSAIndex, m_InputMSACount, "Reading %s", FileName.c_str());
 		MultiSequence &MSA = *new MultiSequence;
 		MSA.LoadMFA(FileName);
-		bool IsNuc = MSA.GuessIsNucleo();
+		bool IsNuc = MSA.GuessIsNucleo(m_rng);
 		if (MSAIndex == 0)
 			IsNucleo = IsNuc;
 		else
@@ -284,7 +285,7 @@ void PProg::AlignAllInputPairs()
 
 			string Path;
 			float Score = AlignMSAsFlat(MSALabel1 + "+" + MSALabel2,
-			  MSA1, MSA2, m_TargetPairCount, Path);
+			  MSA1, MSA2, m_TargetPairCount, Path, m_rng);
 
 			const uint ColCount1 = MSA1.GetColCount();
 			const uint ColCount2 = MSA2.GetColCount();
@@ -392,7 +393,7 @@ void PProg::AlignNewToPending()
 		const string &MSALabeli = m_MSALabels[i];
 		string Path;
 		float Score = AlignMSAsFlat(NewMSALabel + "+" + MSALabeli,
-		  *NewMSA, *MSA, m_TargetPairCount, Path);
+		  *NewMSA, *MSA, m_TargetPairCount, Path, m_rng);
 
 		string InvertedPath;
 		InvertPath(Path, InvertedPath);
@@ -424,6 +425,14 @@ void cmd_pprog()
 	const uint MSACount = SIZE(MSAFileNames);
 	asserta(MSACount > 1);
 	const string &OutputFileName = opt(output);
+
+	uint32_t Seed = 1;
+	if (optset_randseed) {
+		Seed = opt(randseed);
+		if (Seed == 0)
+			Seed = (uint32_t) (time(0)*getpid());
+	}
+	PP.m_rng.srand(Seed);
 
 	PP.m_TargetPairCount = DEFAULT_TARGET_PAIR_COUNT;
 	if (optset_paircount)
