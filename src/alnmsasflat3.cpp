@@ -4,7 +4,7 @@ float AlignMSAsFlat3(const string &ProgressStr,
   const MultiSequence &MSA1, const MultiSequence &MSA2,
   const vector<MySparseMx *> &SparseMxVec,
   uint Index1, uint Index2,
-  uint TargetPairCount, string &Path)
+  uint TargetPairCount, string &Path, RNG &rng)
 	{
 	const uint SeqCount1 = MSA1.GetNumSequences();
 	const uint SeqCount2 = MSA2.GetNumSequences();
@@ -20,7 +20,7 @@ float AlignMSAsFlat3(const string &ProgressStr,
 	vector<uint> SeqIndexes1;
 	vector<uint> SeqIndexes2;
 	GetPairs(SeqCount1, SeqCount2, TargetPairCount,
-	  SeqIndexes1, SeqIndexes2);
+	  SeqIndexes1, SeqIndexes2, rng);
 	const uint PairCount = SIZE(SeqIndexes1);
 	asserta(SIZE(SeqIndexes2) == PairCount);
 

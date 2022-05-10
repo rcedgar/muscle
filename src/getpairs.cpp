@@ -31,7 +31,7 @@ void GetAllPairs(uint Count1, uint Count2,
 	}
 
 void GetPairs(uint Count1, uint Count2, uint TargetPairCount,
-  vector<uint> &Indexes1, vector<uint> &Indexes2)
+  vector<uint> &Indexes1, vector<uint> &Indexes2, RNG &rng)
 	{
 	Indexes1.clear();
 	Indexes2.clear();
@@ -48,8 +48,8 @@ void GetPairs(uint Count1, uint Count2, uint TargetPairCount,
 	uint Counter = 0;
 	while (Counter++ < MaxCounter && (uint) SIZE(PairSet) < TargetPairCount)
 		{
-		uint i = randu32()%Count1;
-		uint j = randu32()%Count2;
+		uint i = rng.randu32()%Count1;
+		uint j = rng.randu32()%Count2;
 		if (i == j)
 			continue;
 		pair<uint, uint> Pair(i, j);

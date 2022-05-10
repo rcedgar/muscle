@@ -31,6 +31,7 @@
 #include "mpcflat.h"
 #include "kmerscan.h"
 #include "alpha3.h"
+#include "rng.h"
 
 #ifndef _WIN32
 #define stricmp strcasecmp
@@ -103,7 +104,7 @@ void LogFlatMx1(const string &Name, const float *Flat, uint LX, uint LY);
 
 float AlignMSAsFlat(const string &aProgressStr,
   const MultiSequence &MSA1, const MultiSequence &MSA2,
-  uint TargetPairCount, string &Path);
+  uint TargetPairCount, string &Path, RNG &rng);
 
 void InitProbcons();
 void AlignMSAsByPath(const MultiSequence &MSA1, const MultiSequence &MSA2,
@@ -130,7 +131,7 @@ void GetAllPairs(uint SeqCount,
 void GetAllPairs(uint SeqCount1, uint SeqCount2,
   vector<uint> &SeqIndexes1, vector<uint> &SeqIndexes2);
 void GetPairs(uint SeqCount1, uint SeqCount2, uint TargetPairCount,
-  vector<uint> &SeqIndexes1, vector<uint> &SeqIndexes2);
+  vector<uint> &SeqIndexes1, vector<uint> &SeqIndexes2, RNG &rng);
 float GetPostPairsAlignedFlat(const string &aProgressStr,
   const MultiSequence &MSA1, const MultiSequence &MSA2,
   const vector<uint> &SeqIndexes1, const vector<uint> &SeqIndexes2, 
