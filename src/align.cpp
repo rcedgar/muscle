@@ -19,7 +19,7 @@ void MakeReplicateFileName(const string &Pattern, TREEPERM TP,
 	}
 
 static void Align(MPCFlat &M, MultiSequence &InputSeqs,
-  uint PerturbSeed, TREEPERM TP, bool WriteEfaHdr, FILE *fOut)
+  uint PerturbSeed, RNG& rng, TREEPERM TP, bool WriteEfaHdr, FILE *fOut)
 	{
 	if (fOut == 0)
 		return;
@@ -29,7 +29,6 @@ static void Align(MPCFlat &M, MultiSequence &InputSeqs,
 	HP.FromDefaults(Nucleo);
 	if (PerturbSeed > 0)
 		{
-		ResetRand(PerturbSeed);
 		HP.PerturbProbs(PerturbSeed);
 		}
 	HP.ToPairHMM();
@@ -49,6 +48,15 @@ static void Align(MPCFlat &M, MultiSequence &InputSeqs,
 
 void cmd_align()
 	{
+	MWCG rng;
+	uint32_t Seed = 1;
+	if (optset_randseed) {
+		Seed = opt(randseed);
+		if (Seed == 0)
+			Seed = (uint32_t) (time(0)*getpid());
+	}
+	rng.srand(Seed);
+
 	MultiSequence InputSeqs;
 	InputSeqs.LoadMFA(opt(align), true);
 
@@ -67,7 +75,7 @@ void cmd_align()
 	bool OutputWildcard = OutputPattern.find('@') != string::npos;
 	FILE *fOut = 0;
 
-	bool IsNucleo = InputSeqs.GuessIsNucleo();
+	bool IsNucleo = InputSeqs.GuessIsNucleo(rng);
 	if (IsNucleo)
 		SetAlpha(ALPHA_Nucleo);
 	else
@@ -115,7 +123,7 @@ void cmd_align()
 		else
 			OutputFileName = OutputPattern;
 		fOut = CreateStdioFile(OutputFileName);
-		Align(M, InputSeqs, PerturbSeed, TP, false, fOut);
+		Align(M, InputSeqs, PerturbSeed, rng, TP, false, fOut);
 		CloseStdioFile(fOut);
 		return;
 		}
@@ -147,7 +155,7 @@ void cmd_align()
 			fOut = CreateStdioFile(OutputFileName);
 			}
 		bool WriteEfaHeader = !OutputWildcard;
-		Align(M, InputSeqs, PerturbSeed, TP, WriteEfaHeader, fOut);
+		Align(M, InputSeqs, PerturbSeed, rng, TP, WriteEfaHeader, fOut);
 		if (OutputWildcard)
 			CloseStdioFile(fOut);
 		}
