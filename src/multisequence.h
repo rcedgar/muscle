@@ -2,6 +2,7 @@
 
 #include <set>
 #include "sequence.h"
+#include "rng.h"
 
 class MSA;
 
@@ -125,7 +126,7 @@ public:
 		return BytePtr;
 		}
 
-	bool GuessIsNucleo() const;
+	bool GuessIsNucleo(RNG &rng) const;
 	void LogGSIs(const char *Msg = 0) const;
 	void AssertGSIs() const;
 	void GetLengthOrder(vector<uint> &SeqIndexes) const;
@@ -136,4 +137,3 @@ public:
 	void AssertSeqIds() const;
 #endif
 	};
-
