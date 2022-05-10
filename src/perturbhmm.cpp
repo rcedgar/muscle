@@ -31,7 +31,7 @@ void HMMParams::PerturbProbs(uint Seed)
 		for (uint j = 0; j <= i; ++j)
 			{
 			float P = m_Emits[i][j];
-			Perturb(P, m_Var);
+			Perturb(P, m_Var, rng);
 			m_Emits[i][j] = P;
 			m_Emits[j][i] = P;
 			}
