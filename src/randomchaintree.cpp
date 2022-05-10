@@ -1,7 +1,8 @@
 #include "muscle.h"
 #include "mpcflat.h"
+#include "rng.h"
 
-static void MakeRandomChainTree(const vector<string> &Labels, Tree &T)
+static void MakeRandomChainTree(const vector<string> &Labels, Tree &T, RNG &rng)
 	{
 	vector<uint> Parents;
 	vector<float> Lengths;
@@ -11,7 +12,7 @@ static void MakeRandomChainTree(const vector<string> &Labels, Tree &T)
 	vector<uint> SeqIndexes;
 	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
 		SeqIndexes.push_back(SeqIndex);
-	Shuffle(SeqIndexes);
+	Shuffle(SeqIndexes, rng);
 
 	Parents.resize(2*SeqCount - 1, UINT_MAX);
 	vector<string> NodeLabels;
@@ -48,11 +49,20 @@ static void MakeRandomChainTree(const vector<string> &Labels, Tree &T)
 
 void MPCFlat::CalcGuideTree_RandomChain()
 	{
-	MakeRandomChainTree(m_Labels, m_GuideTree);
+	MakeRandomChainTree(m_Labels, m_GuideTree, m_rng);
 	}
 
 void cmd_labels2randomchaintree()
 	{
+	MWCG rng;
+	uint32_t Seed = 1;
+	if (optset_randseed) {
+		Seed = opt(randseed):
+		if (Seed == 0)
+			Seed = (uint32_t) (time(0)*getpid());
+	}
+	rng.srand(Seed);
+
 	const string &LabelsFileName = opt(labels2randomchaintree);
 	const string &NewickFileName = opt(output);
 
@@ -60,6 +70,6 @@ void cmd_labels2randomchaintree()
 	ReadStringsFromFile(LabelsFileName, Labels);
 
 	Tree T;
-	MakeRandomChainTree(Labels, T);
+	MakeRandomChainTree(Labels, T, rng);
 	T.ToFile(NewickFileName);
 	}
