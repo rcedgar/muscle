@@ -26,6 +26,8 @@ public:
 	vector<uint> m_JoinMSAIndexes1;
 	vector<uint> m_JoinMSAIndexes2;
 
+	MWCG m_rng = MWCG();
+
 public:
 	void LoadMSAs(const vector<string> &FileNames, bool &IsNucleo);
 	void SetMSAs(const vector<const MultiSequence *> &MSAs,

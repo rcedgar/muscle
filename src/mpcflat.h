@@ -34,6 +34,8 @@ public:
 	vector<MySparseMx *> *m_ptrSparsePosts = &m_SparsePosts1;
 	vector<MySparseMx *> *m_ptrUpdatedSparsePosts = &m_SparsePosts2;
 
+	MWCG m_rng = MWCG();
+
 public:
 	~MPCFlat()
 		{
