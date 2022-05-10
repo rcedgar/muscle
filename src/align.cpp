@@ -48,14 +48,18 @@ static void Align(MPCFlat &M, MultiSequence &InputSeqs,
 
 void cmd_align()
 	{
-	MWCG rng;
+	MPCFlat M;
+	if (optset_consiters)
+		M.m_ConsistencyIterCount = opt(consiters);
+	if (optset_refineiters)
+		M.m_RefineIterCount = opt(refineiters);
 	uint32_t Seed = 1;
 	if (optset_randseed) {
 		Seed = opt(randseed);
 		if (Seed == 0)
 			Seed = (uint32_t) (time(0)*getpid());
 	}
-	rng.srand(Seed);
+	M.m_rng.srand(Seed);
 
 	MultiSequence InputSeqs;
 	InputSeqs.LoadMFA(opt(align), true);
@@ -75,17 +79,11 @@ void cmd_align()
 	bool OutputWildcard = OutputPattern.find('@') != string::npos;
 	FILE *fOut = 0;
 
-	bool IsNucleo = InputSeqs.GuessIsNucleo(rng);
+	bool IsNucleo = InputSeqs.GuessIsNucleo(m_rng);
 	if (IsNucleo)
 		SetAlpha(ALPHA_Nucleo);
 	else
 		SetAlpha(ALPHA_Amino);
-
-	MPCFlat M;
-	if (optset_consiters)
-		M.m_ConsistencyIterCount = opt(consiters);
-	if (optset_refineiters)
-		M.m_RefineIterCount = opt(refineiters);
 
 	if (opt(stratified) && opt(diversified))
 		Die("Cannot set both -stratified and -diversified");
