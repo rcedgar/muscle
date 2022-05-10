@@ -1,9 +1,10 @@
 #include "muscle.h"
+#include "rng.h"
 
-static void Perturb(float &P, float Var)
+static void Perturb(float &P, float Var, RNG &rng)
 	{
 	asserta(Var >= 0 && Var < 1);
-	uint Pct = randu32()%100;
+	uint Pct = rng.randu32()%100;
 	float Fract = Pct/100.0f;
 	asserta(Fract >= 0 && Fract <= 1);
 	float Lo = 1.0f - Var;
@@ -14,14 +15,16 @@ static void Perturb(float &P, float Var)
 
 void HMMParams::PerturbProbs(uint Seed)
 	{
+        MWCG rng;
+
 	if (Seed == 0)
 		return;
 
-	ResetRand(Seed);
+	rng.srand(Seed);
 	asserta(m_Var > 0 && m_Var < 1);
 
 	for (uint i = 0; i < SIZE(m_Trans); ++i)
-		Perturb(m_Trans[i], m_Var);
+		Perturb(m_Trans[i], m_Var, rng);
 
 	const uint AlphaSize = GetAlphaSize();
 	for (uint i = 0; i < AlphaSize; ++i)
