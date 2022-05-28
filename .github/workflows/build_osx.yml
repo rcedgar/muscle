@@ -2,7 +2,8 @@ name: build_osx
 
 on:
   # Enable manual run from the Actions tab
-  workflow_dispatch:
+  - workflow_dispatch
+  - push
 
 jobs:
   # This workflow contains a single job called "build"
