@@ -33,6 +33,8 @@
 #include <map>
 #include <inttypes.h>
 
+#include "rng.h"
+
 // isatty()
 #ifdef	WIN32
 #include <io.h>
@@ -360,9 +362,6 @@ inline bool feq(double x, double y)
 
 #define	memset_zero(a, n)	memset((a), 0, (n)*sizeof(a[0]))
 
-void ResetRand(unsigned Seed);
-unsigned randu32();
-uint64 randu64();
 void Split(const string &Str, vector<string> &Fields, char Sep = '\t');
 void StripWhiteSpace(string &Str);
 bool StartsWith(const string &s, const string &t);
@@ -448,7 +447,7 @@ inline bool myislower(char c) { return (c & 0x20) != 0; }
 bool AccChar(char c);
 void GetAccFromLabel(const string &Label, string &Acc);
 void GetBaseName(const string &PathName, string &BaseName);
-void Shuffle(vector<unsigned> &v);
+void Shuffle(vector<unsigned> &v, RNG &rng);
 
 #define NO_TRACE		0
 #define TMP_TRACE		2	// true but not 1, for grep_trace

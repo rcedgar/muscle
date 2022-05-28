@@ -1,9 +1,13 @@
 #include "muscle.h"
 #include "sort.h"
 #include "locallock.h"
+#include "rng.h"
 
 void cmd_eesort()
 	{
+	MWCG rng;
+	rng.srand_opt();
+
 	const string &QueryFileName = opt(eesort);
 	const string &DBFileName = opt(db);
 	const string &OutputFileName = opt(output);
@@ -20,7 +24,7 @@ void cmd_eesort()
 	DB.FromFASTA(DBFileName, true);
 	Progress("done\n");
 
-	bool IsNucleo = DB.GuessIsNucleo();
+	bool IsNucleo = DB.GuessIsNucleo(rng);
 	if (IsNucleo)
 		SetAlpha(ALPHA_Nucleo);
 	else
