@@ -13,11 +13,7 @@ void cmd_eadistmx_msas()
 	PProg PP;
 	if (optset_paircount)
 		PP.m_TargetPairCount = opt(paircount);
-
-	uint32_t Seed = optd(randseed, 1);
-	if (Seed == 0)
-		Seed = (uint32_t) (time(0)*getpid());
-	PP.m_rng.srand(Seed);
+	PP.m_rng.srand_opt();
 
 	bool IsNucleo;
 	PP.LoadMSAs(MSAFileNames, IsNucleo);

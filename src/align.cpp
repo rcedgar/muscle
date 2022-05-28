@@ -53,10 +53,7 @@ void cmd_align()
 		M.m_ConsistencyIterCount = opt(consiters);
 	if (optset_refineiters)
 		M.m_RefineIterCount = opt(refineiters);
-	uint32_t Seed = optd(randseed, 1);
-	if (Seed == 0)
-		Seed = (uint32_t) (time(0)*getpid());
-	M.m_rng.srand(Seed);
+	M.m_rng.srand_opt();
 
 	MultiSequence InputSeqs;
 	InputSeqs.LoadMFA(opt(align), true);

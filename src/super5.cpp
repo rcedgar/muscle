@@ -342,10 +342,7 @@ void Super5::AlignDupes()
 void cmd_super5()
 	{
 	MWCG rng;
-	uint32_t Seed = optd(randseed, 1);
-	if (Seed == 0)
-		Seed = (uint32_t) (time(0)*getpid());
-	rng.srand(Seed);
+	rng.srand_opt();
 
 	LoadGlobalInputMS(opt(super5));
 
@@ -411,7 +408,7 @@ void cmd_super5()
 		uint PerturbSeed = 0;
 		if (optset_perturb)
 			PerturbSeed = opt(perturb);
-		
+
 		string OutputFileName;
 		if (OutputPattern.find('@') == string::npos)
 			OutputFileName = OutputPattern;

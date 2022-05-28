@@ -245,7 +245,7 @@ void PProg::Run()
 	for (m_JoinIndex = 0; m_JoinIndex < m_JoinCount; ++m_JoinIndex)
 		{
 		ProgressLog("____________________________________________\n");
-		ProgressLog("Join %u/%u, pending %u\n", 
+		ProgressLog("Join %u/%u, pending %u\n",
 		  m_JoinIndex+1, m_JoinCount, SIZE(m_Pending));
 		uint Index1;
 		uint Index2;
@@ -426,10 +426,7 @@ void cmd_pprog()
 	asserta(MSACount > 1);
 	const string &OutputFileName = opt(output);
 
-	uint32_t Seed = optd(randseed, 1);
-	if (Seed == 0)
-		Seed = (uint32_t) (time(0)*getpid());
-	PP.m_rng.srand(Seed);
+	PP.m_rng.srand_opt();
 
 	PP.m_TargetPairCount = DEFAULT_TARGET_PAIR_COUNT;
 	if (optset_paircount)

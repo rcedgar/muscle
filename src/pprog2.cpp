@@ -82,10 +82,7 @@ void cmd_pprog2()
 	vector<string> MSAFileNames;
 	ReadStringsFromFile(opt(pprog2), MSAFileNames);
 
-	uint32_t Seed = optd(randseed, 1);
-	if (Seed == 0)
-		Seed = (uint32_t) (time(0)*getpid());
-	PP.m_rng.srand(Seed);
+	PP.m_rng.srand_opt();
 
 	const uint MSACount = SIZE(MSAFileNames);
 	asserta(MSACount > 1);
