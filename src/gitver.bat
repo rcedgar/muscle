@@ -3,7 +3,7 @@
 if exist gitver.txt (
 	echo gitver.txt found
 ) else (
-	echo 000 > gitver.txt
+	echo "-" > gitver.txt
 )
 
 if exist c:\cygwin64\bin\bash.exe (
