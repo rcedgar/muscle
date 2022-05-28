@@ -3,6 +3,8 @@
 uint64 GetFBSize(uint LX, uint LY)
 	{
 	uint64 Size64 = uint64(LX + 1)*uint64(LY + 1)*HMMSTATE_COUNT;
+	if (double(Size64) > 4e9)
+		Die("Memory object too large due to sequence lengths %u, %u", LX, LY);
 	uint Size = uint(Size64);
 	asserta(Size == uint(Size64));
 	return Size;

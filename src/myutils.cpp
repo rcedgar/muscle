@@ -2398,15 +2398,8 @@ void LogAllocSummary()
 void *mymalloc64(unsigned BytesPerObject, uint64 N)
 	{
 	uint64 Bytes = N*BytesPerObject;
-	//byte *p = 0;
-	//try
-	//	{
-	//	p = new byte[Bytes];
-	//	}
-	//catch (...)
-	//	{
-	//	Die("myalloc64(%u, %.3g) failed", BytesPerObject, double(N));
-	//	}
+	if (Bytes >= UINT32_MAX - 1024)
+		Die("Memory object >4Gb, probably due to long seqences");
 	byte *p = (byte *) malloc(Bytes);
 	if (p == 0)
 		Die("myalloc64(%u, %.3g) failed", BytesPerObject, double(N));
