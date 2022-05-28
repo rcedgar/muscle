@@ -1,12 +1,21 @@
 #pragma once
 
 #include <stdint.h>
+#include <time.h>
+
+#ifdef	WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
+
 
 // Abstract class for Random Number Generators.
 class RNG
   {
 public:
   virtual uint32_t randu32() = 0;
+  void srand_opt();
   virtual void srand(uint32_t Seed) = 0;
   };
 

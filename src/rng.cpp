@@ -1,4 +1,12 @@
 #include "rng.h"
+#include "muscle.h"
+
+void RNG::srand_opt()
+  {
+  uint32_t Seed = optd(randseed, 1);
+  if (Seed == 0) Seed = (uint32_t) (time(0)*getpid());
+  srand(Seed);
+  }
 
 
 uint32_t SLCG::randu32()
