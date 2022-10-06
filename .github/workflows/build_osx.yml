@@ -31,6 +31,7 @@ jobs:
 
           # Build
           env CXX=g++-11 \
+              LIBS="-Wl,-Bstatic -lgomp -Wl,-Bdynamic" \
               make
 
       - name: Check linking
