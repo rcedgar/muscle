@@ -18,7 +18,14 @@
 OS := $(shell uname)
 
 CPPFLAGS += -DNDEBUG -pthread
-CPPFLAGS += -fopenmp
+
+# Detect if CXX is Apple clang, use custom preprocessor call
+COMPILER_VERSION := $(shell $(CXX) --version)
+ifneq '' '$(findstring Apple clang, $(COMPILER_VERSION))'
+	CPPFLAGS += -Xpreprocessor -fopenmp
+else
+	CPPFLAGS += -fopenmp
+endif
 
 # Add default flags
 CXXFLAGS += -O3 -ffast-math -std=c++11
