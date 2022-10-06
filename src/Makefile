@@ -27,9 +27,21 @@ else
 	CPPFLAGS += -fopenmp
 endif
 
+# If Darwin, then -fopenmp won't work in linker stage appropriately.
+# (Apple-ld is picky.)
+# As such, the user must specify an OpenMP implementation in LIBS.
+# We check this (quick-and-dirty) to help them out.
+ifneq '' '$(findstring Darwin, $(OS))'
+	ifeq '' '$(findstring omp, $(LIBS))'
+		maybe_missing_omp=1
+	endif
+else
+	LDFLAGS += -fopenmp
+endif
+
 # Add default flags
 CXXFLAGS += -O3 -ffast-math -std=c++11
-LDFLAGS += -O3 -pthread -lpthread -fopenmp
+LDFLAGS += -O3 -pthread -lpthread
 
 HDRS := $(shell echo *.h)
 OBJS := $(shell echo *.cpp | sed "-es/^/$(OS)\//" | sed "-es/ / $(OS)\//g" | sed "-es/\.cpp/.o/g")
@@ -39,7 +51,11 @@ SRCS := $(shell ls *.cpp *.h)
 .PHONY: clean
 
 $(OS)/muscle : gitver.txt $(OS)/ $(OBJS)
-	$(CXX) $(LDFLAGS) $(OBJS) -o $@
+	@if [ -n "${maybe_missing_omp}" ]; then \
+		echo "Warning: please specify an OpenMP library in LIBS."; \
+	fi
+
+	$(CXX) $(LDFLAGS) $(LIBS) $(OBJS) -o $@
 
 	@# Warning: do not add -d option to strip, this is not portable
 	strip $(OS)/muscle
