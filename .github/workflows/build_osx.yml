@@ -22,7 +22,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           ls -lh
           cd src
-          make
+          CXX=g++-11 make
       - name: Check linking
         run: |
           echo "Checking for dylib linking"

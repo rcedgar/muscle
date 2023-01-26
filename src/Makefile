@@ -19,10 +19,6 @@ OS := $(shell uname)
 
 CPPFLAGS := $(CPPFLAGS) -DNDEBUG -pthread
 
-CXX := g++
-ifeq ($(OS),Darwin)
-	CXX := g++-11
-endif
 
 CXXFLAGS := $(CXXFLAGS) -O3 -fopenmp -ffast-math
 
