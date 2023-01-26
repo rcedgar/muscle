@@ -26,6 +26,10 @@ jobs:
         run: |
           echo "Checking for dylib linking"
           ldd $GITHUB_WORKSPACE/src/Linux/muscle || true
+      - name: Check execution
+        run: |
+          chmod +x $GITHUB_WORKSPACE/src/Linux/muscle
+          $GITHUB_WORKSPACE/src/Linux/muscle -h
       - name: Upload binary artifact
         uses: actions/upload-artifact@v2
         with:
