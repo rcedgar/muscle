@@ -11,12 +11,7 @@ fi
 PATH=$PATH:/usr/bin
 
 git describe --abbrev=6 --dirty --long --always \
-  > gitver.tmp
-
-sed -i '-es/"//g' gitver.tmp
-
-echo \"`cat gitver.tmp`\" > gitver.txt
-
-rm -f gitver.tmp
+  | sed -e 's/\(.*\)/"\1"/' \
+  > gitver.txt
 
 cat gitver.txt
