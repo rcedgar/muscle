@@ -22,6 +22,10 @@ jobs:
           ls -lh
           cd src
           make LDFLAGS2=-static
+      - name: Check linking
+        run: |
+          echo "Checking for dylib linking"
+          ldd $GITHUB_WORKSPACE/src/Linux/muscle || true
       - name: Upload binary artifact
         uses: actions/upload-artifact@v2
         with:

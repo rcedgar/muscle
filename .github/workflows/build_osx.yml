@@ -23,6 +23,10 @@ jobs:
           ls -lh
           cd src
           make
+      - name: Check linking
+        run: |
+          echo "Checking for dylib linking"
+          otool -L $GITHUB_WORKSPACE/src/Darwin/muscle
       - name: Upload binary artifact
         uses: actions/upload-artifact@v2
         with:
