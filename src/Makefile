@@ -37,7 +37,7 @@ SRCS := $(shell ls *.cpp *.h)
 $(OS)/muscle : gitver.txt $(OS)/ $(OBJS)
 	$(CXX) $(LDFLAGS) $(OBJS) -o $@
 
-	# Warning: do not add -d option to strip, this is not portable
+	@# Warning: do not add -d option to strip, this is not portable
 	strip $(OS)/muscle
 
 gitver.txt : $(SRCS)
