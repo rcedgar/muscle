@@ -29,9 +29,13 @@ jobs:
           (echo $MAKECXXVAR && eval export "${MAKECXXVAR}" && $CXX --version)
           echo "${CXX}"
 
-          # Build
+          # On Darwin, LDFLAGS will be read by apple-ld. This doesn't let you do Bstatic or similar tricks.
+          # You have to _specifically_ choose the static library location.
+          # Thankfully GitHub runner allows us to call brew,
+          #   so we can get the location of the required libraries.
           env CXX=g++-11 \
-              LIBS="-Wl,-Bstatic -lgomp -Wl,-Bdynamic" \
+              LDFLAGS="-static-libstdc++" \
+              LIBS="$(brew --prefix gcc@11)/lib/gcc/11/libstdc++.a $(brew --prefix gcc@11)/lib/gcc/11/libgomp.a" \
               make
 
       - name: Check linking
