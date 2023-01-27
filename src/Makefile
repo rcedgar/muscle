@@ -21,7 +21,7 @@ CPPFLAGS += -DNDEBUG -pthread
 CPPFLAGS += -fopenmp
 
 # Add default flags
-CXXFLAGS += -O3 -ffast-math
+CXXFLAGS += -O3 -ffast-math -std=c++11
 LDFLAGS += -O3 -pthread -lpthread -fopenmp
 
 HDRS := $(shell echo *.h)
