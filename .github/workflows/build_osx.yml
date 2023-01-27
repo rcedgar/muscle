@@ -32,10 +32,11 @@ jobs:
           # On Darwin, LDFLAGS will be read by apple-ld. This doesn't let you do Bstatic or similar tricks.
           # You have to _specifically_ choose the static library location.
           # Thankfully GitHub runner allows us to call brew,
-          #   so we can get the location of the required libraries.
-          env CXX=g++-11 \
-              LDFLAGS="-static-libstdc++" \
-              LIBS="$(brew --prefix gcc@11)/lib/gcc/11/libstdc++.a $(brew --prefix gcc@11)/lib/gcc/11/libgomp.a" \
+          #   so we can install libomp (LLVM's openmp library) if it isn't already,
+          #   and statically link against it.
+          brew install libomp
+          env CXXFLAGS="-I$(brew --prefix libomp)/include" \
+              LIBS="$(brew --prefix libomp)/lib/libomp.a" \
               make
 
       - name: Check linking
