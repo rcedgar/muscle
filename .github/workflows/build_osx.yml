@@ -18,11 +18,21 @@ jobs:
         run: |
           echo Starting Build-commands
           echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
+          ls -lh $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE/src
+
+          # What system are we on?
           uname -a
-          cd $GITHUB_WORKSPACE
-          ls -lh
-          cd src
-          CXX=g++-11 make
+
+          # Which compiler is being called from make (unless overridden below)?
+          MAKECXXVAR=$( {(make -n -p | grep -e '^CXX =') 2>/dev/null;} | tr -d '[:space:]' )
+          (echo $MAKECXXVAR && eval export "${MAKECXXVAR}" && $CXX --version)
+          echo "${CXX}"
+
+          # Build
+          env CXX=g++-11 \
+              make
+
       - name: Check linking
         run: |
           echo "Checking for dylib linking"
