@@ -21,7 +21,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           ls -lh
           cd src
-          make LDFLAGS2=-static
+          LDFLAGS="-static" make
       - name: Check linking
         run: |
           echo "Checking for dylib linking"

@@ -17,16 +17,17 @@
 
 OS := $(shell uname)
 
-CPPFLAGS := $(CPPFLAGS) -DNDEBUG -pthread
+CPPFLAGS += -DNDEBUG -pthread
+CPPFLAGS += -fopenmp
 
-
-CXXFLAGS := $(CXXFLAGS) -O3 -fopenmp -ffast-math
-
-LDFLAGS := $(LDFLAGS) -O3 -fopenmp -pthread -lpthread ${LDFLAGS2}
+# Add default flags
+CXXFLAGS += -O3 -ffast-math
+LDFLAGS += -O3 -pthread -lpthread -fopenmp
 
 HDRS := $(shell echo *.h)
 OBJS := $(shell echo *.cpp | sed "-es/^/$(OS)\//" | sed "-es/ / $(OS)\//g" | sed "-es/\.cpp/.o/g")
 SRCS := $(shell ls *.cpp *.h)
+
 
 .PHONY: clean
 
