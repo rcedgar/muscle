@@ -14,16 +14,18 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Build-commands
-        run: |
-          echo Starting Build-commands
-          echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
-          uname -a
-          cd $GITHUB_WORKSPACE
-          ls -lh
-          cd src
-          make LDFLAGS2=-static
+        with:
+          arch: aarch64
+          run: |
+            echo Starting Build-commands
+            echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
+            uname -a
+            cd $GITHUB_WORKSPACE
+            ls -lh
+            cd src
+            make LDFLAGS2=-static
       - name: Upload binary artifact
         uses: actions/upload-artifact@v2
         with:
-          name: muscle-linux-binary
+          name: muscle-linux-aarch64-binary
           path: src/Linux/muscle
