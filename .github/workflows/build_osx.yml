@@ -18,11 +18,35 @@ jobs:
         run: |
           echo Starting Build-commands
           echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
+          ls -lh $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE/src
+
+          # What system are we on?
           uname -a
-          cd $GITHUB_WORKSPACE
-          ls -lh
-          cd src
-          make
+
+          # Which compiler is being called from make (unless overridden below)?
+          MAKECXXVAR=$( {(make -n -p | grep -e '^CXX =') 2>/dev/null;} | tr -d '[:space:]' )
+          (echo $MAKECXXVAR && eval export "${MAKECXXVAR}" && $CXX --version)
+          echo "${CXX}"
+
+          # On Darwin, LDFLAGS will be read by apple-ld. This doesn't let you do Bstatic or similar tricks.
+          # You have to _specifically_ choose the static library location.
+          # Thankfully GitHub runner allows us to call brew,
+          #   so we can install libomp (LLVM's openmp library) if it isn't already,
+          #   and statically link against it.
+          brew install libomp
+          env CXXFLAGS="-I$(brew --prefix libomp)/include" \
+              LIBS="$(brew --prefix libomp)/lib/libomp.a" \
+              make
+
+      - name: Check linking
+        run: |
+          echo "Checking for dylib linking"
+          otool -L $GITHUB_WORKSPACE/src/Darwin/muscle
+      - name: Check execution
+        run: |
+          chmod +x $GITHUB_WORKSPACE/src/Darwin/muscle
+          $GITHUB_WORKSPACE/src/Darwin/muscle -h
       - name: Upload binary artifact
         uses: actions/upload-artifact@v2
         with:
