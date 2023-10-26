@@ -1101,6 +1101,10 @@ double GetPhysMemBytes()
 	return double(mempages);
 	}
 #else
+double GetPhysMemBytes()
+	{
+	return 100000000; // 100M for unknown system
+	}
 double GetMemUseBytes()
 	{
 	return 0.0;
