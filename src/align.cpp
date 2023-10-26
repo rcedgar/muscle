@@ -29,7 +29,6 @@ static void Align(MPCFlat &M, MultiSequence &InputSeqs,
 	HP.FromDefaults(Nucleo);
 	if (PerturbSeed > 0)
 		{
-		ResetRand(PerturbSeed);
 		HP.PerturbProbs(PerturbSeed);
 		}
 	HP.ToPairHMM();
@@ -49,6 +48,13 @@ static void Align(MPCFlat &M, MultiSequence &InputSeqs,
 
 void cmd_align()
 	{
+	MPCFlat M;
+	if (optset_consiters)
+		M.m_ConsistencyIterCount = opt(consiters);
+	if (optset_refineiters)
+		M.m_RefineIterCount = opt(refineiters);
+	M.m_rng.srand_opt();
+
 	MultiSequence InputSeqs;
 	InputSeqs.LoadMFA(opt(align), true);
 
@@ -67,17 +73,11 @@ void cmd_align()
 	bool OutputWildcard = OutputPattern.find('@') != string::npos;
 	FILE *fOut = 0;
 
-	bool IsNucleo = InputSeqs.GuessIsNucleo();
+	bool IsNucleo = InputSeqs.GuessIsNucleo(M.m_rng);
 	if (IsNucleo)
 		SetAlpha(ALPHA_Nucleo);
 	else
 		SetAlpha(ALPHA_Amino);
-
-	MPCFlat M;
-	if (optset_consiters)
-		M.m_ConsistencyIterCount = opt(consiters);
-	if (optset_refineiters)
-		M.m_RefineIterCount = opt(refineiters);
 
 	if (opt(stratified) && opt(diversified))
 		Die("Cannot set both -stratified and -diversified");

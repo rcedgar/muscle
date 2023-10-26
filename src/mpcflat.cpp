@@ -319,6 +319,7 @@ MultiSequence *RunMPCFlat(MultiSequence *InputSeqs)
 		M.m_ConsistencyIterCount = opt(consiters);
 	if (optset_refineiters)
 		M.m_RefineIterCount = opt(refineiters);
+	M.m_rng.srand_opt();
 
 	TREEPERM TP = TP_None;
 	if (optset_perm)

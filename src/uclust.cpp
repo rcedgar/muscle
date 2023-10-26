@@ -113,7 +113,7 @@ void UClust::Run(MultiSequence &InputSeqs, float MinEA)
 			}
 		else
 			++MemberCount;
-		  
+
 		m_SeqIndexToCentroidSeqIndex[SeqIndex] = RepSeqIndex;
 		}
 	}
@@ -179,6 +179,9 @@ void UClust::GetGSIs(
 
 void cmd_uclust()
 	{
+	MWCG rng;
+	rng.srand_opt();
+
 	const string &InputFileName = opt(uclust);
 	const string &OutputFileName = opt(output);
 	const float MinPctId = (float) optd(pctid, 90);
@@ -186,7 +189,7 @@ void cmd_uclust()
 	MultiSequence InputSeqs;
 	InputSeqs.FromFASTA(InputFileName);
 
-	bool IsNucleo = InputSeqs.GuessIsNucleo();
+	bool IsNucleo = InputSeqs.GuessIsNucleo(rng);
 	if (IsNucleo)
 		SetAlpha(ALPHA_Nucleo);
 	else

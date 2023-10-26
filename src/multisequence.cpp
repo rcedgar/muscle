@@ -207,7 +207,7 @@ uint MultiSequence::GetSeqIndex(const string &Label, bool FailOnError) const
 	return UINT_MAX;
 	}
 
-bool MultiSequence::GuessIsNucleo() const
+bool MultiSequence::GuessIsNucleo(RNG &rng) const
 	{
 // If at least MIN_NUCLEO_PCT of the first CHAR_COUNT non-gap
 // letters belong to the nucleotide alphabet, guess nucleo.
@@ -219,10 +219,10 @@ bool MultiSequence::GuessIsNucleo() const
 	uint NucleoCount = 0;
 	for (uint i = 0; i < 100; ++i)
 		{
-		uint SeqIndex = randu32()%SeqCount;
+		uint SeqIndex = rng.randu32()%SeqCount;
 		const Sequence &seq = *GetSequence(SeqIndex);
 		const uint L = seq.GetLength();
-		uint r = randu32();
+		uint r = rng.randu32();
 		const uint Pos = r%L;
 		byte c = (byte) GetChar(SeqIndex, Pos);
 		uint Letter = g_CharToLetterNucleo[c];

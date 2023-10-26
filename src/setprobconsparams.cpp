@@ -29,7 +29,6 @@ void InitProbcons()
 		if (Seed > 0)
 			{
 			ProgressLog("Perturbing HMM parameters with seed %u\n", Seed);
-			ResetRand(Seed);
 			HP.PerturbProbs(Seed);
 			}
 		}

@@ -3,6 +3,9 @@
 
 void cmd_resample()
 	{
+	MWCG rng;
+	rng.srand_opt();
+
 	const string &FileName = opt(resample);
 	const string &OutputPattern = opt(output);
 	if (OutputPattern.empty())
@@ -47,7 +50,7 @@ void cmd_resample()
 		vector<uint> ResampledUniqueIxs;
 		for (uint i = 0; i < SiteCount; ++i)
 			{
-			uint r = randu32()%N;
+			uint r = rng.randu32()%N;
 			uint UniqueIx = NonGappyUniqueIxs[r];
 			ResampledUniqueIxs.push_back(UniqueIx);
 			}

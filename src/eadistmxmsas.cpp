@@ -13,6 +13,8 @@ void cmd_eadistmx_msas()
 	PProg PP;
 	if (optset_paircount)
 		PP.m_TargetPairCount = opt(paircount);
+	PP.m_rng.srand_opt();
+
 	bool IsNucleo;
 	PP.LoadMSAs(MSAFileNames, IsNucleo);
 	SetAlpha(IsNucleo ? ALPHA_Nucleo : ALPHA_Amino);
