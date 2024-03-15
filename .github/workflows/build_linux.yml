@@ -1,6 +1,12 @@
 name: build_linux
 
 on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
   # Enable manual run from the Actions tab
   workflow_dispatch:
 
@@ -27,3 +33,35 @@ jobs:
         with:
           name: muscle-linux-binary
           path: src/Linux/muscle
+
+  build-aarch64:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build
+      uses: uraimo/run-on-arch-action@v2
+      with:
+        arch: aarch64
+        distro: ubuntu20.04
+        githubToken: ${{ github.token }}
+        dockerRunArgs: |
+          --volume "${PWD}:/muscle"
+        install: |
+          apt-get update -q -y
+          apt-get install -q -y make gcc g++ file git
+        run: |
+          cd /muscle  
+          uname -a
+          lscpu
+          cd src/
+          make LDFLAGS2=-static
+          file src/Linux/muscle | grep aarch64 
+
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: muscle-linux-aarch64-binary
+        path: src/Linux/muscle
+    
