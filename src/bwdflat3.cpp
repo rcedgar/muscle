@@ -10,6 +10,8 @@ Bwd[s][i][j] =
 void CalcBwdFlat(const byte *X, uint LX, const byte *Y, uint LY, float *Flat)
 	{
 #include "hmmscores.h"
+	if (double(LX)*double(LY)*5 + 100 > double(INT_MAX))
+		Die("HMM overflow, sequence lengths %u, %u (max ~21k)", LX, LY);
 
 	const int iLX = int(LX);
 	const int iLY = int(LY);

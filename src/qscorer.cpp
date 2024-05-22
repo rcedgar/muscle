@@ -61,6 +61,9 @@ void QScorer::InitRefToTest()
 	const uint RefSeqCount = GetRefSeqCount();
 	const uint TestSeqCount = GetTestSeqCount();
 
+	m_TestSeqIndexToRefSeqIndex.clear();
+	m_TestSeqIndexToRefSeqIndex.resize(TestSeqCount, UINT_MAX);
+
 	m_RefSeqIndexToTestSeqIndex.clear();
 	m_RefSeqIndexToTestSeqIndex.resize(RefSeqCount, UINT_MAX);
 	for (uint TestSeqIndex = 0; TestSeqIndex < TestSeqCount; ++TestSeqIndex)
@@ -71,8 +74,10 @@ void QScorer::InitRefToTest()
 			continue;
 		uint RefSeqIndex = p->second;
 		asserta(RefSeqIndex < RefSeqCount);
+		m_TestSeqIndexToRefSeqIndex[TestSeqIndex] = RefSeqIndex;
 		if (m_RefSeqIndexToTestSeqIndex[RefSeqIndex] != UINT_MAX)
-			Warning("Ref label found twice in test MSA >%s", Label.c_str());
+			Warning("Ref label found twice in test MSA %s >%s",
+			  m_Name.c_str(), Label.c_str());
 		m_RefSeqIndexToTestSeqIndex[RefSeqIndex] = TestSeqIndex;
 
 		m_Labels.push_back(Label);
@@ -97,7 +102,10 @@ void QScorer::InitColPosVecs1(uint i)
 	m_Test->GetPosToCol(TestSeqIndex, m_PosToTestColVec[i]);
 	const uint RefUngappedLength = SIZE(m_PosToRefColVec[i]);
 	const uint TestUngappedLength = SIZE(m_PosToTestColVec[i]);
-	asserta(RefUngappedLength == TestUngappedLength);
+	if (RefUngappedLength != TestUngappedLength)
+		Die("%s >%s ref length %u, test length %u",
+		  m_Name.c_str(), TestLabel.c_str(),
+		  RefUngappedLength, TestUngappedLength);
 
 	m_Ref->GetColToPos(RefSeqIndex, m_RefColToPosVec[i]);
 	m_Test->GetColToPos(TestSeqIndex, m_TestColToPosVec[i]);
@@ -125,7 +133,9 @@ void QScorer::InitColPosVecs1(uint i)
 			char TestChar = m_Test->GetChar(TestSeqIndex, TestCol);
 			char RefChar = m_Ref->GetChar(RefSeqIndex, RefCol);
 			asserta(!isgap(TestChar) && !isgap(RefChar));
-			if (toupper(TestChar) != toupper(RefChar))
+			char ut = toupper(TestChar);
+			char ur = toupper(RefChar);
+			if (ut != ur && ut != 'X' && ur != 'X')
 				Die("Sequences differ pos %u test %c ref %c >%s",
 					Pos, TestChar, RefChar, Label.c_str());
 			m_RefColToTestColVec[i][RefCol] = TestCol;
@@ -135,9 +145,17 @@ void QScorer::InitColPosVecs1(uint i)
 
 void QScorer::InitColPosVecs()
 	{
-	const uint N = SIZE(m_RefSeqIndexes);
+	const uint N = SIZE(m_TestSeqIndexes); // UINT_MAX if not in ref
+	const uint NR = SIZE(m_RefLabels);
+	asserta(N <= NR);
+	if (N < NR && !m_MissingTestSeqOk)
+		Die("%u missing sequences in test MSA %s", NR - N, m_Name.c_str());
 	if (N == 0)
-		Die("No ref labels found in test MSA");
+		{
+		m_Q = -999;
+		m_TC = -999;
+		return;
+		}
 
 	m_PosToTestColVec.clear();
 	m_PosToRefColVec.clear();
@@ -173,7 +191,7 @@ void QScorer::InitRefUngappedCounts()
 	{
 	m_RefAlignedColCount = SIZE(m_RefCols);
 	if (m_RefAlignedColCount == 0)
-		Die("Qscorer: No upper case columns in ref");
+		Die("Qscorer: No upper case columns in ref %s", m_Name.c_str());
 
 	m_RefUngappedCounts.clear();
 	const uint N = SIZE(m_RefSeqIndexes);
@@ -245,7 +263,7 @@ void QScorer::DoRefCol(uint k)
 	m_TotalPairs += UngappedPairCount;
 
 	asserta(UngappedPairCount >= CorrectPairsCol);
-	if (UngappedPairCount == CorrectPairsCol)
+	if (UngappedPairCount == CorrectPairsCol && CorrectPairsCol > 0)
 		++m_CorrectCols;
 	}
 
@@ -280,10 +298,26 @@ void QScorer::SetTestColToBestRefCol()
 		}
 	}
 
-void QScorer::Run(const MSA &Test, const MSA &Ref)
+void QScorer::Run(const string &Name, const MultiSequence &Test, const MultiSequence &Ref)
+	{
+	MSA &msaTest = *new MSA;
+	MSA &msaRef = *new MSA;
+
+	msaTest.FromMultiSequence(Test);
+	msaRef.FromMultiSequence(Ref);
+	Run(Name, msaTest, msaRef);
+
+	//delete &msaTest; // crashes, just leak it
+	//delete &msaRef;
+	}
+
+void QScorer::Run(const string &Name, const MSA &Test, const MSA &Ref)
 	{
 	Clear();
 
+	m_Name = Name;
+	m_Q = 0;
+	m_TC = 0;
 	m_Test = &Test;
 	m_Ref = &Ref;
 
@@ -294,13 +328,23 @@ void QScorer::Run(const MSA &Test, const MSA &Ref)
 	const uint RefColCount = Ref.GetColCount();
 
 	InitRefLabels();
+	asserta(SIZE(m_RefLabels) > 0);
 	InitRefToTest();
 	InitColPosVecs();
+	if (SIZE(m_RefSeqIndexes) <= 1)
+		{
+		m_Q = -1.0;
+		m_TC = -1.0;
+		return;
+		}
 	InitRefCols();
 	InitRefUngappedCounts();
 	DoRefCols();
 	SetTestColToBestRefCol();
 
+	if (m_TotalPairs == 0)
+		Die("m_TotalPairs=0 (%s)", m_Name.c_str());
+	asserta(m_RefAlignedColCount > 0);
 	m_Q = float(m_CorrectPairs)/float(m_TotalPairs);
 	m_TC = float(m_CorrectCols)/float(m_RefAlignedColCount);
 	}

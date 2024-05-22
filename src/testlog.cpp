@@ -1,7 +1,7 @@
 #include "muscle.h"
 #include "timing.h"
 
-void cmd_testlog() {}
+//void cmd_testlog() {}
 
 #if 0
 

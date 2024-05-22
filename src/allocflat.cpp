@@ -3,11 +3,7 @@
 uint64 GetFBSize(uint LX, uint LY)
 	{
 	uint64 Size64 = uint64(LX + 1)*uint64(LY + 1)*HMMSTATE_COUNT;
-	if (double(Size64) > 4e9)
-		Die("Memory object too large due to sequence lengths %u, %u", LX, LY);
-	uint Size = uint(Size64);
-	asserta(Size == uint(Size64));
-	return Size;
+	return Size64;
 	}
 
 uint64 GetPostSize(uint LX, uint LY)
@@ -36,20 +32,24 @@ uint64 GetTBSize(uint LX, uint LY)
 
 float *AllocFB(uint LX, uint LY)
 	{
-	return myalloc64(float, GetFBSize(LX, LY));
+	if (double(LX)*double(LY)*5 + 100 > double(INT_MAX))
+		Die("Sequences length %u, %u overflow HMM buffers", LX, LY);
+
+	uint64 Bytes = GetFBSize(LX, LY)*uint64(sizeof(float));
+	return myalloc(float, Bytes);
 	}
 
 float *AllocPost(uint LX, uint LY)
 	{
-	return myalloc64(float, GetPostSize(LX, LY));
+	return myalloc(float, GetPostSize(LX, LY));
 	}
 
 float *AllocDPRows(uint LX, uint LY)
 	{
-	return myalloc64(float, GetDPRowsSize(LX, LY));
+	return myalloc(float, GetDPRowsSize(LX, LY));
 	}
 
 char *AllocTB(uint LX, uint LY)
 	{
-	return myalloc64(char, GetTBSize(LX, LY));
+	return myalloc(char, GetTBSize(LX, LY));
 	}

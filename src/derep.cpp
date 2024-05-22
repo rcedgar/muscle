@@ -25,7 +25,7 @@ uint Derep::CalcHash(const Sequence *Seq) const
 	return h;
 	}
 
-void Derep::Run(MultiSequence &InputSeqs)
+void Derep::Run(MultiSequence &InputSeqs, bool ShowProgress)
 	{
 	Clear();
 	m_InputSeqs = &InputSeqs;
@@ -40,8 +40,6 @@ void Derep::Run(MultiSequence &InputSeqs)
 	uint DupeCount = 0;
 	for (uint SeqIndex = 0; SeqIndex < InputSeqCount; ++SeqIndex)
 		{
-		ProgressStep(SeqIndex, InputSeqCount, "Derep %u uniques, %u dupes",
-		  UniqueCount, DupeCount);
 		uint RepSeqIndex = Search(SeqIndex);
 		if (RepSeqIndex == UINT_MAX)
 			{
@@ -58,6 +56,9 @@ void Derep::Run(MultiSequence &InputSeqs)
 			m_SeqIndexToRepSeqIndex[SeqIndex] = RepSeqIndex;
 			++DupeCount;
 			}
+		if (ShowProgress)
+			ProgressStep(SeqIndex, InputSeqCount, "Derep %u uniques, %u dupes",
+				UniqueCount, DupeCount);
 		}
 	}
 
@@ -116,7 +117,36 @@ void Derep::GetUniqueSeqs(MultiSequence &UniqueSeqs)
 		const Sequence *Seq = m_InputSeqs->GetSequence(SeqIndex);
 		UniqueSeqs.AddSequence(Seq, false);
 		}
-	AssertSameLabels(UniqueSeqs);
+	//AssertSameLabels(UniqueSeqs);
+	}
+
+void Derep::GetRepLabelToDupeLabels(
+  map<string, vector<string> > &RepLabelToMemberLabels) const
+	{
+	RepLabelToMemberLabels.clear();
+	const uint SeqCount = m_InputSeqs->GetSeqCount();
+	const uint ClusterCount = SIZE(m_RepSeqIndexes);
+
+	vector<string> Empty;
+	for (uint ClusterIndex = 0; ClusterIndex < ClusterCount; ++ClusterIndex)
+		{
+		uint RepSeqIndex = m_RepSeqIndexes[ClusterIndex];
+		const string &RepLabel = m_InputSeqs->GetLabelStr(RepSeqIndex);
+		const vector<uint> &MemberSeqIndexes =
+		  m_RepSeqIndexToSeqIndexes[RepSeqIndex];
+		const uint MemberCount = SIZE(MemberSeqIndexes);
+		if (MemberCount == 1)
+			continue;
+		RepLabelToMemberLabels[RepLabel] = Empty;
+		for (uint MemberIndex = 0; MemberIndex < MemberCount; ++MemberIndex)
+			{
+			uint MemberSeqIndex = MemberSeqIndexes[MemberIndex];
+			const string &MemberLabel =
+			  m_InputSeqs->GetLabelStr(MemberSeqIndex);
+			if (MemberLabel != RepLabel)
+				RepLabelToMemberLabels[RepLabel].push_back(MemberLabel);
+			}
+		}
 	}
 
 void Derep::Validate() const

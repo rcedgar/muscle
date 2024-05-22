@@ -29,6 +29,28 @@ enum NEWICK_TOKEN_TYPE
 class Tree
 	{
 public:
+
+// Yuck. Data is made public for the convenience of Tree::Copy.
+// There has to be a better way.
+public:
+	unsigned m_uNodeCount;
+	unsigned m_uCacheCount;
+	unsigned *m_uNeighbor1;
+	unsigned *m_uNeighbor2;
+	unsigned *m_uNeighbor3;
+	double *m_dEdgeLength1;
+	double *m_dEdgeLength2;
+	double *m_dEdgeLength3;
+	double *m_dHeight;
+	bool *m_bHasEdgeLength1;
+	bool *m_bHasEdgeLength2;
+	bool *m_bHasEdgeLength3;
+	bool *m_bHasHeight;
+	unsigned *m_Ids;
+	char **m_ptrName;
+	bool m_bRooted = false;
+	unsigned m_uRootNodeIndex = UINT_MAX;
+
 	Tree()
 		{
 		m_uNodeCount = 0;
@@ -46,7 +68,10 @@ public:
 		m_bHasHeight = 0;
 		m_ptrName = 0;
 		m_Ids = 0;
+		m_bRooted = false;
+		m_uRootNodeIndex = UINT_MAX;
 		}
+
 	virtual ~Tree()
 		{
 		Clear();
@@ -97,7 +122,7 @@ public:
 
 	void FromFile(const string &FileName);
 	void FromFile(TextFile &File);
-	void FromClust(Clust &C);
+	//void FromClust(Clust &C);
 
 	void Copy(const Tree &tree);
 
@@ -115,7 +140,7 @@ public:
 	void SetEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2,
 	  double dLength);
 
-	void RootUnrootedTree(unsigned uNodeIndex1, unsigned uNodeIndex2);
+	//void RootUnrootedTree(unsigned uNodeIndex1, unsigned uNodeIndex2);
 	void UnrootByDeletingRoot();
 	uint Ladderize(bool Right);
 
@@ -270,8 +295,8 @@ public:
 
 // Misc
 	const char *NTTStr(NEWICK_TOKEN_TYPE NTT) const;
-	void FindCenterByLongestSpan(unsigned *ptrNodeIndex1,
-	  unsigned *ptrNodeIndex2) const;
+	//void FindCenterByLongestSpan(unsigned *ptrNodeIndex1,
+	//  unsigned *ptrNodeIndex2) const;
 	void PruneTree(const Tree &tree, unsigned Subfams[],
 	  unsigned uSubfamCount);
 	unsigned LeafIndexToNodeIndex(unsigned uLeafIndex) const;
@@ -302,29 +327,8 @@ private:
 	void ToFileNodeRooted(TextFile &File, unsigned uNodeIndex) const;
 	void ToFileNodeUnrooted(TextFile &File, unsigned uNodeIndex, unsigned uParent) const;
 	void OrientParent(unsigned uNodeIndex, unsigned uParentNodeIndex);
-	double FromClustNode(const Clust &C, unsigned uClustNodeIndex, unsigned uPhyNodeIndex);
+	//double FromClustNode(const Clust &C, unsigned uClustNodeIndex, unsigned uPhyNodeIndex);
 	unsigned GetAnyNonLeafNode() const;
-
-// Yuck. Data is made public for the convenience of Tree::Copy.
-// There has to be a better way.
-public:
-	unsigned m_uNodeCount;
-	unsigned m_uCacheCount;
-	unsigned *m_uNeighbor1;
-	unsigned *m_uNeighbor2;
-	unsigned *m_uNeighbor3;
-	double *m_dEdgeLength1;
-	double *m_dEdgeLength2;
-	double *m_dEdgeLength3;
-	double *m_dHeight;
-	bool *m_bHasEdgeLength1;
-	bool *m_bHasEdgeLength2;
-	bool *m_bHasEdgeLength3;
-	bool *m_bHasHeight;
-	unsigned *m_Ids;
-	char **m_ptrName;
-	bool m_bRooted;
-	unsigned m_uRootNodeIndex;
 	};
 
 struct PhyEnumEdgeState
@@ -339,7 +343,5 @@ struct PhyEnumEdgeState
 	unsigned m_uNodeIndex1;
 	unsigned m_uNodeIndex2;
 	};
-
-const unsigned NODE_CHANGED = (unsigned) (~0);
 
 #endif // tree_h

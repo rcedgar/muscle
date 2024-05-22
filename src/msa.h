@@ -8,6 +8,7 @@ class ClusterNode;
 class NodeCounts;
 class DataBuffer;
 class Sequence;
+class MultiSequence;
 
 class MSA
 	{
@@ -38,6 +39,7 @@ public:
 	void FromFASTAFile(TextFile &File);
 	void FromSeq(const Seq &s);
 	void FromSequence(const Sequence &s);
+	void FromMultiSequence(const MultiSequence &MS);
 	void GetLabelToSeqIndex(vector<string> &Labels,
 	  map<string, uint> &LabelToIndex) const;
 
@@ -50,7 +52,8 @@ public:
 	void SetSeqCount(unsigned uSeqCount);
 	char GetChar(unsigned uSeqIndex, unsigned uIndex) const;
 	unsigned GetLetter(unsigned uSeqIndex, unsigned uIndex) const;
-	unsigned GetLetterEx(unsigned uSeqIndex, unsigned uIndex) const;
+	//unsigned GetLetterEx(unsigned uSeqIndex, unsigned uIndex) const;
+	const char *GetLabel(unsigned uSeqIndex) const { return GetSeqName(uSeqIndex); }
 	const char *GetSeqName(unsigned uSeqIndex) const;
 	void GetSeqLabel(uint SeqIndex, string &Label) const;
 	unsigned GetSeqId(unsigned uSeqIndex) const;
@@ -58,9 +61,11 @@ public:
 	bool GetSeqIndex(unsigned uId, unsigned *ptruIndex) const;
 	double GetOcc(unsigned uColIndex) const;
 	bool IsGap(unsigned uSeqIndex, unsigned uColIndex) const;
-	bool IsWildcard(unsigned uSeqIndex, unsigned uColIndex) const;
+	//bool IsWildcard(unsigned uSeqIndex, unsigned uColIndex) const;
 	bool IsGapColumn(unsigned uColIndex) const;
 	uint GetGapCount(uint ColIndex) const;
+	void GetUpperLowerGapCount(uint ColIndex,
+	  uint &NU, uint &NL, uint &NG, uint &NDots, uint &NDashes) const;
 	bool ColumnHasGap(unsigned uColIndex) const;
 	bool IsGapSeq(unsigned uSeqIndex) const;
 	void GetUngappedSeqStr(uint SeqIndex, string &SeqStr) const;
@@ -87,14 +92,14 @@ public:
 	bool IsEmptyCol(unsigned uColIndex) const;
 
 	ALPHA GuessAlpha() const;
-	void FixAlpha();
+	//void FixAlpha();
 
-	unsigned UniqueResidueTypes(unsigned uColIndex) const;
+	unsigned /*Uniq*/ueResidueTypes(unsigned uColIndex) const;
 
 	unsigned GetCharCount(unsigned uSeqIndex, unsigned uColIndex) const;
 	const char *GetSeqBuffer(unsigned uSeqIndex) const;
 	unsigned AlignedColIndexToColIndex(unsigned uAlignedColIndex) const;
-	unsigned GetSeqLength(unsigned uSeqIndex) const;
+	unsigned GetUngappedSeqLength(unsigned uSeqIndex) const;
 	void GetPWID(unsigned uSeqIndex1, unsigned uSeqIndex2, double *ptrdPWID,
 	  unsigned *ptruPosCount) const;
 
@@ -119,6 +124,10 @@ public:
 	  unsigned uSeqIndex2);
 	void GetPosToCol(uint SeqIndex, vector<uint> &PosToCol) const;
 	void GetColToPos(uint SeqIndex, vector<uint> &ColToPos) const;
+
+// 1-based positions, if <0 the column has a gap in this
+// sequence which opens at 1-based position (-Pos).
+	void GetColToPos1(uint SeqIndex, vector<int> &ColToPos) const;
 	bool ColIsUpper(uint ColIndex, double MaxGapFract) const;
 
 	static void SetIdCount(unsigned uIdCount);

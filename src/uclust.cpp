@@ -181,10 +181,11 @@ void cmd_uclust()
 	{
 	const string &InputFileName = opt(uclust);
 	const string &OutputFileName = opt(output);
-	const float MinPctId = (float) optd(pctid, 90);
+	const float MinEA = (float) optd(minea, 0.9);
 
-	MultiSequence InputSeqs;
-	InputSeqs.FromFASTA(InputFileName);
+	LoadGlobalInputMS(InputFileName);
+	ShowGlobalInputSeqStats();
+	MultiSequence &InputSeqs = GetGlobalInputMS();
 
 	bool IsNucleo = InputSeqs.GuessIsNucleo();
 	if (IsNucleo)
@@ -193,7 +194,7 @@ void cmd_uclust()
 		SetAlpha(ALPHA_Amino);
 
 	UClust U;
-	U.Run(InputSeqs, MinPctId);
+	U.Run(InputSeqs, MinEA);
 
 	MultiSequence *CentroidSeqs = new MultiSequence;
 	U.GetCentroidSeqs(*CentroidSeqs);

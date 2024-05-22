@@ -380,6 +380,14 @@ void HMMParams::ToPairHMM() const
 			}
 		}
 
+	if (optset_anchor_letter)
+		{
+		const string sAL = opt(anchor_letter);
+		asserta(SIZE(sAL) == 1);
+		char c = sAL[0];
+		PairHMM::m_MatchScore[c][c] = -0.1f;
+		}
+
 	if (AlphaSize == 4)
 		PairHMM::FixUT();
 	}

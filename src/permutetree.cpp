@@ -65,7 +65,7 @@ void PermuteTree(const Tree &InputTree,
 	LabelsC.clear();
 
 	const uint InputLeafCount = InputTree.GetLeafCount();
-	if (InputLeafCount < 10)
+	if (InputLeafCount < 6)
 		{
 		TreeABC.Copy(InputTree);
 		TreeACB.Copy(InputTree);

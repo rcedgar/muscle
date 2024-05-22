@@ -38,6 +38,8 @@ void MPCFlat::ConsPair(uint PairIndex)
 		{
 		if (SeqIndexZ == SeqIndexX || SeqIndexZ == SeqIndexY)
 			continue;
+		float wZ = m_Weights[SeqIndexZ];
+		wZ = 1.0f;//@@@@@@@@@@@@@@@@@@@@@ TODO
 
 #if 0//TRACE
 		g_X = GetSequence(SeqIndexX)->GetBytePtr();
@@ -54,7 +56,7 @@ void MPCFlat::ConsPair(uint PairIndex)
 			const MySparseMx &ZX = GetSparsePost(PairIndexZX);
 			const MySparseMx &ZY = GetSparsePost(PairIndexZY);
 
-			RelaxFlat_ZX_ZY(ZX, ZY, Post);
+			RelaxFlat_ZX_ZY(ZX, ZY, wZ, Post);
 #if 0//TRACE
 		LogFlatMx("ConsPair after RelaxFlat_ZX_ZY", Post, LX, LY);
 #endif
@@ -67,7 +69,7 @@ void MPCFlat::ConsPair(uint PairIndex)
 			const MySparseMx &XZ = GetSparsePost(PairIndexXZ);
 			const MySparseMx &ZY = GetSparsePost(PairIndexZY);
 
-			RelaxFlat_XZ_ZY(XZ, ZY, Post);
+			RelaxFlat_XZ_ZY(XZ, ZY, wZ, Post);
 #if 0//TRACE
 			LogFlatMx("ConsPair after RelaxFlat_XZ_ZY", Post, LX, LY);
 #endif
@@ -80,7 +82,7 @@ void MPCFlat::ConsPair(uint PairIndex)
 			const MySparseMx &XZ = GetSparsePost(PairIndexXZ);
 			const MySparseMx &YZ = GetSparsePost(PairIndexYZ);
 
-			RelaxFlat_XZ_YZ(XZ, YZ, Post);
+			RelaxFlat_XZ_YZ(XZ, YZ, wZ, Post);
 #if 0//TRACE
 			LogFlatMx("ConsPair after RelaxFlat_XZ_YZ", Post, LX, LY);
 #endif

@@ -79,18 +79,19 @@ bool Seq::FromFASTAFile(TextFile &File)
 				continue;
 			if (IsGapChar(c))
 				continue;
-			if (!IsResidueChar(c))
+			if (!isalpha(c))
 				{
-				if (isprint(c))
+				static bool WarningDone = false;
+				if (!WarningDone)
 					{
-					char w = GetWildcardChar();
-					Warning("Invalid residue '%c' in FASTA file %s line %d, replaced by '%c'",
-					  c, File.GetFileName(), File.GetLineNr(), w);
-					c = w;
+					if (isprint(c))
+						Warning("Invalid character'%c' in FASTA file %s line %d",
+						  c, File.GetFileName(), File.GetLineNr());
+					else
+						Warning("Invalid byte hex %02x in FASTA file %s line %d",
+						  (unsigned char) c, File.GetFileName(), File.GetLineNr());
 					}
-				else
-					Die("Invalid byte hex %02x in FASTA file %s line %d",
-					  (unsigned char) c, File.GetFileName(), File.GetLineNr());
+				continue;
 				}
 			c = toupper(c);
 			push_back(c);
@@ -326,17 +327,17 @@ bool Seq::HasGap() const
 	return false;
 	}
 
-void Seq::FixAlpha()
-	{
-	for (CharVect::iterator p = begin(); p != end(); ++p)
-		{
-		char c = *p;
-		if (!IsResidueChar(c))
-			{
-			char w = GetWildcardChar();
-			// Warning("Invalid residue '%c', replaced by '%c'", c, w);
-			InvalidLetterWarning(c, w);
-			*p = w;
-			}
-		}
-	}
+//void Seq::FixAlpha()
+//	{
+//	for (CharVect::iterator p = begin(); p != end(); ++p)
+//		{
+//		char c = *p;
+//		if (!IsResidueChar(c))
+//			{
+//			char w = GetWildcardChar();
+//			// Warning("Invalid residue '%c', replaced by '%c'", c, w);
+//			InvalidLetterWarning(c, w);
+//			*p = w;
+//			}
+//		}
+//	}

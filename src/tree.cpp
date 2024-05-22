@@ -32,23 +32,23 @@ void Tree::InitCache(unsigned uCacheCount)
 	{
 	m_uCacheCount = uCacheCount;
 
-	m_uNeighbor1 = new unsigned[m_uCacheCount];
-	m_uNeighbor2 = new unsigned[m_uCacheCount];
-	m_uNeighbor3 = new unsigned[m_uCacheCount];
+	m_uNeighbor1 = myalloc(unsigned, m_uCacheCount);
+	m_uNeighbor2 = myalloc(unsigned, m_uCacheCount);
+	m_uNeighbor3 = myalloc(unsigned, m_uCacheCount);
 
-	m_Ids = new unsigned[m_uCacheCount];
+	m_Ids = myalloc(unsigned, m_uCacheCount);
 
-	m_dEdgeLength1 = new double[m_uCacheCount];
-	m_dEdgeLength2 = new double[m_uCacheCount];
-	m_dEdgeLength3 = new double[m_uCacheCount];
-	m_dHeight = new double[m_uCacheCount];
+	m_dEdgeLength1 = myalloc(double, m_uCacheCount);
+	m_dEdgeLength2 = myalloc(double, m_uCacheCount);
+	m_dEdgeLength3 = myalloc(double, m_uCacheCount);
+	m_dHeight = myalloc(double, m_uCacheCount);
 
-	m_bHasEdgeLength1 = new bool[m_uCacheCount];
-	m_bHasEdgeLength2 = new bool[m_uCacheCount];
-	m_bHasEdgeLength3 = new bool[m_uCacheCount];
-	m_bHasHeight = new bool[m_uCacheCount];
+	m_bHasEdgeLength1 = myalloc(bool, m_uCacheCount);
+	m_bHasEdgeLength2 = myalloc(bool, m_uCacheCount);
+	m_bHasEdgeLength3 = myalloc(bool, m_uCacheCount);
+	m_bHasHeight = myalloc(bool, m_uCacheCount);
 
-	m_ptrName = new char *[m_uCacheCount];
+	m_ptrName = myalloc(char *, m_uCacheCount);
 
 	for (unsigned uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
 		{
@@ -257,24 +257,24 @@ void Tree::ExpandCache()
 	{
 	const unsigned uNodeCount = 100;
 	unsigned uNewCacheCount = m_uCacheCount + uNodeCount;
-	unsigned *uNewNeighbor1 = new unsigned[uNewCacheCount];
-	unsigned *uNewNeighbor2 = new unsigned[uNewCacheCount];
-	unsigned *uNewNeighbor3 = new unsigned[uNewCacheCount];
+	unsigned *uNewNeighbor1 = myalloc(unsigned, uNewCacheCount);
+	unsigned *uNewNeighbor2 = myalloc(unsigned, uNewCacheCount);
+	unsigned *uNewNeighbor3 = myalloc(unsigned, uNewCacheCount);
 
-	unsigned *uNewIds = new unsigned[uNewCacheCount];
+	unsigned *uNewIds = myalloc(unsigned, uNewCacheCount);
 	memset(uNewIds, 0xff, uNewCacheCount*sizeof(unsigned));
 
-	double *dNewEdgeLength1 = new double[uNewCacheCount];
-	double *dNewEdgeLength2 = new double[uNewCacheCount];
-	double *dNewEdgeLength3 = new double[uNewCacheCount];
-	double *dNewHeight = new double[uNewCacheCount];
+	double *dNewEdgeLength1 = myalloc(double, uNewCacheCount);
+	double *dNewEdgeLength2 = myalloc(double, uNewCacheCount);
+	double *dNewEdgeLength3 = myalloc(double, uNewCacheCount);
+	double *dNewHeight = myalloc(double, uNewCacheCount);
 
-	bool *bNewHasEdgeLength1 = new bool[uNewCacheCount];
-	bool *bNewHasEdgeLength2 = new bool[uNewCacheCount];
-	bool *bNewHasEdgeLength3 = new bool[uNewCacheCount];
-	bool *bNewHasHeight = new bool[uNewCacheCount];
+	bool *bNewHasEdgeLength1 = myalloc(bool, uNewCacheCount);
+	bool *bNewHasEdgeLength2 = myalloc(bool, uNewCacheCount);
+	bool *bNewHasEdgeLength3 = myalloc(bool, uNewCacheCount);
+	bool *bNewHasHeight = myalloc(bool, uNewCacheCount);
 
-	char **ptrNewName = new char *[uNewCacheCount];
+	char **ptrNewName = myalloc(char *, uNewCacheCount);
 	memset(ptrNewName, 0, uNewCacheCount*sizeof(char *));
 
 	if (m_uCacheCount > 0)
@@ -301,22 +301,22 @@ void Tree::ExpandCache()
 		const unsigned uNameBytes = m_uCacheCount*sizeof(char *);
 		memcpy(ptrNewName, m_ptrName, uNameBytes);
 
-		delete[] m_uNeighbor1;
-		delete[] m_uNeighbor2;
-		delete[] m_uNeighbor3;
+		myfree(m_uNeighbor1);
+		myfree(m_uNeighbor2);
+		myfree(m_uNeighbor3);
 
-		delete[] m_Ids;
+		myfree(m_Ids);
 
-		delete[] m_dEdgeLength1;
-		delete[] m_dEdgeLength2;
-		delete[] m_dEdgeLength3;
+		myfree(m_dEdgeLength1);
+		myfree(m_dEdgeLength2);
+		myfree(m_dEdgeLength3);
 
-		delete[] m_bHasEdgeLength1;
-		delete[] m_bHasEdgeLength2;
-		delete[] m_bHasEdgeLength3;
-		delete[] m_bHasHeight;
+		myfree(m_bHasEdgeLength1);
+		myfree(m_bHasEdgeLength2);
+		myfree(m_bHasEdgeLength3);
+		myfree(m_bHasHeight);
 
-		delete[] m_ptrName;
+		myfree(m_ptrName);
 		}
 	m_uCacheCount = uNewCacheCount;
 	m_uNeighbor1 = uNewNeighbor1;
@@ -1017,7 +1017,7 @@ void Tree::GetPathToRoot(uint Node, vector<uint> &Path) const
 	if (!IsRooted())
 		Die("GetPathToRoot(), not rooted");
 	const uint NodeCount = GetNodeCount();
-	Path.clear();
+	Path.resize(0);
 	for (;;)
 		{
 		asserta(Node < NodeCount);

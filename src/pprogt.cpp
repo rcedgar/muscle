@@ -1,4 +1,3 @@
-#include "myutils.h"
 #include "muscle.h"
 #include "textfile.h"
 #include "tree.h"

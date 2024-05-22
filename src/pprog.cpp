@@ -339,8 +339,8 @@ void PProg::Join_ByPrecomputedPath(uint Index1, uint Index2)
 	MultiSequence *MSA12 = new MultiSequence;
 	const string &Path = m_PathMx[Index1][Index2];
 	AlignMSAsByPath(MSA1, MSA2, Path, *MSA12);
-	AssertSeqsEq(MSA1, *MSA12);
-	AssertSeqsEq(MSA2, *MSA12);
+	//AssertSeqsEq(MSA1, *MSA12);
+	//AssertSeqsEq(MSA2, *MSA12);
 
 	ProgressLog("Join %u/%u best pair %u, %u\n",
 	  m_JoinIndex+1, m_JoinCount, Index1, Index2);

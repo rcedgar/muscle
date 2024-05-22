@@ -64,7 +64,8 @@ void USorter::AddSeq(const byte *Seq, uint L, uint SeqIndex)
 	{
 	asserta(g_AlphaSize > 0);
 	uint Index = SIZE(m_IndexSeqIndexes);
-	asserta(L >= m_WordLength);
+	if (L < m_WordLength)
+		return;
 	const uint WordCount = L + 1 - m_WordLength;
 	for (uint i = 0; i < WordCount; ++i)
 		{
@@ -85,7 +86,8 @@ void USorter::SearchSeq(const byte *Seq, uint L, vector<uint> &TopSeqIndexes,
 	if (IndexSize == 0)
 		return;
 
-	asserta(L >= m_WordLength);
+	if (L < m_WordLength)
+		return;
 	const uint WordCount = L + 1 - m_WordLength;
 	vector<uint> U(IndexSize, 0);
 	for (uint i = 0; i < WordCount; ++i)

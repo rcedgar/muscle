@@ -10,26 +10,42 @@ class MultiSequence
 public:
 	vector<const Sequence *> m_Seqs;
 	vector<bool> m_Owners;
+	bool m_DupeLabelsOk = false;
+
+public:
+	static uint m_NewCount;
+	static uint m_DeleteCount;
 
 public:
 	MultiSequence()
 		{
-		Clear();
+		//Clear();
+#pragma omp critical
+		++m_NewCount;
 		}
 
 	MultiSequence(FileBuffer& infile)
 		{
 		LoadMFA(infile);
+#pragma omp critical
+		++m_NewCount;
 		}
 
 	MultiSequence(const string& filename)
 		{
 		LoadMFA(filename);
+#pragma omp critical
+		++m_NewCount;
 		}
 
 	void Clear();
-//	void DeleteSeqs();
-	~MultiSequence() { Clear(); }
+	~MultiSequence()
+		{ 
+		Clear();
+#pragma omp critical
+		++m_DeleteCount;
+		}
+
 	void FromStrings(const vector<string> &Labels, const vector<string> &Seqs);
 	void Copy(const MultiSequence &rhs);
 	void LoadMFA(const string& filename, bool stripGaps = false);
@@ -45,6 +61,16 @@ public:
 		{
 		m_Seqs.push_back(sequence);
 		m_Owners.push_back(Owner);
+		}
+
+	void ToFasta(FILE *f) const
+		{
+		WriteMFA(f);
+		}
+
+	void ToFasta(const string &FileName) const
+		{
+		WriteMFA(FileName);
 		}
 
 	void WriteMFA(FILE *f) const
@@ -85,15 +111,17 @@ public:
 
 	double GetMeanSeqLength() const;
 	uint GetMaxSeqLength() const;
+	uint GetMinSeqLength() const;
 
 	uint GetChar(uint SeqIndex, uint ZeroBasedPos) const
 		{
 		const Sequence *seq = GetSequence((int) SeqIndex);
-		char c = seq->GetPosition(int(ZeroBasedPos)+1);
+		char c = seq->GetChar(int(ZeroBasedPos));
 		return c;
 		}
 
 	MultiSequence* Project(const set<int>& indices);
+	MultiSequence* Project(const vector<uint> &SeqIndexes);
 
 	bool IsAligned() const;
 	uint GetColCount() const;
@@ -102,6 +130,12 @@ public:
 		{
 		const Sequence *seq = GetSequence((int) SeqIndex);
 		return seq->m_Label;
+		}
+
+	void GetSeqStr(uint SeqIndex, string &Seq) const
+		{
+		const Sequence *seq = GetSequence((int) SeqIndex);
+		seq->GetSeqAsString(Seq);
 		}
 
 	const char *GetLabel(uint SeqIndex) const
@@ -113,7 +147,7 @@ public:
 	const byte *GetByteSeq(uint SeqIndex, uint &L) const
 		{
 		const Sequence *seq = GetSequence((int) SeqIndex);
-		const byte *ByteSeq = (const byte *) seq->m_CharVec.data() + 1;
+		const byte *ByteSeq = (const byte *) seq->m_CharVec.data();
 		L = (uint) seq->GetLength();
 		return ByteSeq;
 		}
@@ -125,6 +159,13 @@ public:
 		return BytePtr;
 		}
 
+	const char *GetCharPtr(uint SeqIndex) const
+		{
+		const Sequence *seq = GetSequence((int) SeqIndex);
+		const char *CharPtr = seq->GetCharPtr();
+		return CharPtr;
+		}
+
 	bool GuessIsNucleo() const;
 	void LogGSIs(const char *Msg = 0) const;
 	void AssertGSIs() const;
@@ -132,8 +173,8 @@ public:
 	uint GetSeqLength(uint SeqIndex) const;
 	uint GetGSI(uint SeqIndex) const;
 	void LogMe() const;
-#if SEQ_TRACE
-	void AssertSeqIds() const;
-#endif
+	void SetSequentialGSIs();
+	void AssertSequentialGSIs() const;
+	bool ColIsAllGaps(uint Col) const;
+	void SetGSIs();
 	};
-

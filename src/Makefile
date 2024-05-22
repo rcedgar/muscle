@@ -1,53 +1,300 @@
-# The $(OS) variable is the o/s name returned by uname, which is 
-# used as the sub-directory name under src/ where object files
-# and the executable are stored. This allows several target
-# operating systems in the same directory structure.
-# Typical values are:
-
-#	Platform    Value of $(OS)
-#   --------    --------------
-#	Linux       linux
-#	Mac OSX     Darwin
-#	Cygwin      CYGWIN_NT-10.0
-
-# Building on Mac OSX is challenging because Apple does not support gcc or
-# the OMP threading library. Hacks to install gcc and OMP vary by OSX release.
-# This Makefile works with the AWS Catalina v10.15.7 AMI. With this AMI, 
-# running 'brew install gcc' currently installs gcc v11.
-
-OS := $(shell uname)
+BINDIR := ../bin
+OBJDIR := o
+BINPATH := $(BINDIR)/muscle
 
 CPPFLAGS := $(CPPFLAGS) -DNDEBUG -pthread
 
-CXX := g++
-ifeq ($(OS),Darwin)
-	CXX := g++-11
+CXX = ccache g++
+CXXFLAGS := $(CXXFLAGS) -O3 -fopenmp -ffast-math -msse -mfpmath=sse
+
+UNAME_S := $(shell uname -s)
+LDFLAGS := $(LDFLAGS) -O3 -fopenmp -pthread -lpthread
+ifeq ($(UNAME_S),Linux)
+    LDFLAGS += -static
 endif
 
-CXXFLAGS := $(CXXFLAGS) -O3 -fopenmp -ffast-math
+HDRS = \
+  alpha.h \
+  alpha3.h \
+  bench.h \
+  best3.h \
+  build_describe.h \
+  build_time.h \
+  cachemem3.h \
+  chainer.h \
+  clustalweights.h \
+  cmds.h \
+  countsort.h \
+  derep.h \
+  diagbox.h \
+  eacluster.h \
+  ensemble.h \
+  estring.h \
+  filebuffer.h \
+  flatmx.h \
+  gobuff.h \
+  gtbnode.h \
+  gtbuilder.h \
+  heatmapcolors.h \
+  help.h \
+  hmmparams.h \
+  hmmscores.h \
+  hmmtrans.h \
+  kmerdist33.h \
+  kmerdist66.h \
+  kmerscan.h \
+  locallock.h \
+  m3alnparams.h \
+  mpcflat.h \
+  msa.h \
+  multisequence.h \
+  muscle.h \
+  muscle3.h \
+  mx.h \
+  myalloc.h \
+  myopts.h \
+  mysparsemx.h \
+  myutils.h \
+  obj.h \
+  objmgr.h \
+  objtype.h \
+  objtypes.h \
+  omplock.h \
+  pairhmm.h \
+  pathinfo.h \
+  pprog.h \
+  pprog3.h \
+  profile3.h \
+  profpos3.h \
+  pwpath.h \
+  qscorer.h \
+  qscorer2.h \
+  qscorer3.h \
+  quarts.h \
+  scoretype.h \
+  seq.h \
+  seqinfo.h \
+  sequence.h \
+  simplecluster.h \
+  sort.h \
+  super4.h \
+  super5.h \
+  super6.h \
+  sweeper.h \
+  textfile.h \
+  timing.h \
+  tracebit.h \
+  transaln.h \
+  tree.h \
+  treeperm.h \
+  treesplitter.h \
+  types.h \
+  uclust.h \
+  uclustpd.h \
+  upgma5.h \
+  usage.h \
+  usorter.h \
+  viterbiparams.h \
+  xdpmem.h \
 
-LDFLAGS := $(LDFLAGS) -O3 -fopenmp -pthread -lpthread ${LDFLAGS2}
-
-HDRS := $(shell echo *.h)
-OBJS := $(shell echo *.cpp | sed "-es/^/$(OS)\//" | sed "-es/ / $(OS)\//g" | sed "-es/\.cpp/.o/g")
-SRCS := $(shell ls *.cpp *.h)
+OBJS = \
+  $(OBJDIR)/addconfseq.o \
+  $(OBJDIR)/align.o \
+  $(OBJDIR)/cmd_cmp_msa.o \
+  $(OBJDIR)/cmd_m3ensemble.o \
+  $(OBJDIR)/cmd_mustang_core.o \
+  $(OBJDIR)/cmd_newbench_pfamgroups.o \
+  $(OBJDIR)/cmd_newbench_selectpfams.o \
+  $(OBJDIR)/cmd_qscoredir_cmp2.o \
+  $(OBJDIR)/cmd_squeeze_inserts.o \
+  $(OBJDIR)/hscore.o \
+  $(OBJDIR)/m3alnparams.o \
+  $(OBJDIR)/alignpairflat.o \
+  $(OBJDIR)/allocflat.o \
+  $(OBJDIR)/alnalnsflat.o \
+  $(OBJDIR)/alnmsasbypath.o \
+  $(OBJDIR)/alnmsasflat.o \
+  $(OBJDIR)/alnmsasflat3.o \
+  $(OBJDIR)/alnprof3sbypath.o \
+  $(OBJDIR)/alpha2.o \
+  $(OBJDIR)/alpha3.o \
+  $(OBJDIR)/alpha6.o \
+  $(OBJDIR)/assertsameseqs.o \
+  $(OBJDIR)/bench.o \
+  $(OBJDIR)/cmd_bench.o \
+  $(OBJDIR)/bittraceback.o \
+  $(OBJDIR)/blosum.o \
+  $(OBJDIR)/clustalweights.o \
+  $(OBJDIR)/cmd_batch.o \
+  $(OBJDIR)/cmd_muscle3.o \
+  $(OBJDIR)/enumgrid.o \
+  $(OBJDIR)/estring.o \
+  $(OBJDIR)/build_guide_tree.o \
+  $(OBJDIR)/calcalnscoresparse.o \
+  $(OBJDIR)/eesort.o \
+  $(OBJDIR)/gtbnode.o \
+  $(OBJDIR)/heatmapcolors.o \
+  $(OBJDIR)/jalview.o \
+  $(OBJDIR)/kimuradist.o \
+  $(OBJDIR)/kmerdist33.o \
+  $(OBJDIR)/kmerdist66.o \
+  $(OBJDIR)/letterconf.o \
+  $(OBJDIR)/diagbox.o \
+  $(OBJDIR)/buildposterior3flat.o \
+  $(OBJDIR)/buildpostflat.o \
+  $(OBJDIR)/bwdflat3.o \
+  $(OBJDIR)/calcalnflat.o \
+  $(OBJDIR)/calcalnscoreflat.o \
+  $(OBJDIR)/calcposteriorflat.o \
+  $(OBJDIR)/conspairflat.o \
+  $(OBJDIR)/consflat.o \
+  $(OBJDIR)/defaulthmmparams.o \
+  $(OBJDIR)/derep.o \
+  $(OBJDIR)/disperse.o \
+  $(OBJDIR)/dividetree.o \
+  $(OBJDIR)/eacluster.o \
+  $(OBJDIR)/efabestcols.o \
+  $(OBJDIR)/efabestconf.o \
+  $(OBJDIR)/efaexplode.o \
+  $(OBJDIR)/efastats.o \
+  $(OBJDIR)/ensemble.o \
+  $(OBJDIR)/fa2efa.o \
+  $(OBJDIR)/fwdflat3.o \
+  $(OBJDIR)/getpairs.o \
+  $(OBJDIR)/getpostpairsalignedflat.o \
+  $(OBJDIR)/letterconfhtml.o \
+  $(OBJDIR)/logdistmx.o \
+  $(OBJDIR)/logmx.o \
+  $(OBJDIR)/m3refine.o \
+  $(OBJDIR)/m3select.o \
+  $(OBJDIR)/make_a2m.o \
+  $(OBJDIR)/make_a2m_refseq.o \
+  $(OBJDIR)/make_substmx.o \
+  $(OBJDIR)/maxcc.o \
+  $(OBJDIR)/mpcflat.o \
+  $(OBJDIR)/eadistmx.o \
+  $(OBJDIR)/eadistmxmsas.o \
+  $(OBJDIR)/fasta.o \
+  $(OBJDIR)/fasta2.o \
+  $(OBJDIR)/msaselfscore3.o \
+  $(OBJDIR)/muscle3.o \
+  $(OBJDIR)/mx.o \
+  $(OBJDIR)/myalloc.o \
+  $(OBJDIR)/mysparsemx.o \
+  $(OBJDIR)/nwsmall3.o \
+  $(OBJDIR)/objmgr.o \
+  $(OBJDIR)/pathinfo.o \
+  $(OBJDIR)/perturbhmm.o \
+  $(OBJDIR)/getconsseq.o \
+  $(OBJDIR)/globalinputms.o \
+  $(OBJDIR)/guidetreejoinorder.o \
+  $(OBJDIR)/hmmdump.o \
+  $(OBJDIR)/hmmparams.o \
+  $(OBJDIR)/jointrees.o \
+  $(OBJDIR)/logaln.o \
+  $(OBJDIR)/main.o \
+  $(OBJDIR)/msastats.o \
+  $(OBJDIR)/multisequence.o \
+  $(OBJDIR)/permutetree.o \
+  $(OBJDIR)/pprog.o \
+  $(OBJDIR)/pprog2.o \
+  $(OBJDIR)/pprog3.o \
+  $(OBJDIR)/pprogt.o \
+  $(OBJDIR)/pprog_tree.o \
+  $(OBJDIR)/probcons.o \
+  $(OBJDIR)/msa.o \
+  $(OBJDIR)/msa2.o \
+  $(OBJDIR)/myutils.o \
+  $(OBJDIR)/colscoreefa.o \
+  $(OBJDIR)/profalign.o \
+  $(OBJDIR)/profile3.o \
+  $(OBJDIR)/profpos3.o \
+  $(OBJDIR)/profprof3.o \
+  $(OBJDIR)/profseq.o \
+  $(OBJDIR)/protdist.o \
+  $(OBJDIR)/protdistpair.o \
+  $(OBJDIR)/protdists.o \
+  $(OBJDIR)/qscore.o \
+  $(OBJDIR)/qscoreefa.o \
+  $(OBJDIR)/qscorer2.o \
+  $(OBJDIR)/randomchaintree.o \
+  $(OBJDIR)/randomdistmx.o \
+  $(OBJDIR)/relabel.o \
+  $(OBJDIR)/repredict.o \
+  $(OBJDIR)/resample.o \
+  $(OBJDIR)/scoretest.o \
+  $(OBJDIR)/searchpd.o \
+  $(OBJDIR)/seqinfo.o \
+  $(OBJDIR)/simplecluster.o \
+  $(OBJDIR)/spatter.o \
+  $(OBJDIR)/stripgappy.o \
+  $(OBJDIR)/stripgappyrows.o \
+  $(OBJDIR)/strip_anchors.o \
+  $(OBJDIR)/substmxfromfile.o \
+  $(OBJDIR)/super6.o \
+  $(OBJDIR)/sweep.o \
+  $(OBJDIR)/sweeper.o \
+  $(OBJDIR)/test.o \
+  $(OBJDIR)/test_malloc.o \
+  $(OBJDIR)/tracebackbitmem.o \
+  $(OBJDIR)/tree.o \
+  $(OBJDIR)/tree2.o \
+  $(OBJDIR)/tree4.o \
+  $(OBJDIR)/treefromfile.o \
+  $(OBJDIR)/treetofile.o \
+  $(OBJDIR)/pairhmm.o \
+  $(OBJDIR)/progalnflat.o \
+  $(OBJDIR)/project.o \
+  $(OBJDIR)/qscore_oldcode.o \
+  $(OBJDIR)/qscore2.o \
+  $(OBJDIR)/qscorer.o \
+  $(OBJDIR)/quarts.o \
+  $(OBJDIR)/refineflat.o \
+  $(OBJDIR)/relaxflat.o \
+  $(OBJDIR)/seb8.o \
+  $(OBJDIR)/sequence.o \
+  $(OBJDIR)/setprobconsparams.o \
+  $(OBJDIR)/seq.o \
+  $(OBJDIR)/stripgappycols.o \
+  $(OBJDIR)/super4.o \
+  $(OBJDIR)/super5.o \
+  $(OBJDIR)/testfb.o \
+  $(OBJDIR)/testlog.o \
+  $(OBJDIR)/testscoretype.o \
+  $(OBJDIR)/textfile.o \
+  $(OBJDIR)/totalprobflat.o \
+  $(OBJDIR)/tracebackflat.o \
+  $(OBJDIR)/transaln.o \
+  $(OBJDIR)/transq.o \
+  $(OBJDIR)/treeperm.o \
+  $(OBJDIR)/treesplitter.o \
+  $(OBJDIR)/treesubsetnodes.o \
+  $(OBJDIR)/trimtoref.o \
+  $(OBJDIR)/trimtorefefa.o \
+  $(OBJDIR)/uclust.o \
+  $(OBJDIR)/uclustpd.o \
+  $(OBJDIR)/uclustpd2.o \
+  $(OBJDIR)/upgma5.o \
+  $(OBJDIR)/upgma5_msa.o \
+  $(OBJDIR)/usage.o \
+  $(OBJDIR)/usorter.o \
+  $(OBJDIR)/viterbifastmem.o \
+  $(OBJDIR)/vtml2.o \
 
 .PHONY: clean
 
-$(OS)/muscle : gitver.txt $(OS)/ $(OBJS)
-	$(CXX) $(LDFLAGS) $(OBJS) -o $@
+$(BINPATH) : $(BINDIR)/ $(OBJDIR)/ $(OBJS)
+	$(CXX) $(LDFLAGS) $(OBJS) -o $(BINPATH)
+	strip -d $(BINPATH)
 
-	# Warning: do not add -d option to strip, this is not portable
-	strip $(OS)/muscle
+$(OBJDIR)/ :
+	mkdir -p $(OBJDIR)/
 
-gitver.txt : $(SRCS)
-	bash ./gitver.bash
+$(BINDIR)/ :
+	mkdir -p $(BINDIR)/
 
-$(OS)/ :
-	mkdir -p $(OS)/
-
-$(OS)/%.o : %.cpp $(HDRS)
+$(OBJDIR)/%.o : %.cpp $(HDRS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	rm -rf gitver.txt $(OS)/
+	rm -rf $(OBJDIR)/ $(BINPATH)

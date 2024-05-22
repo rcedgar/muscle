@@ -1,9 +1,10 @@
+#if 0
 #include "myutils.h"
 #include "muscle.h"
 #include "treesplitter.h"
 #include "sort.h"
 
-void Splitter::Run(const Tree &T, uint SplitCount)
+void TreeSplitter::Run(const Tree &T, uint SplitCount)
 	{
 	m_T = &T;
 	const uint NodeCount = m_T->GetNodeCount();
@@ -48,7 +49,7 @@ void Splitter::Run(const Tree &T, uint SplitCount)
 		asserta(SIZE(m_SubtreeNodes) == m_SplitCount);
 	}
 
-void Splitter::GetSizeOrder(vector<uint> &Order) const
+void TreeSplitter::GetSizeOrder(vector<uint> &Order) const
 	{
 	vector<uint> Sizes;
 	for (uint i = 0; i < SIZE(m_SubtreeNodes); ++i)
@@ -62,7 +63,7 @@ void Splitter::GetSizeOrder(vector<uint> &Order) const
 	QuickSortOrderDesc(Sizes.data(), N, Order.data());
 	}
 
-void Splitter::LogState() const
+void TreeSplitter::LogState() const
 	{
 	Log("\n");
 	Log("_______________ Split %u ______________\n", m_SplitIndex);
@@ -92,7 +93,7 @@ void Splitter::LogState() const
 	Log("Total %u\n", SumSize);
 	}
 
-uint Splitter::GetBiggestNode() const
+uint TreeSplitter::GetBiggestNode() const
 	{
 	uint MaxSize = 0;
 	uint MaxNode = UINT_MAX;
@@ -110,7 +111,7 @@ uint Splitter::GetBiggestNode() const
 	return MaxNode;
 	}
 
-void Splitter::GetLabelsVec(vector<vector<string> > &LabelsVec) const
+void TreeSplitter::GetLabelsVec(vector<vector<string> > &LabelsVec) const
 	{
 	const uint SplitCount = SIZE(m_SubtreeNodes);
 	LabelsVec.clear();
@@ -127,7 +128,7 @@ void Splitter::GetLabelsVec(vector<vector<string> > &LabelsVec) const
 		}
 	}
 
-void Splitter::WriteLabels(const string &FileNamePrefix) const
+void TreeSplitter::WriteLabels(const string &FileNamePrefix) const
 	{
 	if (FileNamePrefix.empty())
 		return;
@@ -151,7 +152,7 @@ void Splitter::WriteLabels(const string &FileNamePrefix) const
 		}
 	}
 
-void Splitter::GetSubtree(Tree &Subtree, vector<string> &SplitLabels) const
+void TreeSplitter::GetSubtree(Tree &Subtree, vector<string> &SplitLabels) const
 	{
 	SplitLabels.clear();
 	asserta(m_T != 0);
@@ -180,7 +181,7 @@ void cmd_split_tree()
 	T.FromFile(TreeFileName);
 	asserta(T.IsRooted());
 
-	Splitter S;
+	TreeSplitter S;
 	S.Run(T, n);
 	S.WriteLabels(opt(prefix));
 
@@ -192,3 +193,4 @@ void cmd_split_tree()
 		Subtree.ToFile(opt(output));
 		}
 	}
+#endif // 0

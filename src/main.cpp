@@ -1,6 +1,8 @@
 #include "muscle.h"
 #include "myutils.h"
 
+string g_Arg1;
+
 int main(int argc, char **argv)
 	{
 	for (int i = 1; i < argc; ++i)
@@ -15,8 +17,8 @@ int main(int argc, char **argv)
 
 		if (s == "-help" || s == "--help")
 			{
-			void Help();
-			Help();
+			void Usage(FILE *f);
+			Usage(stdout);
 			return 0;
 			}
 		}
@@ -41,6 +43,8 @@ int main(int argc, char **argv)
 #define C(x)	\
 	if (optset_##x) \
 		{ \
+		g_Arg1 = opt_##x; \
+		optused_##x = true; \
 		void cmd_##x(); \
 		cmd_##x(); \
 		CheckUsedOpts(false); \

@@ -5,12 +5,18 @@
 #include "tree.h"
 #include "treeperm.h"
 #include "mysparsemx.h"
+#include "derep.h"
+#include "clustalweights.h"
 
 // Multi-threaded ProbCons
 class MPCFlat
 	{
 public:
+	MultiSequence *m_OriginalInputSeqs = 0;
+
+// m_InputSeqs are unique seqs after derep of m_OriginalInputSeqs
 	MultiSequence *m_InputSeqs = 0;
+
 	MultiSequence *m_MSA = 0;
 
 	uint m_ConsistencyIterCount = DEFAULT_CONSISTENCY_ITERS;
@@ -21,6 +27,10 @@ public:
 	UPGMA5 m_Upgma5;
 	Tree m_GuideTree;
 	vector<MultiSequence *> m_ProgMSAs;
+	Derep m_D;
+
+	ClustalWeights m_CW;
+	vector<float> m_Weights;
 
 	vector<vector<float> > m_DistMx;
 	vector<pair<uint, uint> > m_Pairs;
@@ -44,6 +54,9 @@ public:
 	void Run(MultiSequence *InputSeqs);
 	uint GetSeqCount() const;
 	void Run_Super4(MultiSequence *InputSeqs);
+	MultiSequence *ProfAlign(const MultiSequence &MSA1, const MultiSequence &MSA2);
+	void ProfSeq(const MultiSequence &MSA1, const Sequence &seq,
+	  string &Path);
 
 private:
 	void AllocPairCount(uint SeqCount);
@@ -71,11 +84,17 @@ private:
 	uint GetPairIndex(uint SMI1, uint SMI2) const;
 	MySparseMx &GetSparsePost(uint PairIndex);
 	MySparseMx &GetUpdatedSparsePost(uint PairIndex);
-	MultiSequence *AlignAlns(const MultiSequence &MSA1, const MultiSequence &MSA2);
 	void BuildPost(const MultiSequence &MSA1, const MultiSequence &MSA2,
 	  float *Post);
 	uint GetSeqLength(uint SeqIndex) const;
 	const Sequence *GetSequence(uint SeqIndex) const;
+	MultiSequence *AlignAlns(const MultiSequence &MSA1,
+	  const MultiSequence &MSA2, float *ptrScore = 0);
+	void GetLabelToMSASeqIndex(map<string, uint> &LabelToMSASeqIndex) const;
+	void SortMSA_ByInputOrder();
+	void SortMSA_ByGuideTree();
+	void SortMSA();
+	void InsertDupes(const map<string, vector<string> > &RepSeqLabelToDupeLabels);
 	};
 
 float *AllocFB(uint LX, uint LY);
@@ -90,6 +109,9 @@ float CalcAlnScoreFlat(const float *Post, uint LX, uint LY, float *DPRows);
 float CalcAlnFlat(const float *Post, uint LX, uint LY,
   float *DPRows, char *TB, string &Path);
 
-void RelaxFlat_XZ_ZY(const MySparseMx &XZ, const MySparseMx &ZY, float *Post);
-void RelaxFlat_ZX_ZY(const MySparseMx &XZ, const MySparseMx &YZ, float *Post);
-void RelaxFlat_XZ_YZ(const MySparseMx &XZ, const MySparseMx &YZ, float *Post);
+void RelaxFlat_XZ_ZY(const MySparseMx &XZ, const MySparseMx &ZY,
+  float WeightZ, float *Post);
+void RelaxFlat_ZX_ZY(const MySparseMx &XZ, const MySparseMx &YZ,
+  float WeightZ, float *Post);
+void RelaxFlat_XZ_YZ(const MySparseMx &XZ, const MySparseMx &YZ,
+  float WeightZ, float *Post);

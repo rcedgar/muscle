@@ -37,6 +37,7 @@ void MPCFlat::BuildPost(const MultiSequence &MSA1, const MultiSequence &MSA2,
 		const Sequence *Seq1 = MSA1.GetSequence(SeqIndex1);
 		uint SMI_1 = Seq1->GetSMI();
 		asserta(SMI_1 != UINT_MAX);
+		const float w1 = m_Weights[SeqIndex1];
 
 		Seq1->GetPosToCol(PosToCol1);
 
@@ -47,6 +48,7 @@ void MPCFlat::BuildPost(const MultiSequence &MSA1, const MultiSequence &MSA2,
 			uint SMI_2 = Seq2->GetSMI();
 			asserta(SMI_2 != UINT_MAX);
 			asserta(SMI_1 != SMI_2);
+			const float w2 = m_Weights[SeqIndex2];
 
 			Seq2->GetPosToCol(PosToCol2);
 
@@ -56,6 +58,8 @@ void MPCFlat::BuildPost(const MultiSequence &MSA1, const MultiSequence &MSA2,
 				const MySparseMx &Mx = GetSparsePost(PairIndex);
 				const uint LX = Mx.GetLX();
 				const uint LY = Mx.GetLY();
+				assert(SIZE(PosToCol1) == LX);
+				assert(SIZE(PosToCol2) == LY);
 				for (uint i = 0; i < LX; ++i)
 					{
 					uint Col1 = PosToCol1[i];
@@ -67,7 +71,7 @@ void MPCFlat::BuildPost(const MultiSequence &MSA1, const MultiSequence &MSA2,
 						uint j = Mx.GetCol_Offset(Offset);
 						++Offset;
 						uint Col2 = PosToCol2[j];
-						Post[Col1*ColCount2 + Col2] += P;
+						Post[Col1*ColCount2 + Col2] += w1*w2*P;
 						}
 					}
 				}
@@ -77,6 +81,8 @@ void MPCFlat::BuildPost(const MultiSequence &MSA1, const MultiSequence &MSA2,
 				const MySparseMx &Mx = GetSparsePost(PairIndex);
 				const uint LX = Mx.GetLX();
 				const uint LY = Mx.GetLY();
+				assert(SIZE(PosToCol2) == LX);
+				assert(SIZE(PosToCol1) == LY);
 				for (uint i = 0; i < LX; ++i)
 					{
 					uint Col2 = PosToCol2[i];
@@ -88,7 +94,7 @@ void MPCFlat::BuildPost(const MultiSequence &MSA1, const MultiSequence &MSA2,
 						uint j = Mx.GetCol_Offset(Offset);
 						++Offset;
 						uint Col1 = PosToCol1[j];
-						Post[Col1*ColCount2 + Col2] += P;
+						Post[Col1*ColCount2 + Col2] += w1*w2*P;
 						}
 					}
 				}

@@ -3,7 +3,7 @@
 void Usage(FILE *f)
 	{
 	PrintBanner(f);
-	fprintf(f,
-#include "usage.h"
-	);
+	fputs(
+#include "help.h"
+	, f);
 	}

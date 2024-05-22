@@ -7,11 +7,10 @@
 #endif // !defined(IN_MYUTILS_CPP)
 #endif
 
-#define RCE_MALLOC		0
-#define TRACK_ALLOC		0
-#define ALLOC_TOTALS	0
+#include <cstddef>
+#include "myalloc.h"
 
-#if defined(__x86_64__) || defined(_M_X64) || defined(__arm64__) || defined(__aarch64__)
+#if defined(__x86_64__) || defined(_M_X64) || defined(__arm64__)
 #define	BITS			64
 #else
 #define	BITS			32
@@ -32,6 +31,7 @@
 #include <algorithm>
 #include <map>
 #include <inttypes.h>
+#include "types.h"
 
 // isatty()
 #ifdef	WIN32
@@ -117,20 +117,6 @@ void myassertfail(const char *Exp, const char *File, unsigned Line);
 #endif
 #define asserta(exp) (void)( (exp) || (myassertfail(#exp, __FILE__, __LINE__), 0) )
 
-#define ureturn(x)	return (x)
-
-#if DEBUG && defined(_MSC_VER)
-#if RCE_MALLOC
-#define _chkmem()	rce_chkmem()
-#else
-#define _chkmem()	asserta(_CrtCheckMemory())
-#endif
-#endif
-
-#if	ALLOC_TOTALS
-void LogAllocSummary();
-#endif
-
 #define NotUsed(v)	((void *) &v)
 
 // pom=plus or minus, tof=true or false, yon=yes or no
@@ -145,51 +131,6 @@ unsigned GetElapsedSecs();
 void mysleep(unsigned ms);
 void mylistdir(const string &DirName, vector<string> &FileNames);
 void PrintVersion(FILE *f);
-
-#if	RCE_MALLOC
-
-void *rce_malloc(unsigned n, unsigned bytes, const char *FileName, int Line);
-void rce_free(void *p, const char *FileName, int LineNr);
-void rce_chkmem();
-
-void rce_assertvalidptr_(void *p, const char *FileName, int LineNr);
-#define rce_assertvalidptr(p)	rce_assertvalidptr_(p, __FILE__, __LINE__)
-
-void rce_dumpptr_(void *p, const char *FileName, int LineNr);
-#define rce_dumpptr(p)	rce_dumpptr_(p, __FILE__, __LINE__)
-
-#define mymalloc(n, m)	rce_malloc((n), (m), __FILE__, __LINE__)
-#define myfree(p)		rce_free(p, __FILE__, __LINE__)
-#define myalloc(t, n)	(t *) rce_malloc((n)*sizeof(t), __FILE__, __LINE__)
-
-#else // RCE_MALLOC
-
-void *mymalloc(unsigned n, unsigned bytes);
-void myfree(void *p);
-#define rce_chkmem()	/* empty */
-
-extern unsigned g_AllocLine;
-extern const char *g_AllocFile;
-#define myalloc(t, n)	(t *) (g_AllocLine = __LINE__, g_AllocFile = __FILE__, (mymalloc((n), sizeof(t))))
-
-void *mymalloc64(unsigned BytesPerObject, uint64 N);
-#define myalloc64(t, n)	(t *) mymalloc64(sizeof(t), (n));
-
-#endif // RCE_MALLOC
-
-#if TRACK_ALLOC
-
-#undef myalloc
-#undef myfree
-
-void *myalloc_track(unsigned Bytes, const char *FileName, int LineNr);
-void myfree_track(void *p, const char *FileName, int LineNr);
-void myalloc_trace(bool On);
-
-#define myalloc(t, n)	(t *) myalloc_track(sizeof(t)*(n), __FILE__, __LINE__)
-#define myfree(p)		myfree_track(p, __FILE__, __LINE__)
-
-#endif // TRACK_ALLOC
 
 #define SIZE(c)	unsigned((c).size())
 #define RoundUp(Bytes, BlockSize)	((Bytes) + ((BlockSize) - (Bytes)%(BlockSize)))
@@ -453,5 +394,7 @@ void Shuffle(vector<unsigned> &v);
 #define NO_TRACE		0
 #define TMP_TRACE		2	// true but not 1, for grep_trace
 #define REMOVEME		1
+
+extern string g_Arg1;
 
 #endif	// myutils_h

@@ -1,4 +1,5 @@
 #include "muscle.h"
+#include "pathinfo.h"
 
 void MakeAlnRows(const string &X, const string &Y,
   const string &PathXY, string &RowX, string &RowY)
@@ -16,20 +17,60 @@ void MakeAlnRows(const string &X, const string &Y,
 	for (uint Col = 0; Col < ColCount; ++Col)
 		{
 		char c = PathXY[Col];
-		if (c == 'B')
+		if (c == 'B' || c == 'M')
 			{
 			RowX += XSeq[XPos];
 			RowY += YSeq[YPos];
 			++YPos;
 			++XPos;
 			}
-		else if (c == 'X')
+		else if (c == 'X' || c == 'D')
 			{
 			RowX += XSeq[XPos];
 			RowY += '-';
 			++XPos;
 			}
-		else if (c == 'Y')
+		else if (c == 'Y' || c == 'I')
+			{
+			RowY += YSeq[YPos];
+			RowX += '-';
+			++YPos;
+			}
+		else
+			asserta(false);
+		}
+	asserta(XPos == LX && YPos == LY);
+	}
+
+void MakeAlnRows(const byte *XSeq, uint LX,
+  const byte *YSeq, uint LY, const PathInfo &PI,
+  string &RowX, string &RowY)
+	{
+	RowX.clear();
+	RowY.clear();
+
+	string PathXY;
+	PI.GetPathStr(PathXY);
+	const uint ColCount = SIZE(PathXY);
+	uint XPos = 0;
+	uint YPos = 0;
+	for (uint Col = 0; Col < ColCount; ++Col)
+		{
+		char c = PathXY[Col];
+		if (c == 'B' || c == 'M')
+			{
+			RowX += XSeq[XPos];
+			RowY += YSeq[YPos];
+			++YPos;
+			++XPos;
+			}
+		else if (c == 'X' || c == 'D')
+			{
+			RowX += XSeq[XPos];
+			RowY += '-';
+			++XPos;
+			}
+		else if (c == 'Y' || c == 'I')
 			{
 			RowY += YSeq[YPos];
 			RowX += '-';
@@ -90,6 +131,19 @@ void LogAln(const string &X, const string &Y, const string &PathXY)
 	Log("\n");
 	Log("%s\n", RowX.c_str());
 	Log("%s\n", RowY.c_str());
+	}
+
+void LogAln(const byte *X, uint LX, const byte *Y, uint LY, const PathInfo &PI)
+	{
+	string sX;
+	string sY;
+	for (uint i = 0; i < LX; ++i)
+		sX += X[i];
+	for (uint i = 0; i < LY; ++i)
+		sY += Y[i];
+	string PathXY;
+	PI.GetPathStr(PathXY);
+	LogAln(sX, sY, PathXY);
 	}
 
 void LogAln(const Sequence &X, const Sequence &Y, const string &PathXY)

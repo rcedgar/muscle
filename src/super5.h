@@ -50,6 +50,9 @@ public:
 	vector<uint> m_GSIToCentroidSeqsSeqIndex;
 	vector<uint> m_GSIToCentroidMSASeqIndex;
 	vector<uint> m_GSIToMemberCount;
+	vector<uint> m_GSIToCentroidGSI;
+	vector<vector<uint> > m_CentroidGSIToMemberGSIs;
+	vector<vector<uint> > m_DupeRepGSIToMemberGSIs;
 
 	vector<string> m_GSIToMemberCentroidPath;
 
@@ -57,7 +60,6 @@ public:
 	void SetOpts();
 	void Run(MultiSequence &InputSeqs, TREEPERM Perm);
 	void MakeCentroidSeqs(MultiSequence &InputSeqs);
-	void AlignCentroidSeqs(TREEPERM Perm, MultiSequence &MSA);
 	void SetDupeVecs();
 	void SetCentroidVecs();
 	void SetCentroidSeqsVecs();
@@ -66,4 +68,16 @@ public:
 	void AlignDupes();
 	void ValidateVecs() const;
 	void ClearTreesAndMSAs();
+	void LogClusters() const;
+
+	void GetLabelsInGuideTreeOrder(vector<string> &Labels) const;
+	void AppendLabelsFromCentroid(uint CentroidIndex,
+	  vector<string> &Labels) const;
+	const string &GetLabel(uint GSI) const;
+	void AppendLabels(uint GSI, vector<string> &Labels) const;
+	void GetLabelToAlnSeqIndex(const MultiSequence &Aln,
+	  map<string, uint> &LabelToAlnSeqIndex) const;
+	void SortMSA_ByInputOrder(MultiSequence &Aln);
+	void SortMSA_ByGuideTree(MultiSequence &Aln);
+	void SortMSA(MultiSequence &Aln);
 	};

@@ -1,5 +1,5 @@
 #include "muscle.h"
-#include "qscorer.h"
+#include "qscorer2.h"
 
 void cmd_qscore2()
 	{
@@ -12,25 +12,27 @@ void cmd_qscore2()
 	GetBaseName(TestFileName.c_str(), Name);
 
 	MSA Test;
-	MSA Ref;
 	Test.FromFASTAFile(TestFileName);
-	Ref.FromFASTAFile_PreserveCase(RefFileName);
 
-	QScorer QS;
-	QS.m_MaxGapFract = MaxGapFract;
-	QS.Run(Test, Ref);
-	ProgressLog("%s: Q=%.4f, TC=%.4f\n", Name.c_str(), QS.m_Q, QS.m_TC);
+	MultiSequence Ref;
+	Ref.m_DupeLabelsOk = true;
+	Ref.FromFASTA(RefFileName);
+
+	QScorer2 QS;
+	double Q = QS.Run(Test, Ref);
+
+	ProgressLog("Q=%.4f %s\n", Q, Name.c_str());
 	}
 
-void cmd_qscoredir()
+void cmd_qscore2dir()
 	{
-	const string NamesFileName = opt(qscoredir);
+	const string NamesFileName = g_Arg1;
 	string TestDir = opt(testdir);
 	string RefDir = opt(refdir);
 	const string OutputFileName = opt(output);
-	double MaxGapFract = 0.5;
-	if (optset_max_gap_fract)
-		MaxGapFract = opt(max_gap_fract);
+
+	string Algo;
+	Algo = (string) BaseName(TestDir.c_str());
 
 	Dirize(TestDir);
 	Dirize(RefDir);
@@ -40,45 +42,42 @@ void cmd_qscoredir()
 
 	FILE *fOut = CreateStdioFile(OutputFileName);
 
-	float SumQ = 0;
-	float SumTC = 0;
-
-	float AvgQ = 0;
-	float AvgTC = 0;
+	double SumQ = 0;
+	double AvgQ = 0;
 
 	const uint NameCount = SIZE(Names);
 	for (uint i = 0; i < NameCount; ++i)
 		{
-		ProgressStep(i, NameCount, "%s  Q %.2f TC %.2f",
-		  TestDir.c_str(), AvgQ, AvgTC);
+		ProgressStep(i, NameCount, "%s  Q %.3f",
+		  TestDir.c_str(), AvgQ);
 
 		const string &Name = Names[i];
 		const string &TestFileName = TestDir + Name;
 		const string &RefFileName = RefDir + Name;
 
 		MSA Test;
-		MSA Ref;
+		MultiSequence Ref;
 		Test.FromFASTAFile(TestFileName);
 
 		extern bool g_FASTA_Upper;
 		bool SaveUpper = g_FASTA_Upper;
 		g_FASTA_Upper = false;
-		Ref.FromFASTAFile(RefFileName);
+		Ref.m_DupeLabelsOk = true;
+		Ref.FromFASTA(RefFileName);
 		g_FASTA_Upper = SaveUpper;
 
-		QScorer QS;
-		QS.m_MaxGapFract = MaxGapFract;
-		QS.Run(Test, Ref);
-		Pf(fOut, "set=%s	q=%.4f	tc=%.4f\n", Name.c_str(), QS.m_Q, QS.m_TC); 
+		QScorer2 QS;
+		double Q = QS.Run(Test, Ref);
+		Pf(fOut, "set=%s	q=%.4f\n", Name.c_str(), Q); 
 
-		SumQ += QS.m_Q;
-		SumTC += QS.m_TC;
-
+		SumQ += Q;
 		AvgQ = SumQ/(i+1);
-		AvgTC = SumTC/(i+1);
 		}
 
-	Pf(fOut, "testdir=%s n=%u avgq=%.4f	avgtc=%.4f\n", 
-	  TestDir.c_str(), NameCount, AvgQ, AvgTC);
+	Pf(fOut, "testdir=%s n=%u avgq=%.4f\n", 
+	  TestDir.c_str(), NameCount, AvgQ);
+	Pf(fOut, "Algo=%s Q=%.3f\n", Algo.c_str(), AvgQ);
 	CloseStdioFile(fOut);
+
+	printf("Algo=%s Q=%.3f\n", Algo.c_str(), AvgQ);
 	}

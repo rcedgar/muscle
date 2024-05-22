@@ -51,6 +51,7 @@ public:
 	void Clear();
 	void Init(const vector<string> &Labels,
 	  const vector<vector<float> > &DistMx);
+	void Run(const string &sLinkage, Tree &tree);
 	void Run(LINKAGE Linkage, Tree &tree);
 	void ReadDistMx(const string &FileName);
 	void ScaleDistMx();

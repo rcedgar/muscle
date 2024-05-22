@@ -12,7 +12,7 @@ static const float DEFAULT_MIN_EA_SUPER4_PASS2 = 0.9f;
 class Super4
 	{
 public:
-	uint m_PairCount = DEFAULT_TARGET_PAIR_COUNT;
+	uint m_TargetPairCount = DEFAULT_TARGET_PAIR_COUNT;
 	uint m_MaxClusterSize = DEFAULT_MAX_COARSE_SEQS;
 	float m_MinEAPass1 = DEFAULT_MIN_EA_SUPER4_PASS1;
 	float m_MinEAPass2 = DEFAULT_MIN_EA_SUPER4_PASS2;

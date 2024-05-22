@@ -65,6 +65,7 @@ void Super5::Run(MultiSequence &InputSeqs, TREEPERM Perm)
 		AlignMembers();
 		AlignDupes();
 		m_FinalMSA = m_ExtendedMSA;
+		SortMSA(*m_FinalMSA);
 		return;
 		}
 
@@ -73,35 +74,28 @@ void Super5::Run(MultiSequence &InputSeqs, TREEPERM Perm)
 	AlignMembers();
 	AlignDupes();
 	m_FinalMSA_None.Copy(*m_ExtendedMSA);
+	SortMSA(m_FinalMSA_None);
 
 	m_CentroidMSA = &m_S4.m_FinalMSA_ABC;
 	SetCentroidMSAVecs();
 	AlignMembers();
 	AlignDupes();
 	m_FinalMSA_ABC.Copy(*m_ExtendedMSA);
+	SortMSA(m_FinalMSA_ABC);
 
 	m_CentroidMSA = &m_S4.m_FinalMSA_ACB;
 	SetCentroidMSAVecs();
 	AlignMembers();
 	AlignDupes();
 	m_FinalMSA_ACB.Copy(*m_ExtendedMSA);
+	SortMSA(m_FinalMSA_ACB);
 
 	m_CentroidMSA = &m_S4.m_FinalMSA_BCA;
 	SetCentroidMSAVecs();
 	AlignMembers();
 	AlignDupes();
 	m_FinalMSA_BCA.Copy(*m_ExtendedMSA);
-	}
-
-void Super5::AlignCentroidSeqs(TREEPERM Perm, MultiSequence &MSA)
-	{
-	m_S4.Run(*m_CentroidSeqs, Perm);
-	m_CentroidMSA = &m_S4.m_FinalMSA;
-	SetCentroidMSAVecs();
-	AlignMembers();
-	AlignDupes();
-	asserta(m_ExtendedMSA != 0);
-	MSA.Copy(*m_ExtendedMSA);
+	SortMSA(m_FinalMSA_BCA);
 	}
 
 void Super5::SetCentroidMSAVecs()
@@ -163,6 +157,8 @@ void Super5::SetDupeVecs()
 	m_DupeGSIs.clear();
 	m_DupeRepGSIs.clear();
 	m_IsDupe.clear();
+	m_DupeRepGSIToMemberGSIs.clear();
+	m_DupeRepGSIToMemberGSIs.resize(InputSeqCount);
 
 	m_D.GetDupeGSIs(
 	  m_DupeGSIs,
@@ -173,9 +169,11 @@ void Super5::SetDupeVecs()
 	for (uint i = 0; i < DupeCount; ++i)
 		{
 		uint GSI = m_DupeGSIs[i];
+		uint DupeRepGSI = m_DupeRepGSIs[i];
 		asserta(GSI < InputSeqCount);
 		asserta(m_IsDupe[GSI] == false);
 		m_IsDupe[GSI] = true;
+		m_DupeRepGSIToMemberGSIs[DupeRepGSI].push_back(GSI);
 		}
 	}
 
@@ -186,6 +184,13 @@ void Super5::SetCentroidVecs()
 	m_CentroidGSIs.clear();
 	m_MemberGSIs.clear();
 	m_MemberCentroidGSIs.clear();
+
+	m_GSIToCentroidGSI.clear();
+	m_GSIToCentroidGSI.resize(InputSeqCount, UINT_MAX);
+
+	m_CentroidGSIToMemberGSIs.clear();
+	m_CentroidGSIToMemberGSIs.resize(InputSeqCount);
+
 	m_U.GetGSIs(m_CentroidGSIs,
 	  m_MemberGSIs, m_MemberCentroidGSIs,
 	  m_GSIToMemberCentroidPath);
@@ -233,8 +238,93 @@ void Super5::SetCentroidVecs()
 		asserta(!IsCentroid);
 
 		m_IsMember[MemberGSI] = true;
-
+		m_GSIToCentroidGSI[MemberGSI] = MemberCentroidGSI;
+		m_CentroidGSIToMemberGSIs[MemberCentroidGSI].push_back(MemberGSI);
 		m_GSIToMemberCount[MemberCentroidGSI] += 1;
+		}
+	}
+
+void Super5::LogClusters() const
+	{
+	const uint InputSeqCount = m_InputSeqs->GetSeqCount();
+	asserta(SIZE(m_IsDupe) == InputSeqCount);
+	asserta(SIZE(m_IsCentroid) == InputSeqCount);
+	asserta(SIZE(m_IsMember) == InputSeqCount);
+	asserta(SIZE(m_GSIToCentroidSeqsSeqIndex) == InputSeqCount);
+	asserta(SIZE(m_GSIToCentroidMSASeqIndex) == InputSeqCount);
+	asserta(SIZE(m_GSIToMemberCount) == InputSeqCount);
+
+	Log("%5.5s", "GSI");
+	Log("  %3.3s", "Cat");
+	Log("  %5.5s", "CSSI");
+	Log("  %5.5s", "CMSI");
+	Log("  %5.5s", "MbCt");
+	Log("  %5.5s", "Cent");
+	Log("\n");
+
+	for (uint GSI = 0; GSI < InputSeqCount; ++GSI)
+		{
+		const string &Label = GetGlobalInputSeqLabel(GSI);
+		bool Dupe = m_IsDupe[GSI];
+		bool Centroid = m_IsCentroid[GSI];
+		bool Member = m_IsMember[GSI];
+		const char *Cat = "Error";
+		if (Dupe)
+			Cat = "Dup";
+		else if (Centroid)
+			Cat = "Cnt";
+		else if (Member)
+			Cat = "Mem";
+		else
+			asserta(false);
+
+		uint CentroidSeqsSeqIndex = m_GSIToCentroidSeqsSeqIndex[GSI];
+		uint CentroidMSASeqIndex = m_GSIToCentroidMSASeqIndex[GSI];
+		uint MemberCount = m_GSIToMemberCount[GSI];
+		uint CentroidGSI = m_GSIToCentroidGSI[GSI];
+		string CentroidLabel = "";
+		if (CentroidGSI != UINT_MAX)
+			CentroidLabel = GetGlobalInputSeqLabel(CentroidGSI);
+
+		Log("%5u", GSI);
+		Log("  %3.3s", Cat);
+
+		if (CentroidSeqsSeqIndex == UINT_MAX)
+			Log("  %5.5s", "*");
+		else
+			Log("  %5u", CentroidSeqsSeqIndex);
+
+		if (CentroidMSASeqIndex == UINT_MAX)
+			Log("  %5.5s", "*");
+		else
+			Log("  %5u", CentroidMSASeqIndex);
+
+		Log("  %5u", MemberCount);
+
+		if (CentroidGSI == UINT_MAX)
+			Log("  %5.5s", "*");
+		else
+			Log("  %5u", CentroidGSI);
+
+		Log("  >%s", Label.c_str());
+		if (CentroidLabel != "")
+			Log("  >> %s", CentroidLabel.c_str());
+
+		const vector<uint> &Members = m_CentroidGSIToMemberGSIs[GSI];
+		const uint M = SIZE(Members);
+		for (uint m = 0; m < min(M, 4u); ++m)
+			Log(" <%u>", Members[m]);
+		if (M > 4)
+			Log(" ...");
+
+		const vector<uint> &DupeMembers = m_DupeRepGSIToMemberGSIs[GSI];
+		const uint DM = SIZE(DupeMembers);
+		for (uint m = 0; m < min(DM, 4u); ++m)
+			Log(" =%u", DupeMembers[m]);
+		if (DM > 4)
+			Log(" ...");
+
+		Log("\n");
 		}
 	}
 
@@ -337,6 +427,126 @@ void Super5::AlignDupes()
 		}
 	ProgressLog(" done.\n");
 	AssertSeqsEqInput(*m_ExtendedMSA);
+	}
+
+void Super5::GetLabelToAlnSeqIndex(const MultiSequence &Aln,
+  map<string, uint> &LabelToAlnSeqIndex) const
+	{
+	LabelToAlnSeqIndex.clear();
+	const uint SeqCount = Aln.GetSeqCount();
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		const string &Label = Aln.GetLabelStr(i);
+		if (LabelToAlnSeqIndex.find(Label) != LabelToAlnSeqIndex.end())
+			Die("Duplicate label >%s", Label.c_str());
+		LabelToAlnSeqIndex[Label] = i;
+		}
+	}
+
+void Super5::SortMSA(MultiSequence &Aln)
+	{
+	if (opt(input_order))
+		SortMSA_ByInputOrder(Aln);
+	else
+		{
+		opt(tree_order);
+		SortMSA_ByGuideTree(Aln);
+		}
+	}
+
+const string &Super5::GetLabel(uint GSI) const
+	{
+	const string &Label = m_InputSeqs->GetLabelStr(GSI);
+	return Label;
+	}
+
+void Super5::AppendLabels(uint GSI, vector<string> &Labels) const
+	{
+	const string &Label = GetLabel(GSI);
+	Labels.push_back(Label);
+	asserta(GSI < SIZE(m_DupeRepGSIToMemberGSIs));
+	const vector<uint> &DupeGSIs = m_DupeRepGSIToMemberGSIs[GSI];
+	const uint D = SIZE(DupeGSIs);
+	for (uint d = 0; d < D; ++d)
+		{
+		const string &Label = GetLabel(DupeGSIs[d]);
+		Labels.push_back(Label);
+		}
+	}
+
+void Super5::AppendLabelsFromCentroid(uint CentroidIndex,
+  vector<string> &Labels) const
+	{
+	asserta(CentroidIndex < SIZE(m_CentroidGSIs));
+	uint CentroidGSI = m_CentroidGSIs[CentroidIndex];
+	AppendLabels(CentroidGSI, Labels);
+	asserta(CentroidGSI < SIZE(m_CentroidGSIToMemberGSIs));
+	const vector<uint> &MemberGSIs = m_CentroidGSIToMemberGSIs[CentroidGSI];
+	const uint M = SIZE(MemberGSIs);
+	for (uint m = 0; m < M; ++m)
+		AppendLabels(MemberGSIs[m], Labels);
+	}
+
+void Super5::GetLabelsInGuideTreeOrder(vector<string> &Labels) const
+	{
+	Labels.clear();
+	const uint CentroidCount = SIZE(m_CentroidGSIs);
+	for (uint CentroidIndex = 0; CentroidIndex < CentroidCount; ++CentroidIndex)
+		AppendLabelsFromCentroid(CentroidIndex, Labels);
+
+	const uint SeqCount = m_InputSeqs->GetSeqCount();
+	asserta(SIZE(Labels) == SeqCount);
+	}
+
+void Super5::SortMSA_ByGuideTree(MultiSequence &Aln)
+	{
+	const uint SeqCount = m_InputSeqs->GetSeqCount();
+
+	map<string, uint> LabelToMSASeqIndex;
+	GetLabelToAlnSeqIndex(Aln, LabelToMSASeqIndex);
+
+	vector<string> Labels;
+	GetLabelsInGuideTreeOrder(Labels);
+	asserta(SIZE(Labels) == SeqCount);
+
+	vector<const Sequence *> SortedSeqs;
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		const string &Label = Labels[i];
+		map<string, uint>::const_iterator p =
+		  LabelToMSASeqIndex.find(Label);
+		if (p == LabelToMSASeqIndex.end())
+			Die("Super5::SortMSA_ByGuideTree(), missing >%s", Label.c_str());
+		uint MSASeqIndex = p->second;
+		const Sequence *Seq = Aln.GetSequence(MSASeqIndex);
+		SortedSeqs.push_back(Seq);
+		}
+
+	for (uint i = 0; i < SeqCount; ++i)
+		Aln.m_Seqs[i] = SortedSeqs[i];
+	}
+
+void Super5::SortMSA_ByInputOrder(MultiSequence &Aln)
+	{
+	const uint SeqCount = m_InputSeqs->GetSeqCount();
+	map<string, uint> LabelToMSASeqIndex;
+	GetLabelToAlnSeqIndex(Aln, LabelToMSASeqIndex);
+
+	vector<const Sequence *> SortedSeqs;
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		const string &Label = m_InputSeqs->GetLabelStr(i);
+		map<string, uint>::const_iterator p =
+		  LabelToMSASeqIndex.find(Label);
+		if (p == LabelToMSASeqIndex.end())
+			Die("Super5::SortMSA_ByInputOrder(), missing >%s", Label.c_str());
+		uint MSASeqIndex = p->second;
+		const Sequence *Seq = Aln.GetSequence(MSASeqIndex);
+		SortedSeqs.push_back(Seq);
+		}
+
+	for (uint i = 0; i < SeqCount; ++i)
+		Aln.m_Seqs[i] = SortedSeqs[i];
 	}
 
 void cmd_super5()

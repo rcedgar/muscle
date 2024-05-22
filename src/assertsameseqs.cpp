@@ -16,8 +16,8 @@ void _AssertSeqsEq(const char *FileName, uint LineNr,
 		uint GSI1 = Seq1->GetGSI();
 		uint GSI2 = Seq2->GetGSI();
 
-		Sequence *uSeq1 = Seq1->DeleteGaps();
-		Sequence *uSeq2 = Seq2->DeleteGaps();
+		Sequence *uSeq1 = Seq1->CopyDeleteGaps();
+		Sequence *uSeq2 = Seq2->CopyDeleteGaps();
 		int Length1 = uSeq1->GetLength();
 		int Length2 = uSeq2->GetLength();
 
@@ -81,9 +81,9 @@ void _AssertSeqsEqInput(const char *File, uint Line, const MultiSequence &MS)
 
 		GSIs.insert(GSI);
 
-		const Sequence *UngappedInputSeq = InputSeq->DeleteGaps();
+		const Sequence *UngappedInputSeq = InputSeq->CopyDeleteGaps();
 		const uint L = UngappedInputSeq->GetLength();
-		const Sequence *UngappedSeq = Seq->DeleteGaps();
+		const Sequence *UngappedSeq = Seq->CopyDeleteGaps();
 		const uint MSL = UngappedSeq->GetLength();
 		if (L != MSL)
 			Die("%s:%u AssertSeqsEqInput Seq(%u) GSI=%u L=%u, MSL=%u, label=%s",

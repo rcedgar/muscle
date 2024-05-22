@@ -330,7 +330,7 @@ void TransAln::Init(const MultiSequence &MSA,
 		m_MSAPaths.push_back(MSAPath);
 
 		const Sequence *Seq = MSA.GetSequence(MSAIndex);
-		Sequence *UngappedSeq = Seq->DeleteGaps();
+		Sequence *UngappedSeq = Seq->CopyDeleteGaps();
 		m_UngappedMSASeqs.push_back(UngappedSeq);
 		}
 
@@ -771,7 +771,7 @@ void cmd_transaln()
 	for (uint i = 0; i < RefSeqCount; ++i)
 		{
 		const Sequence *AlignedRefSeq = RefMSA.GetSequence(i);
-		Sequence *UngappedRefSeq = AlignedRefSeq->DeleteGaps();
+		Sequence *UngappedRefSeq = AlignedRefSeq->CopyDeleteGaps();
 		UngappedRefSeqs.AddSequence(UngappedRefSeq, true);
 		}
 

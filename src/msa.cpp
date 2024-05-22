@@ -160,13 +160,13 @@ unsigned MSA::GetLetter(unsigned uSeqIndex, unsigned uIndex) const
 	return uLetter;
 	}
 
-unsigned MSA::GetLetterEx(unsigned uSeqIndex, unsigned uIndex) const
-	{
-// TODO: Performance cost?
-	char c = GetChar(uSeqIndex, uIndex);
-	unsigned uLetter = CharToLetterEx(c);
-	return uLetter;
-	}
+//unsigned MSA::GetLetterEx(unsigned uSeqIndex, unsigned uIndex) const
+//	{
+//// TODO: Performance cost?
+//	char c = GetChar(uSeqIndex, uIndex);
+//	unsigned uLetter = CharToLetterEx(c);
+//	return uLetter;
+//	}
 
 void MSA::SetSeqName(unsigned uSeqIndex, const char szName[])
 	{
@@ -196,11 +196,11 @@ bool MSA::IsGap(unsigned uSeqIndex, unsigned uIndex) const
 	return IsGapChar(c);
 	}
 
-bool MSA::IsWildcard(unsigned uSeqIndex, unsigned uIndex) const
-	{
-	char c = GetChar(uSeqIndex, uIndex);
-	return IsWildcardChar(c);
-	}
+//bool MSA::IsWildcard(unsigned uSeqIndex, unsigned uIndex) const
+//	{
+//	char c = GetChar(uSeqIndex, uIndex);
+//	return IsWildcardChar(c);
+//	}
 
 void MSA::SetChar(unsigned uSeqIndex, unsigned uIndex, char c)
 	{
@@ -315,6 +315,34 @@ void MSA::Copy(const MSA &msa)
 			const char c = msa.GetChar(uSeqIndex, uColIndex);
 			SetChar(uSeqIndex, uColIndex, c);
 			}
+		}
+	}
+
+void MSA::GetUpperLowerGapCount(uint ColIndex,
+  uint &NU, uint &NL, uint &NG, uint &NDots, uint &NDashes) const
+	{
+	NU = 0;
+	NL = 0;
+	NG = 0;
+	NDots = 0;
+	NDashes = 0;
+	for (unsigned SeqIndex = 0; SeqIndex < GetSeqCount(); ++SeqIndex)
+		{
+		char c = GetChar(SeqIndex, ColIndex);
+		if (c == '.')
+			{
+			++NDots;
+			++NG;
+			}
+		else if (c == '-')
+			{
+			++NDashes;
+			++NG;
+			}
+		else if (isupper(c))
+			++NU;
+		else if (islower(c))
+			++NL;
 		}
 	}
 
@@ -449,6 +477,22 @@ void MSA::FromSequence(const Sequence &s)
 		SetChar(0, n, CharSeq[n]);
 	}
 
+void MSA::FromMultiSequence(const MultiSequence &MS)
+	{
+	Clear();
+
+	m_uSeqCount = MS.GetSeqCount();
+	m_uColCount = MS.GetColCount();
+
+	m_szSeqs = myalloc(char *, m_uSeqCount);
+	m_szNames = myalloc(char *, m_uSeqCount);
+	for (uint i = 0; i < m_uSeqCount; ++i)
+		{
+		m_szSeqs[i] = (char *) MS.GetCharPtr(i);
+		m_szNames[i] = (char *) MS.GetLabel(i);
+		}
+	}
+
 void MSA::FromSeq(const Seq &s)
 	{
 	unsigned uSeqLength = s.Length();
@@ -556,7 +600,7 @@ bool MSA::SeqsEq(const MSA &a1, unsigned uSeqIndex1, const MSA &a2,
 	return s1.EqIgnoreCase(s2);
 	}
 
-unsigned MSA::GetSeqLength(unsigned uSeqIndex) const
+unsigned MSA::GetUngappedSeqLength(unsigned uSeqIndex) const
 	{
 	assert(uSeqIndex < GetSeqCount());
 
@@ -596,26 +640,26 @@ void MSA::GetPWID(unsigned uSeqIndex1, unsigned uSeqIndex2, double *ptrPWID,
 		*ptrPWID = 0;
 	}
 
-unsigned MSA::UniqueResidueTypes(unsigned uColIndex) const
-	{
-	assert(uColIndex < GetColCount());
-
-	unsigned Counts[MAX_ALPHA];
-	memset(Counts, 0, sizeof(Counts));
-	const unsigned uSeqCount = GetSeqCount();
-	for (unsigned uSeqIndex = 0; uSeqIndex < uSeqCount; ++uSeqIndex)
-		{
-		if (IsGap(uSeqIndex, uColIndex) || IsWildcard(uSeqIndex, uColIndex))
-			continue;
-		const unsigned uLetter = GetLetter(uSeqIndex, uColIndex);
-		++(Counts[uLetter]);
-		}
-	unsigned uUniqueCount = 0;
-	for (unsigned uLetter = 0; uLetter < g_AlphaSize; ++uLetter)
-		if (Counts[uLetter] > 0)
-			++uUniqueCount;
-	return uUniqueCount;
-	}
+//unsigned MSA::UniqueResidueTypes(unsigned uColIndex) const
+//	{
+//	assert(uColIndex < GetColCount());
+//
+//	unsigned Counts[MAX_ALPHA];
+//	memset(Counts, 0, sizeof(Counts));
+//	const unsigned uSeqCount = GetSeqCount();
+//	for (unsigned uSeqIndex = 0; uSeqIndex < uSeqCount; ++uSeqIndex)
+//		{
+//		if (IsGap(uSeqIndex, uColIndex) || IsWildcard(uSeqIndex, uColIndex))
+//			continue;
+//		const unsigned uLetter = GetLetter(uSeqIndex, uColIndex);
+//		++(Counts[uLetter]);
+//		}
+//	unsigned uUniqueCount = 0;
+//	for (unsigned uLetter = 0; uLetter < g_AlphaSize; ++uLetter)
+//		if (Counts[uLetter] > 0)
+//			++uUniqueCount;
+//	return uUniqueCount;
+//	}
 
 double MSA::GetOcc(unsigned uColIndex) const
 	{
@@ -790,25 +834,25 @@ void MSA::ExpandCache(unsigned uSeqCount, unsigned uColCount)
 	m_uColCount = uColCount;
 	}
 
-void MSA::FixAlpha()
-	{
-	ClearInvalidLetterWarning();
-	for (unsigned uSeqIndex = 0; uSeqIndex < m_uSeqCount; ++uSeqIndex)
-		{
-		for (unsigned uColIndex = 0; uColIndex < m_uColCount; ++uColIndex)
-			{
-			char c = GetChar(uSeqIndex, uColIndex);
-			if (!IsResidueChar(c) && !IsGapChar(c))
-				{
-				char w = GetWildcardChar();
-				// Warning("Invalid letter '%c', replaced by '%c'", c, w);
-				InvalidLetterWarning(c, w);
-				SetChar(uSeqIndex, uColIndex, w);
-				}
-			}
-		}
-	ReportInvalidLetters();
-	}
+//void MSA::FixAlpha()
+//	{
+//	ClearInvalidLetterWarning();
+//	for (unsigned uSeqIndex = 0; uSeqIndex < m_uSeqCount; ++uSeqIndex)
+//		{
+//		for (unsigned uColIndex = 0; uColIndex < m_uColCount; ++uColIndex)
+//			{
+//			char c = GetChar(uSeqIndex, uColIndex);
+//			if (!IsResidueChar(c) && !IsGapChar(c))
+//				{
+//				char w = GetWildcardChar();
+//				// Warning("Invalid letter '%c', replaced by '%c'", c, w);
+//				InvalidLetterWarning(c, w);
+//				SetChar(uSeqIndex, uColIndex, w);
+//				}
+//			}
+//		}
+//	ReportInvalidLetters();
+//	}
 
 ALPHA MSA::GuessAlpha() const
 	{
@@ -823,8 +867,7 @@ ALPHA MSA::GuessAlpha() const
 	if (0 == uSeqCount)
 		return ALPHA_Amino;
 
-	unsigned uDNACount = 0;
-	unsigned uRNACount = 0;
+	unsigned uNucleoCount = 0;
 	unsigned uTotal = 0;
 	unsigned i = 0;
 	for (;;)
@@ -837,17 +880,13 @@ ALPHA MSA::GuessAlpha() const
 		char c = GetChar(uSeqIndex, uColIndex);
 		if (IsGapChar(c))
 			continue;
-		if (IsDNA(c))
-			++uDNACount;
-		if (IsRNA(c))
-			++uRNACount;
+		if (g_CharToLetterNucleo[c] < 4 || c == 'N' || c == 'n')
+			++uNucleoCount;
 		++uTotal;
 		if (uTotal >= CHAR_COUNT)
 			break;
 		}
-	if (uTotal != 0 && ((uRNACount*100)/uTotal) >= MIN_NUCLEO_PCT)
-		return ALPHA_Nucleo;
-	if (uTotal != 0 && ((uDNACount*100)/uTotal) >= MIN_NUCLEO_PCT)
+	if (uTotal != 0 && ((uNucleoCount*100)/uTotal) >= MIN_NUCLEO_PCT)
 		return ALPHA_Nucleo;
 	return ALPHA_Amino;
 	}
@@ -863,6 +902,26 @@ void MSA::GetPosToCol(uint SeqIndex, vector<uint> &PosToCol) const
 		char c = Seq[Col];
 		if (!isgap(c))
 			PosToCol.push_back(Col);
+		}
+	}
+
+// 1-based positions, if <0 the column has a gap in this
+// sequence which follows at 1-based position (-Pos).
+// If ColToPos[Col] is 0, this is left terminal gap.
+void MSA::GetColToPos1(uint SeqIndex, vector<int> &ColToPos) const
+	{
+	ColToPos.clear();
+	const uint ColCount = GetColCount();
+	const char *Seq = GetSeqCharPtr(SeqIndex);
+	ColToPos.reserve(ColCount);
+	int Pos = 0;
+	for (uint Col = 0; Col < ColCount; ++Col)
+		{
+		char c = Seq[Col];
+		if (isgap(c))
+			ColToPos.push_back(Pos == 0 ? 0 : -Pos);
+		else
+			ColToPos.push_back(++Pos);
 		}
 	}
 

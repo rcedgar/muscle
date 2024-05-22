@@ -40,8 +40,8 @@ float GetPostPairsAlignedFlat(const string &aProgressStr,
 
 		const Sequence *gapped_seq1 = MSA1.GetSequence(SeqIndex1);
 		const Sequence *gapped_seq2 = MSA2.GetSequence(SeqIndex2);
-		Sequence *seq1 = gapped_seq1->DeleteGaps();
-		Sequence *seq2 = gapped_seq2->DeleteGaps();
+		Sequence *seq1 = gapped_seq1->CopyDeleteGaps();
+		Sequence *seq2 = gapped_seq2->CopyDeleteGaps();
 		const byte *ByteSeq1 = seq1->GetBytePtr();
 		const byte *ByteSeq2 = seq2->GetBytePtr();
 		const uint L1 = seq1->GetLength();

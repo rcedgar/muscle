@@ -3,20 +3,6 @@
 #include "tree.h"
 #include "locallock.h"
 
-#define DOTIMING	0
-
-#if DOTIMING
-#include "timing.h"
-
-static TICKS g_tFwd;
-static TICKS g_tBwd;
-static TICKS g_tPost;
-static TICKS g_tSparse;
-static TICKS g_tAln;
-static TICKS g_tDelete;
-
-#endif
-
 void MPCFlat::Clear()
 	{
 	m_InputSeqs = 0;
@@ -32,6 +18,7 @@ void MPCFlat::Clear()
 	m_PairToIndex.clear();
 	m_JoinIndexes1.clear();
 	m_JoinIndexes2.clear();
+	m_Weights.clear();
 	FreeSparsePosts();
 	FreeProgMSAs();
 	}
@@ -205,6 +192,15 @@ void MPCFlat::CalcGuideTree()
 
 	m_Upgma5.Run(LINKAGE_Biased, m_GuideTree);
 	PermTree(m_GuideTree, m_TreePerm);
+	if (optset_guidetreeout)
+		{
+		const string &FN = opt(guidetreeout);
+		Progress("Saving guide tree [%s] to %s\n",
+		  TREEPERMToStr(m_TreePerm), FN.c_str());
+		m_GuideTree.ToFile(FN);
+		Progress("Quitting.\n");
+		exit(0);
+		}
 	}
 
 void MPCFlat::CalcJoinOrder()
@@ -285,61 +281,170 @@ void MPCFlat::Run_Super4(MultiSequence *ConsensusSeqs)
 	CalcGuideTree();
 	}
 
-void MPCFlat::Run(MultiSequence *InputSeqs)
+void MPCFlat::Run(MultiSequence *OriginalInputSeqs)
 	{
-	assert(InputSeqs != 0);
+	assert(OriginalInputSeqs != 0);
 	Clear();
 
-	const uint SeqCount = InputSeqs->GetSeqCount();
+	m_D.Run(*OriginalInputSeqs);
+	m_D.Validate();
+	
+	MultiSequence *UniqueSeqs = new MultiSequence;
+	m_D.GetUniqueSeqs(*UniqueSeqs);
+
+	const uint SeqCount = UniqueSeqs->GetSeqCount();
 	if (SeqCount == 1)
 		{
-		m_MSA = InputSeqs;
+		m_MSA = new MultiSequence;
+		m_MSA->Copy(*OriginalInputSeqs);
 		return;
 		}
+	map<string, vector<string> > RepSeqLabelToDupeLabels;
+	m_D.GetRepLabelToDupeLabels(RepSeqLabelToDupeLabels);
+	const uint DupeCount = SIZE(RepSeqLabelToDupeLabels);
 
-	uint PairCount = (SeqCount*(SeqCount-1))/2;
+	const uint PairCount = (SeqCount*(SeqCount-1))/2;
 	AllocPairCount(PairCount);
 
-	InitSeqs(InputSeqs);
+	InitSeqs(UniqueSeqs);
 	InitPairs();
 	InitDistMx();
 	CalcPosteriors();
-	Consistency();
 	CalcGuideTree();
+
+	m_CW.Run(*m_InputSeqs, m_GuideTree, m_Weights);
+	asserta(SIZE(m_Weights) == SeqCount);
+	double Sum = 0;
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		float w = m_Weights[i]*SeqCount;
+		m_Weights[i] = w;
+		Sum += w;
+		m_Weights[i] = 1.0f;//@@@@@@@@@ TODO
+		}
+	asserta(feq(Sum, SeqCount));
+
+	Consistency();
 	CalcJoinOrder();
 	ProgressiveAlign();
 	Refine();
 	asserta(m_MSA != 0);
+	SortMSA();
+
+	if (DupeCount > 0)
+		InsertDupes(RepSeqLabelToDupeLabels);
 	}
 
-MultiSequence *RunMPCFlat(MultiSequence *InputSeqs)
+void MPCFlat::SortMSA()
 	{
-	MPCFlat M;
-	if (optset_consiters)
-		M.m_ConsistencyIterCount = opt(consiters);
-	if (optset_refineiters)
-		M.m_RefineIterCount = opt(refineiters);
-
-	TREEPERM TP = TP_None;
-	if (optset_perm)
-		TP = StrToTREEPERM(opt(perm));
-	if (TP == TP_All)
-		Die("-perm all not supported, please specify none, abc, acb or bca");
-	M.m_TreePerm = TP;
-	M.Run(InputSeqs);
-
-	asserta(M.m_MSA != 0);
-	return M.m_MSA;
+	if (opt(input_order))
+		SortMSA_ByInputOrder();
+	else
+		{
+		opt(tree_order);
+		SortMSA_ByGuideTree();
+		}
 	}
 
-#if DOTIMING
-void LogTiming()
+void MPCFlat::GetLabelToMSASeqIndex(map<string, uint> &LabelToMSASeqIndex) const
 	{
-	double Sum = g_tFwd + g_tBwd + g_tPost + g_tAln + g_tDelete;
-	ProgressLog("%10.3g  %4.1f%%  Fwd\n", double(g_tFwd), GetPct(g_tFwd, Sum));
-	ProgressLog("%10.3g  %4.1f%%  Bwd\n", double(g_tBwd), GetPct(g_tBwd, Sum));
-	ProgressLog("%10.3g  %4.1f%%  Post\n", double(g_tPost), GetPct(g_tPost, Sum));
-	ProgressLog("%10.3g  %4.1f%%  Aln\n", double(g_tAln), GetPct(g_tAln, Sum));
-	ProgressLog("%10.3g  %4.1f%%  Delete\n", double(g_tDelete), GetPct(g_tDelete, Sum));
+	LabelToMSASeqIndex.clear();
+	const uint SeqCount = GetSeqCount();
+	asserta(m_MSA->GetSeqCount() == SeqCount);
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		const string &Label = m_MSA->GetLabelStr(i);
+		if (LabelToMSASeqIndex.find(Label) != LabelToMSASeqIndex.end())
+			Die("Duplicate label >%s", Label.c_str());
+		LabelToMSASeqIndex[Label] = i;
+		}
 	}
-#endif
+
+void MPCFlat::SortMSA_ByGuideTree()
+	{
+	const uint SeqCount = GetSeqCount();
+	map<string, uint> LabelToMSASeqIndex;
+	GetLabelToMSASeqIndex(LabelToMSASeqIndex);
+
+	const uint LeafCount = m_GuideTree.GetLeafCount();
+	asserta(LeafCount == SeqCount);
+	const Tree &T = m_GuideTree;
+	uint Node = T.FirstDepthFirstNode();
+	vector<const Sequence *> SortedSeqs;
+	for (;;)
+		{
+		if (T.IsLeaf(Node))
+			{
+			string Label;
+			T.GetLabel(Node, Label);
+			map<string, uint>::const_iterator p =
+			  LabelToMSASeqIndex.find(Label);
+			if (p == LabelToMSASeqIndex.end())
+				Die("MPCFlat::SortMSA_ByGuideTree not found >%s", Label.c_str());
+			uint MSASeqIndex = p->second;
+			const Sequence *Seq = m_MSA->GetSequence(MSASeqIndex);
+			SortedSeqs.push_back(Seq);
+			}
+
+		Node = T.NextDepthFirstNode(Node);
+		if (Node == NULL_NEIGHBOR)
+			break;
+		}
+
+	for (uint i = 0; i < SeqCount; ++i)
+		m_MSA->m_Seqs[i] = SortedSeqs[i];
+	}
+
+void MPCFlat::SortMSA_ByInputOrder()
+	{
+	const uint SeqCount = GetSeqCount();
+	map<string, uint> LabelToMSASeqIndex;
+	GetLabelToMSASeqIndex(LabelToMSASeqIndex);
+
+	vector<const Sequence *> SortedSeqs;
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		const string &Label = m_InputSeqs->GetLabelStr(i);
+		map<string, uint>::const_iterator p =
+		  LabelToMSASeqIndex.find(Label);
+		if (p == LabelToMSASeqIndex.end())
+			Die("MPCFlat::SortMSA_ByInputOrder(), missing >%s", Label.c_str());
+		uint MSASeqIndex = p->second;
+		const Sequence *Seq = m_MSA->GetSequence(MSASeqIndex);
+		SortedSeqs.push_back(Seq);
+		}
+	for (uint i = 0; i < SeqCount; ++i)
+		m_MSA->m_Seqs[i] = SortedSeqs[i];
+	}
+
+void MPCFlat::InsertDupes(
+  const map<string, vector<string> > &RepSeqLabelToDupeLabels)
+	{
+	MultiSequence *UpdatedMSA = new MultiSequence;
+	const uint SeqCount = m_MSA->GetSeqCount();
+	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
+		{
+		const Sequence *OldSeq = m_MSA->GetSequence(SeqIndex);
+		Sequence *NewSeq = Sequence::NewSequence();
+		const string &Label = OldSeq->m_Label;
+		NewSeq->m_Label = Label;
+		NewSeq->m_CharVec = OldSeq->m_CharVec;
+
+		UpdatedMSA->AddSequence(NewSeq, false);
+		map<string, vector<string> >::const_iterator iter =
+		  RepSeqLabelToDupeLabels.find(Label);
+		if (iter != RepSeqLabelToDupeLabels.end())
+			{
+			const vector<string> &DupeLabels = iter->second;
+			for (uint i = 0; i < SIZE(DupeLabels); ++i)
+				{
+				Sequence *DupeSeq = Sequence::_NewSequence();
+				DupeSeq->m_Label = DupeLabels[i];
+				DupeSeq->m_CharVec = OldSeq->m_CharVec;
+				UpdatedMSA->AddSequence(DupeSeq, true);
+				}
+			}
+		}
+	delete m_MSA;
+	m_MSA = UpdatedMSA;
+	}

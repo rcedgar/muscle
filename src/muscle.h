@@ -1,5 +1,7 @@
 #pragma once
 
+#define _CRTDBG_MAP_ALLOC
+
 #if	DEBUG && !_DEBUG
 #define _DEBUG	1
 #endif
@@ -31,6 +33,8 @@
 #include "mpcflat.h"
 #include "kmerscan.h"
 #include "alpha3.h"
+#include "cachemem3.h"
+#include "profile3.h"
 
 #ifndef _WIN32
 #define stricmp strcasecmp
@@ -42,9 +46,6 @@
 const double VERY_NEGATIVE_DOUBLE = -9e29;
 const float VERY_NEGATIVE_FLOAT = (float) -9e29;
 
-const double BLOSUM_DIST = 0.62;	// todo settable
-
-void RunSuper5();
 void CalcEADistMx(FILE *f, MultiSequence* sequences,
   vector<vector<float> > &DistMx, vector<MySparseMx * > *SparsePostVec = 0);
 void PermuteTree(const Tree &InputTree,
@@ -135,3 +136,31 @@ float GetPostPairsAlignedFlat(const string &aProgressStr,
   const MultiSequence &MSA1, const MultiSequence &MSA2,
   const vector<uint> &SeqIndexes1, const vector<uint> &SeqIndexes2, 
   vector<MySparseMx *> &SparsePosts);
+void SeqToFasta(FILE *f, const byte *Seq, unsigned L, const char *Label);
+void SeqToFasta(FILE *f, const char *Seq, unsigned L, const char *Label);
+
+float NWSmall3(CacheMem3 &CM, const Profile3 &ProfA,
+  const Profile3 &ProfB, string &Path);
+void AlignTwoMSAsGivenPath(const MultiSequence &msaA,
+  const MultiSequence &msaB, const string &Path,
+  MultiSequence &msa2);
+void AlignTwoProfsGivenPath(const Profile3 &ProfA, float WeightA,
+  const Profile3 &ProfB, float WeightB,
+  const Mx2020 &SubstMx_Letter, float GapOpen,
+  const string &Path, Profile3 &ProfAB);
+void GetKimuraDistMx(const MultiSequence &MSA,
+  vector<vector<float> > &DistMx);
+void GetKimuraDistMx_Viterbi(const MultiSequence &MS,
+  vector<vector<float> > &DistMx);
+class PathInfo;
+void LogAln(const byte *X, uint LX, const byte *Y, uint LY, const PathInfo &PI);
+bool GetNextEnumGrid(const vector<uint> &Sizes, vector<uint> &Indexes);
+
+void GetSubstMx_Letter_Blosum(uint PctId, float Mx[20][20]);
+void ReadSubstMx_Letter_FromFile(const string &FileName, float Mx[20][20]);
+void GetGapParams_Blosum(uint PctId, uint n, float *ptrOpen, float *ptrCenter);
+float ScoreProfPos2(const ProfPos3 &PPA, const ProfPos3 &PPB);
+double hscore(const double *xs, const double *ys, uint N, double X);
+
+typedef bool (*ptr_GetMSAColIsAligned)(const MSA &Aln, uint Col);
+uint GetOverlap(uint Lo1, uint Hi1, uint Lo2, uint Hi2);

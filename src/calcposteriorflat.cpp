@@ -35,6 +35,14 @@ void MPCFlat::CalcPosterior(uint PairIndex)
 
 	uint LX = GetL(SeqIndexX);
 	uint LY = GetL(SeqIndexY);
+	if (double(LX)*double(LY)*5 + 100 > double(INT_MAX))
+		{
+		ProgressLog("\nSequence length %u >%s\n",
+		  LX, GetLabel(SeqIndexX));
+		ProgressLog("Sequence length %u >%s\n",
+		  LY, GetLabel(SeqIndexY));
+		Die("HMM overflow, sequence lengths %u, %u (max ~21k)", LX, LY);
+		}
 
 	float *Fwd = AllocFB(LX, LY);
 	float *Bwd = AllocFB(LX, LY);

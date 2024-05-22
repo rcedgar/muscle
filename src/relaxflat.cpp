@@ -1,7 +1,8 @@
 #include "muscle.h"
 #include "mpcflat.h"
 
-void RelaxFlat_XZ_ZY(const MySparseMx &XZ, const MySparseMx &ZY, float *Post)
+void RelaxFlat_XZ_ZY(const MySparseMx &XZ, const MySparseMx &ZY,
+  float WeightZ, float *Post)
 	{
 	const uint LX = XZ.GetLX();
 	const uint LZ = XZ.GetLY();
@@ -23,13 +24,14 @@ void RelaxFlat_XZ_ZY(const MySparseMx &XZ, const MySparseMx &ZY, float *Post)
 				{
 				float P_ZY = ZY.GetProb_Offset(Offset_ZY + m);
 				uint PosY = ZY.GetCol_Offset(Offset_ZY + m);
-				Post[PosX*LY + PosY] += P_XZ*P_ZY;
+				Post[PosX*LY + PosY] += WeightZ*P_XZ*P_ZY;
 				}
 			}
 		}
 	}
 
-void RelaxFlat_ZX_ZY(const MySparseMx &ZX, const MySparseMx &ZY, float *Post)
+void RelaxFlat_ZX_ZY(const MySparseMx &ZX, const MySparseMx &ZY,
+  float WeightZ, float *Post)
 	{
 	const uint LZ = ZX.GetLX();
 	const uint LX = ZX.GetLY();
@@ -51,13 +53,14 @@ void RelaxFlat_ZX_ZY(const MySparseMx &ZX, const MySparseMx &ZY, float *Post)
 				{
 				float P_ZY = ZY.GetProb_Offset(Offset_ZY + m);
 				uint PosY = ZY.GetCol_Offset(Offset_ZY + m);
-				Post[PosX*LY + PosY] += P_ZX*P_ZY;
+				Post[PosX*LY + PosY] += WeightZ*P_ZX*P_ZY;
 				}
 			}
 		}
 	}
 
-void RelaxFlat_XZ_YZ(const MySparseMx &XZ, const MySparseMx &YZ, float *Post)
+void RelaxFlat_XZ_YZ(const MySparseMx &XZ, const MySparseMx &YZ,
+  float WeightZ, float *Post)
 	{
 	const uint LX = XZ.GetLX();
 	const uint LZ = XZ.GetLY();
@@ -84,7 +87,7 @@ void RelaxFlat_XZ_YZ(const MySparseMx &XZ, const MySparseMx &YZ, float *Post)
 			for (uint PosY = LoPosY; PosY <= HiPosY; ++PosY)
 				{
 				float P_YZ = YZ.GetProb(PosY, PosZ);
-				Post[PosX*LY + PosY] += P_XZ*P_YZ;
+				Post[PosX*LY + PosY] += WeightZ*P_XZ*P_YZ;
 				}
 			}
 		}

@@ -11,6 +11,8 @@ Fwd[s][i][j] =
 void CalcFwdFlat(const byte *X, uint LX, const byte *Y, uint LY, float *Flat)
 	{
 #include "hmmscores.h"
+	if (double(LX)*double(LY)*5 + 100 > double(INT_MAX))
+		Die("HMM overflow, sequence lengths %u, %u (max ~21k)", LX, LY);
 
 	char x0 = X[0];
 	char y0 = Y[0];

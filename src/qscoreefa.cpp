@@ -26,7 +26,7 @@ void cmd_qscore_efa()
 		{
 		const MSA &TestMSA = E.GetMSA(MSAIndex);
 		const string &TestName = E.GetMSAName(MSAIndex);
-		QS.Run(TestMSA, RefMSA);
+		QS.Run(TestName, TestMSA, RefMSA);
 		ProgressLog("%s %s Q=%.4f TC=%.4f\n",
 		  RefName.c_str(), TestName.c_str(), QS.m_Q, QS.m_TC);
 		}

@@ -57,13 +57,6 @@ static time_t g_StartTime = time(0);
 extern vector<string> g_Argv;
 static double g_PeakMemUseBytes;
 static char g_TmpStr[64];
-unsigned g_AllocCount;
-unsigned g_FreeCount;
-
-#if ALLOC_TOTALS
-uint64 g_AllocTotal;
-uint64 g_FreeTotal;
-#endif
 
 static const double LOG2 = log(2.0);
 static const double LOG10 = log(10.0);
@@ -906,22 +899,24 @@ void Die_(const char *Format, ...)
 	if (InDie)
 		exit(1);
 	InDie = true;
+	}
+
 	string Msg;
 
 	if (g_fLog != 0)
 		setbuf(g_fLog, 0);
 	myvstrprintf(Msg, Format, ArgList);
 
-	fprintf(stderr, "\n\n");
+	//fprintf(stderr, "\n\n");
 	Log("\n");
 	time_t t = time(0);
 	Log("%s", asctime(localtime(&t)));
 	for (unsigned i = 0; i < g_Argv.size(); i++)
 		{
-		fprintf(stderr, (i == 0) ? "%s" : " %s", g_Argv[i].c_str());
+		//fprintf(stderr, (i == 0) ? "%s" : " %s", g_Argv[i].c_str());
 		Log((i == 0) ? "%s" : " %s", g_Argv[i].c_str());
 		}
-	fprintf(stderr, "\n");
+	//fprintf(stderr, "\n");
 	Log("\n");
 
 	time_t CurrentTime = time(0);
@@ -930,9 +925,9 @@ void Die_(const char *Format, ...)
 	Log("Elapsed time: %s\n", sstr);
 
 	const char *szStr = Msg.c_str();
-	fprintf(stderr, "Elapsed time %s\n", SecsToHHMMSS(ElapsedSeconds));
-	fprintf(stderr, "Max memory %s\n", MemBytesToStr(g_PeakMemUseBytes));
-	fprintf(stderr, "\n---Fatal error---\n%s\n", szStr);
+	//fprintf(stderr, "Elapsed time %s\n", SecsToHHMMSS(ElapsedSeconds));
+	//fprintf(stderr, "Max memory %s\n", MemBytesToStr(g_PeakMemUseBytes));
+	fprintf(stderr, "\n**ABORT** %s\n", szStr);
 	Log("\n---Fatal error---\n%s\n", szStr); 
 
 #ifdef _MSC_VER
@@ -942,7 +937,6 @@ void Die_(const char *Format, ...)
 #endif
 
 	exit(1);
-	}
 	va_end(ArgList);
 	}
 
@@ -981,11 +975,13 @@ void mysleep(unsigned ms)
 double GetMemUseBytes()
 	{
 	HANDLE hProc = GetCurrentProcess();
-	PROCESS_MEMORY_COUNTERS PMC;
-	BOOL bOk = GetProcessMemoryInfo(hProc, &PMC, sizeof(PMC));
+	PROCESS_MEMORY_COUNTERS_EX PMC;
+	BOOL bOk = GetProcessMemoryInfo(hProc, (PROCESS_MEMORY_COUNTERS *) &PMC, sizeof(PMC));
 	if (!bOk)
 		return 1000000;
-	double Bytes = (double) PMC.WorkingSetSize;
+	
+	//double Bytes = (double) PMC.WorkingSetSize;
+	double Bytes = (double) PMC.PrivateUsage;
 	if (Bytes > g_PeakMemUseBytes)
 		g_PeakMemUseBytes = Bytes;
 	return Bytes;
@@ -1101,10 +1097,6 @@ double GetPhysMemBytes()
 	return double(mempages);
 	}
 #else
-double GetPhysMemBytes()
-	{
-	return 100000000; // 100M for unknown system
-	}
 double GetMemUseBytes()
 	{
 	return 0.0;
@@ -1640,6 +1632,8 @@ void LogProgramInfoAndCmdLine()
 
 void LogElapsedTimeAndRAM()
 	{
+	LogAllocs();
+
 	time_t Now = time(0);
 	struct tm *t = localtime(&Now);
 	const char *s = asctime(t);
@@ -2338,139 +2332,6 @@ unsigned GetThreadIndex()
 #undef myalloc
 #undef myfree
 
-#if	RCE_MALLOC
-#undef mymalloc
-#undef myfree
-#undef myfree2
-
-static unsigned g_NewCalls;
-static unsigned g_FreeCalls;
-static double g_InitialMemUseBytes;
-static double g_TotalAllocBytes;
-static double g_TotalFreeBytes;
-static double g_NetBytes;
-static double g_MaxNetBytes;
-
-void LogAllocStats()
-	{
-	Log("\n");
-	Log("       Allocs  %u\n", g_NewCalls);
-	Log("        Frees  %u\n", g_FreeCalls);
-	Log("Initial alloc  %s\n", MemBytesToStr(g_InitialMemUseBytes));
-	Log("  Total alloc  %s\n", MemBytesToStr(g_TotalAllocBytes));
-	Log("   Total free  %s\n", MemBytesToStr(g_TotalFreeBytes));
-	Log("    Net bytes  %s\n", MemBytesToStr(g_NetBytes));
-	Log("Max net bytes  %s\n", MemBytesToStr(g_MaxNetBytes));
-	Log("   Peak total  %s\n", MemBytesToStr(g_MaxNetBytes + g_InitialMemUseBytes));
-	}
-
-void *mymalloc(unsigned n, unsigned bytes, const char *FileName, int Line)
-	{
-	void *rce_malloc(unsigned bytes, const char *FileName, int Line);
-	return rce_malloc(n*bytes, FileName, Line);
-	}
-
-void myfree(void *p, const char *FileName, int Line)
-	{
-	void rce_free(void *p, const char *FileName, int Line);
-	rce_free(p, FileName, Line);
-	}
-
-void myfree2(void *p, unsigned bytes, const char *FileName, int Line)
-	{
-	void rce_free(void *p, const char *FileName, int Line);
-	rce_free(p, FileName, Line);
-	}
-
-#else // RCE_MALLOC
-
-#if	ALLOC_TOTALS
-void LogAllocSummary()
-	{
-	extern unsigned g_AllocCount;
-	extern unsigned g_FreeCount;
-	extern uint64 g_AllocTotal;
-	extern uint64 g_FreeTotal;
-
-	double RAM = GetMemUseBytes();
-	Log("RAM %s", MemBytesToStr(RAM));
-	Log(", malloc %s", MemBytesToStr(g_AllocTotal));
-	Log(", free %s",  MemBytesToStr(g_FreeTotal));
-	Log(", net %s\n", MemBytesToStr(g_AllocTotal - g_FreeTotal));
-	}
-#endif
-
-void *mymalloc64(unsigned BytesPerObject, uint64 N)
-	{
-	uint64 Bytes = N*BytesPerObject;
-	if (Bytes >= UINT32_MAX - 1024)
-		Die("Memory object >4Gb, probably due to long seqences");
-	byte *p = (byte *) malloc(Bytes);
-	if (p == 0)
-		Die("myalloc64(%u, %.3g) failed", BytesPerObject, double(N));
-	return p;
-	}
-
-void *mymalloc(unsigned n, unsigned bytes)
-	{
-	++g_AllocCount;
-	uint64 Bytes64 = uint64(n)*uint64(bytes);
-
-	if (Bytes64 > uint64(UINT_MAX))
-		Die("%s(%u): mymalloc(%u, %u) overflow", g_AllocFile, g_AllocLine, n, bytes);
-
-#if	ALLOC_TOTALS
-	g_AllocTotal += Bytes64;
-	Bytes64 += 4;
-#endif
-	uint32 Bytes32 = uint32(Bytes64);
-	void *p = malloc(Bytes32);
-	if (0 == p)
-		{
-		double b = GetMemUseBytes();
-		double Total = b + double(Bytes32);
-
-#if	BITS==32
-		if (Total > 2e9)
-			{
-			Log("\n%s(%u): Out of memory, mymalloc(%u, %u), curr %.3g bytes, total %.3g (%s)\n",
-			  g_AllocFile, g_AllocLine, n, bytes, b, Total, MemBytesToStr(Total));
-			Die("Memory limit of 32-bit process exceeded, 64-bit build required");
-			}
-#endif
-
-		fprintf(stderr, "\n%s(%u): Out of memory mymalloc(%u), curr %.3g bytes",
-		  g_AllocFile, g_AllocLine, (unsigned) bytes, b);
-#if DEBUG && defined(_MSC_VER)
-		asserta(_CrtCheckMemory());
-#endif
-		Die("%s(%u): Out of memory, mymalloc(%u, %u), curr %.3g bytes, total %.3g (%s)\n",
-		  g_AllocFile, g_AllocLine, n, bytes, b, Total, MemBytesToStr(Total));
-		}
-#if	ALLOC_TOTALS
-	*((uint32 *) p) = Bytes32;
-	return (void *) ((byte *) p + 4);
-#else
-	return p;
-#endif
-	}
-
-void myfree(void *p)
-	{
-	if (p == 0)
-		return;
-	++g_FreeCount;
-#if	ALLOC_TOTALS
-	uint32 *pi = (uint32 *) p;
-	uint32 Bytes32 = *(pi - 1);
-	g_FreeTotal += Bytes32;
-	free((void *) (pi - 1));
-#else
-	free(p);
-#endif
-	}
-
-#endif // RCE_MALLOC
 void CompilerInfo();
 
 vector<string> g_Argv;
@@ -2711,6 +2572,11 @@ void GetBaseName(const string &PathName, string &BaseName)
 void SeqToFasta(FILE *f, const string &Seq, const string &Label)
 	{
 	SeqToFasta(f, (const byte *) Seq.c_str(), SIZE(Seq), Label.c_str());
+	}
+
+void SeqToFasta(FILE *f, const char *Seq, unsigned L, const char *Label)
+	{
+	SeqToFasta(f, (const byte *) Seq, L, Label);
 	}
 
 void SeqToFasta(FILE *f, const byte *Seq, unsigned L, const char *Label)

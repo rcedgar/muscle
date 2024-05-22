@@ -1,6 +1,8 @@
 #include "muscle.h"
 #include "ensemble.h"
 
+#pragma warning(3: 4365)	// signed/unsigned conversion
+
 static const uint MAXBIN = 10;
 
 static uint GetBin(double Conf)
@@ -43,7 +45,7 @@ void cmd_colscore_efa()
 		if (Ref.ColIsUpper(RefColIndex, MaxGapFract))
 			++RefUpperColCount;
 
-	set<pair<uint, uint> > RefPosSet;
+	set<pair<uint, int> > RefPosSet;
 	E.GetRefPosSet(Ref, MaxGapFract, RefPosSet);
 
 	vector<uint> BinToCount(MAXBIN+1);

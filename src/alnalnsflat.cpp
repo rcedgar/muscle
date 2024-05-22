@@ -5,7 +5,7 @@ float CalcAlnFlat(const float *Post, uint LX, uint LY,
   float *DPRows, char *TB, string &Path);
 
 MultiSequence *MPCFlat::AlignAlns(const MultiSequence &MSA1,
-  const MultiSequence &MSA2)
+  const MultiSequence &MSA2, float *ptrScore)
 	{
 	const uint SeqCount1 = MSA1.GetSeqCount();
 	const uint SeqCount2 = MSA2.GetSeqCount();
@@ -20,7 +20,9 @@ MultiSequence *MPCFlat::AlignAlns(const MultiSequence &MSA1,
 	char *TB = AllocTB(ColCount1, ColCount2);
 
 	string Path;
-	CalcAlnFlat(Post, ColCount1, ColCount2, DPRows, TB, Path);
+	float Score = CalcAlnFlat(Post, ColCount1, ColCount2, DPRows, TB, Path);
+	if (ptrScore != 0)
+		*ptrScore = Score;
 	myfree(Post);
 	myfree(DPRows);
 	myfree(TB);

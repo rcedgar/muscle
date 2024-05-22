@@ -1,87 +1,72 @@
 #include "muscle.h"
 
-/////////////////////////////////////////////////////////////////
-// MultiSequence::Project()
-//
-// Given a set of indices, extract all sequences from the current
-// MultiSequence object whose index is included in the set.
-// Then, project the multiple alignments down to the desired
-// subset, and return the projection as a new MultiSequence
-// object.
-/////////////////////////////////////////////////////////////////
-MultiSequence* MultiSequence::Project(const set<int>& indices)
+MultiSequence* MultiSequence::Project(const vector<uint> &SeqIndexes)
 	{
-	vector<vector<char> *> newPtrs(indices.size());
-
-	assert(indices.size() != 0);
-
-	// grab old data
-	//vector<vector<char>::iterator> oldPtrs(indices.size());
-	//for (set<int>::const_iterator iter = indices.begin();
-	//  iter != indices.end(); ++iter)
-	//	oldPtrs[i++] = GetSequence(*iter)->GetDataPtr();
-
-	int i = 0;
-	vector<const char *> oldPtrs(indices.size());
-	for (set<int>::const_iterator iter = indices.begin();
-	  iter != indices.end(); ++iter)
-		oldPtrs[i++] = GetSequence(*iter)->GetCharPtr1();
-
-	// compute new length
-	int oldLength = GetSequence(*indices.begin())->GetLength();
-	int newLength = 0;
-	for (i = 1; i <= oldLength; i++)
+	set<int> IndexSet;
+	for (uint i = 0; i < SIZE(SeqIndexes); ++i)
 		{
-		// check to see if there is a gap in every sequence of the set
-		bool found = false;
-		for (int j = 0; !found && j < (int)indices.size(); j++)
-			found = (oldPtrs[j][i] != '-');
-
-		// if not, then this column counts towards the sequence length
-		if (found) newLength++;
+		int Index = (int) SeqIndexes[i];
+		IndexSet.insert(Index);
 		}
+	return Project(IndexSet);
+	}
 
-	// build new alignments
-	for (i = 0; i < (int)indices.size(); i++)
+// Create new MSA from subset of sequences, deleting
+// all-blank columns
+MultiSequence* MultiSequence::Project(const set<int>& SeqIndexes)
+	{
+	MultiSequence* SubsetMSA = new MultiSequence;
+	vector<Sequence *> NewSeqs;
+	uint OldColCount = UINT_MAX;
+	for (set<int>::const_iterator p = SeqIndexes.begin();
+	  p != SeqIndexes.end(); ++p)
 		{
-		newPtrs[i] = new vector<char>; assert(newPtrs[i]);
-		newPtrs[i]->push_back('@');
-		}
-
-	// add all needed columns
-	for (i = 1; i <= oldLength; i++)
-		{
-		// make sure column is not gapped in all sequences in the set
-		bool found = false;
-		for (int j = 0; !found && j < (int)indices.size(); j++)
-			found = (oldPtrs[j][i] != '-');
-
-		// if not, then add it
-		if (found)
-			{
-			for (int j = 0; j < (int)indices.size(); j++)
-				newPtrs[j]->push_back(oldPtrs[j][i]);
-			}
-		}
-
-	// wrap sequences in MultiSequence object
-	MultiSequence* ret = new MultiSequence();
-	i = 0;
-	for (set<int>::const_iterator iter = indices.begin();
-	  iter != indices.end(); ++iter)
-		{
-		const Sequence *OldSeq = GetSequence(*iter);
-		Sequence *NewSeq = NewSequence();
-		asserta(NewSeq != 0);
-		vector<char> *DataPtr = newPtrs[i++];
-
+		int OldSeqIndex = *p;
+		const Sequence *OldSeq = GetSequence(OldSeqIndex);
 		const string &Label = OldSeq->m_Label;
 		uint GSI = OldSeq->GetGSI();
 		uint SMI = OldSeq->GetSMI();
+		uint L = OldSeq->GetLength();
+		if (OldColCount == UINT_MAX)
+			OldColCount = L;
+		else
+			asserta(L == OldColCount);
 
-		NewSeq->Create(DataPtr, Label, GSI, SMI);
-		ret->AddSequence(NewSeq, true);
+		Sequence *NewSeq = NewSequence(); 
+		NewSeq->m_Label = Label;
+		NewSeq->m_GSI = GSI;
+		NewSeq->m_SMI = SMI;
+		NewSeq->m_CharVec.reserve(L);
+		SubsetMSA->m_Seqs.push_back(NewSeq);
+		SubsetMSA->m_Owners.push_back(true);
 		}
 
-	return ret;
+	uint NewSeqCount = SIZE(SeqIndexes);
+	vector<char> NewCol(NewSeqCount);
+	for (uint OldColIndex = 0; OldColIndex < OldColCount; ++OldColIndex)
+		{
+		bool AllGaps = true;
+		uint NewSeqIndex = 0;
+		for (set<int>::const_iterator p = SeqIndexes.begin();
+		  p != SeqIndexes.end(); ++p)
+			{
+			int OldSeqIndex = *p;
+			const Sequence *OldSeq = GetSequence(OldSeqIndex);
+			char c = OldSeq->GetChar(OldColIndex);
+			NewCol[NewSeqIndex++] = c;
+			if (c != '-')
+				AllGaps = false;
+			}
+		if (AllGaps)
+			continue;
+
+		for (uint NewSeqIndex = 0; NewSeqIndex < NewSeqCount; ++NewSeqIndex)
+			{
+			char c = NewCol[NewSeqIndex];
+			Sequence *NewSeq = (Sequence *) SubsetMSA->m_Seqs[NewSeqIndex];
+			NewSeq->m_CharVec.push_back(c);
+			}
+		}
+
+	return SubsetMSA;
 	}

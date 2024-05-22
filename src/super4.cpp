@@ -238,13 +238,13 @@ void Super4::InitPP()
 		MSAs.push_back(MSA);
 		}
 
-	m_PP.m_TargetPairCount = m_PairCount;
+	m_PP.m_TargetPairCount = m_TargetPairCount;
 	m_PP.SetMSAs(MSAs, m_ClusterLabels);
 	}
 
 void Super4::SetOpts()
 	{
-	m_PairCount = optd(paircount, DEFAULT_TARGET_PAIR_COUNT);
+	m_TargetPairCount = optd(paircount, DEFAULT_TARGET_PAIR_COUNT);
 	m_MaxClusterSize = optd(paircount, DEFAULT_MAX_COARSE_SEQS);
 	m_MinEAPass1 = (float) optd(super4_minea1, DEFAULT_MIN_EA_SUPER4_PASS1);
 	m_MinEAPass2 = (float) optd(super4_minea2, DEFAULT_MIN_EA_SUPER4_PASS2);

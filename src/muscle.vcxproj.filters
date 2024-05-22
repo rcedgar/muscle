@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="alpha.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="fasta.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -128,7 +125,7 @@
     <ClCompile Include="jointrees.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="qscore.cpp">
+    <ClCompile Include="qscore_oldcode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="derep.cpp">
@@ -326,9 +323,6 @@
     <ClCompile Include="randomchaintree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="help.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="maxcc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -348,6 +342,219 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="eesort.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="strip_anchors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="make_a2m_refseq.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stripgappy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="profalign.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="profseq.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="protdist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="repredict.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pathinfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tracebackbitmem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="viterbifastmem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="protdists.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objmgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="seqinfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="blosum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="build_guide_tree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gtbnode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uclustpd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uclustpd2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="searchpd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="super6.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="protdistpair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_malloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="upgma5_msa.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pprog_tree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kmerdist66.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="alpha6.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clustalweights.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="profile3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="profpos3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vtml2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nwsmall3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bittraceback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="profprof3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="alnmsasbypath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="alnprof3sbypath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pprog3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="muscle3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="estring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kimuradist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kmerdist33.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="alpha2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scoretest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_muscle3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="myalloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="make_substmx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sweeper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bench.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sweep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="enumgrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="substmxfromfile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="m3alnparams.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_bench.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="spatter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="msaselfscore3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_batch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_m3ensemble.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="m3select.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="m3refine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="randomdistmx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simplecluster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qscorer2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qscore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_cmp_msa.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_qscoredir_cmp2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_squeeze_inserts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_newbench_selectpfams.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hscore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_newbench_pfamgroups.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cmd_mustang_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -382,18 +589,6 @@
     <ClInclude Include="edgelist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="enumopts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="estring.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gapscoredimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gonnet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="intmath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -407,9 +602,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="params.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="profile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scorehistory.h">
@@ -575,6 +767,96 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="heatmapcolors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pathinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xdpmem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tracebit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="obj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objtype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objtypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objmgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="omplock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="seqinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gtbuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gtbnode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uclustpd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="super6.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kmerdist66.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clustalweights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pprog3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="profile3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="profpos3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cachemem3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="estring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kmerdist33.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="m3alnparams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="muscle3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="myalloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sweeper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bench.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viterbiparams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="simplecluster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="qscorer2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

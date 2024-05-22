@@ -26,7 +26,10 @@ static void Align(MPCFlat &M, MultiSequence &InputSeqs,
 
 	bool Nucleo = (g_Alpha == ALPHA_Nucleo);
 	HMMParams HP;
-	HP.FromDefaults(Nucleo);
+	if (optset_hmmin)
+		HP.FromFile(opt(hmmin));
+	else
+		HP.FromDefaults(Nucleo);
 	if (PerturbSeed > 0)
 		{
 		ResetRand(PerturbSeed);
@@ -51,16 +54,31 @@ void cmd_align()
 	{
 	MultiSequence InputSeqs;
 	InputSeqs.LoadMFA(opt(align), true);
-
 	const uint InputSeqCount = InputSeqs.GetSeqCount();
+	if (optset_minsuper && InputSeqCount >= opt(minsuper))
+		{
+		InputSeqs.Clear();
+		Progress("%u seqs, running Super5 algorithm\n", InputSeqCount);
+		opt_super5 = opt(align);
+		optset_super5 = true;
+		void cmd_super5();
+		cmd_super5();
+		return;
+		}
+
 	const string &OutputPattern = opt(output);
 	if (OutputPattern.empty())
 		Die("Must set -output");
 
 	double MeanSeqLength = InputSeqs.GetMeanSeqLength();
 	uint MaxSeqLength = InputSeqs.GetMaxSeqLength();
-	ProgressLog("Input: %u seqs, avg length %.0f, max %u\n\n",
-	  InputSeqCount, MeanSeqLength, MaxSeqLength);
+	uint MinSeqLength = InputSeqs.GetMinSeqLength();
+	ProgressLog("Input: %u seqs, avg length %.0f, max %u, min %u\n\n",
+	  InputSeqCount, MeanSeqLength, MaxSeqLength, MinSeqLength);
+	if (MaxSeqLength > 100000)
+		Die("Sequences too long, not appropriate for global alignment");
+	if (MaxSeqLength > 50000)
+		Warning("Long sequences, likey to crash / not globally alignable, max allowed is ~21k");
 	if (InputSeqCount > 1000)
 		Warning(">1k sequences, may be slow or use excessive memory, consider using -super5");
 

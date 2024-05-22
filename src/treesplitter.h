@@ -1,8 +1,9 @@
+#if 0
 #pragma once
 
 #include "tree.h"
 
-class Splitter
+class TreeSplitter
 	{
 public:
 	const Tree *m_T = 0;
@@ -26,3 +27,4 @@ void MakeSubsetNodes(const Tree &InputTree,
   const vector<uint> &SubsetNodes, 
   const vector<string> &SubsetLabels,
   Tree &SubsetTree);
+#endif // 0

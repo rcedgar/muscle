@@ -14,7 +14,7 @@ public:
 public:
 	uint CalcHash(const Sequence *Seq) const;
 	void Clear();
-	void Run(MultiSequence &InputSeqs);
+	void Run(MultiSequence &InputSeqs, bool ShowProgress = true);
 	uint Search(uint SeqIndex) const;
 	void GetUniqueSeqs(MultiSequence &UniqueSeqs);
 	void AddToHash(uint SeqIndex);
@@ -22,4 +22,6 @@ public:
 	void Validate() const;
 	void GetDupeGSIs(vector<uint> &GSIs,
 	  vector<uint> &GlobalRepSeqIndexes) const;
+	void GetRepLabelToDupeLabels(
+	  map<string, vector<string> > &RepLabelToDupeLabels) const;
 	};

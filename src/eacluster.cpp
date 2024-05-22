@@ -229,14 +229,22 @@ void EACluster::Validate() const
 
 void cmd_eacluster()
 	{
-	const string &InputFileName = opt(eacluster);
+	LoadGlobalInputMS(opt(eacluster));
 
-	MultiSequence InputSeqs;
-	InputSeqs.FromFASTA(InputFileName);
+	MultiSequence &InputSeqs = GetGlobalInputMS();
 
 	const float MinEA = (float) optd(minea, 0.9);
 	string OutputFileNamePattern = optd(output, "cluster%.afa");
 
+	bool Nucleo = false;
+	if (opt(nt))
+		Nucleo = true;
+	else if (opt(amino))
+		Nucleo = false;
+	else
+		Nucleo = InputSeqs.GuessIsNucleo();
+
+	SetAlpha(Nucleo ? ALPHA_Nucleo : ALPHA_Amino);
 	InitProbcons();
 
 	EACluster EC;

@@ -72,6 +72,18 @@ void UPGMA5::LogMe() const
 		  m_RightLength[i]);
 	}
 
+void UPGMA5::Run(const string &sLinkage, Tree &tree)
+	{
+	LINKAGE Link = LINKAGE_Undefined;
+	if      (sLinkage == "min") Link = LINKAGE_Min;
+	else if (sLinkage == "max") Link = LINKAGE_Max;
+	else if (sLinkage == "avg") Link = LINKAGE_Avg;
+	else if (sLinkage == "biased") Link = LINKAGE_Biased;
+	else
+		Die("UPGMA5::Run(Linkage=%s)", sLinkage.c_str());
+	Run(Link, tree);
+	}
+
 void UPGMA5::Run(LINKAGE Linkage, Tree &tree)
 	{
 	m_LeafCount = SIZE(m_Labels);
@@ -82,19 +94,19 @@ void UPGMA5::Run(LINKAGE Linkage, Tree &tree)
 	m_TriangleSize = (m_LeafCount*(m_LeafCount - 1))/2;
 	m_InternalNodeCount = m_LeafCount - 1;
 
-	m_Dist = new float[m_TriangleSize];
+	m_Dist = myalloc(float, m_TriangleSize);
 
-	m_NodeIndex = new uint[m_LeafCount];
-	m_NearestNeighbor = new uint[m_LeafCount];
-	m_MinDist = new float[m_LeafCount];
-	uint *Ids = new uint [m_LeafCount];
-	char **Names = new char *[m_LeafCount];
+	m_NodeIndex = myalloc(uint, m_LeafCount);
+	m_NearestNeighbor = myalloc(uint, m_LeafCount);
+	m_MinDist = myalloc(float, m_LeafCount);
+	uint *Ids = myalloc(uint, m_LeafCount);
+	char **Names = myalloc(char *, m_LeafCount);
 
-	m_Left = new uint[m_InternalNodeCount];
-	m_Right = new uint[m_InternalNodeCount];
-	m_Height = new float[m_InternalNodeCount];
-	m_LeftLength = new float[m_InternalNodeCount];
-	m_RightLength = new float[m_InternalNodeCount];
+	m_Left = myalloc(uint, m_InternalNodeCount);
+	m_Right = myalloc(uint, m_InternalNodeCount);
+	m_Height = myalloc(float, m_InternalNodeCount);
+	m_LeftLength = myalloc(float, m_InternalNodeCount);
+	m_RightLength = myalloc(float, m_InternalNodeCount);
 
 	for (uint i = 0; i < m_LeafCount; ++i)
 		{
@@ -121,7 +133,7 @@ void UPGMA5::Run(LINKAGE Linkage, Tree &tree)
 	for (uint i = 1; i < m_LeafCount; ++i)
 		{
 		uint Base = TriangleSubscript(i, 0);
-		float *Row = m_Dist + Base;
+		//float *Row = m_Dist + Base;
 		for (uint j = 0; j < i; ++j)
 			{
 			float d = m_DistMx[i][j];
@@ -143,6 +155,7 @@ void UPGMA5::Run(LINKAGE Linkage, Tree &tree)
 				m_NearestNeighbor[j] = i;
 				}
 			}
+		asserta(Base <= m_TriangleSize);
 		}
 
 #if	TRACE
@@ -209,7 +222,7 @@ void UPGMA5::Run(LINKAGE Linkage, Tree &tree)
 			const uint vR = TriangleSubscript(Rmin, j);
 			const float dL = m_Dist[vL];
 			const float dR = m_Dist[vR];
-			float dtNewDist;
+			float dtNewDist = 0;
 
 			switch (Linkage)
 				{
@@ -299,22 +312,22 @@ void UPGMA5::Run(LINKAGE Linkage, Tree &tree)
 	tree.LogMe();
 #endif
 
-	delete[] m_Dist;
+	myfree(m_Dist);
 
-	delete[] m_NodeIndex;
-	delete[] m_NearestNeighbor;
-	delete[] m_MinDist;
-	delete[] m_Height;
+	myfree(m_NodeIndex);
+	myfree(m_NearestNeighbor);
+	myfree(m_MinDist);
+	myfree(m_Height);
 
-	delete[] m_Left;
-	delete[] m_Right;
-	delete[] m_LeftLength;
-	delete[] m_RightLength;
+	myfree(m_Left);
+	myfree(m_Right);
+	myfree(m_LeftLength);
+	myfree(m_RightLength);
 	
 	for (uint i = 0; i < m_LeafCount; ++i)
-		free(Names[i]);
-	delete[] Names;
-	delete[] Ids;
+		myfree(Names[i]);
+	myfree(Names);
+	myfree(Ids);
 
 	m_Dist = 0;
 	m_NodeIndex = 0;

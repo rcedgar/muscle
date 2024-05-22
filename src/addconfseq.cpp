@@ -22,6 +22,16 @@ static char ConfToChar2(double Conf)
 	return '0' + H%10;
 	}
 
+char ConfToChar_1(double Conf)
+	{
+	asserta(Conf >= 0 && Conf <= 1);
+	uint Tenth = uint(Conf*10);
+	asserta(Tenth >= 0 && Tenth <= 10);
+	static const char Symbols[12] = "___.,/:=@*^";
+	//                               01234567890
+	return Symbols[Tenth];
+	}
+
 static void Do1(FILE *fOut, const Ensemble &E, uint MSAIndex,
   const string &ConfLabel, int Dec)
 	{
@@ -34,6 +44,10 @@ static void Do1(FILE *fOut, const Ensemble &E, uint MSAIndex,
 		char c = '?';
 		switch (Dec)
 			{
+		case -1:
+			c = ConfToChar_1(Conf);
+			break;
+
 		case 1:
 			c = ConfToChar1(Conf);
 			break;
@@ -83,8 +97,13 @@ void cmd_addconfseq()
 		const uint MSASeqCount = M.GetSeqCount();
 		asserta(MSASeqCount == SeqCount);
 
-		Do1(fOut, E, MSAIndex, ConfLabel, 1);
-		Do1(fOut, E, MSAIndex, ConfLabel + "2", 2);
+		if (opt(confseq1))
+			Do1(fOut, E, MSAIndex, ConfLabel, -1);
+		else
+			{
+			Do1(fOut, E, MSAIndex, ConfLabel, 1);
+			Do1(fOut, E, MSAIndex, ConfLabel + "2", 2);
+			}
 		for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
 			{
 			const char *S = M.m_szSeqs[SeqIndex];

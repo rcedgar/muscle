@@ -8,7 +8,7 @@ const int CR = '\r';
 const int NL = '\n';
 
 bool g_FASTA_Upper = true;
-bool g_FASTA_AllowDigits = false;
+bool g_FASTA_AllowDigits = true;
 
 #define ADD(c)															\
 		{																\

@@ -2,6 +2,9 @@
 #include "alpha3.h"
 #include "sort.h"
 
+uint MultiSequence::m_NewCount;
+uint MultiSequence::m_DeleteCount;
+
 void MultiSequence::LoadMFA(const string& filename, bool stripGaps)
 	{
 	// try opening file
@@ -48,6 +51,38 @@ void MultiSequence::Copy(const MultiSequence &rhs)
 		{
 		const Sequence *r = rhs.GetSequence(i)->Clone();
 		AddSequence(r, true);
+		}
+	}
+
+void MultiSequence::AssertSequentialGSIs() const
+	{
+	const uint SeqCount = GetSeqCount();
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		const Sequence *r = m_Seqs[i];
+		asserta(r->m_GSI == i);
+		}
+	}
+
+bool MultiSequence::ColIsAllGaps(uint Col) const
+	{
+	const uint SeqCount = GetSeqCount();
+	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
+		{
+		char c = GetChar(SeqIndex, Col);
+		if (!isgap(c))
+			return false;
+		}
+	return true;
+	}
+
+void MultiSequence::SetSequentialGSIs()
+	{
+	const uint SeqCount = GetSeqCount();
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		Sequence *r = (Sequence *) m_Seqs[i];
+		r->m_GSI = i;
 		}
 	}
 
@@ -153,8 +188,11 @@ void MultiSequence::LoadMFA(FileBuffer& infile, bool stripGaps)
 			{
 			if (Labels.find(Label) == Labels.end())
 				break;
-			Dupe = true;
-			Ps(Label, "%s dupelabel%u", seq->m_Label.c_str(), i);
+			if (!m_DupeLabelsOk)
+				{
+				Dupe = true;
+				Ps(Label, "%s dupelabel%u", seq->m_Label.c_str(), i);
+				}
 			}
 		if (Dupe)
 			{
@@ -166,7 +204,7 @@ void MultiSequence::LoadMFA(FileBuffer& infile, bool stripGaps)
 		m_Seqs.push_back(seq);
 		m_Owners.push_back(true);
 		}
-	if (DupeCount > 0)
+	if (DupeCount > 0 && !m_DupeLabelsOk)
 		Warning("%u duplicate labels", DupeCount);
 	}
 
@@ -288,4 +326,15 @@ uint MultiSequence::GetMaxSeqLength() const
 	for (uint i = 0; i < SeqCount; ++i)
 		MaxSeqLength = max(MaxSeqLength, GetSequence(i)->GetLength());
 	return MaxSeqLength;
+	}
+
+uint MultiSequence::GetMinSeqLength() const
+	{
+	const uint SeqCount = GetSeqCount();
+	if (SeqCount == 0)
+		return 0;
+	uint MinSeqLength = UINT_MAX;
+	for (uint i = 0; i < SeqCount; ++i)
+		MinSeqLength = min(MinSeqLength, GetSequence(i)->GetLength());
+	return MinSeqLength;
 	}

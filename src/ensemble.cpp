@@ -2,6 +2,8 @@
 #include "ensemble.h"
 #include "qscorer.h"
 
+#pragma warning(3: 4365)	// signed/unsigned conversion
+
 static char ReadFirstChar(const string &FileName)
 	{
 	FILE *f = OpenStdioFile(FileName);
@@ -350,12 +352,12 @@ void Ensemble::SetColToPosVec()
 		const MSA &M = *m_MSAs[MSAIndex];
 		m_ColToPosVec[MSAIndex].resize(SeqCount);
 		for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
-			M.GetColToPos(SeqIndex, m_ColToPosVec[MSAIndex][SeqIndex]);
+			M.GetColToPos1(SeqIndex, m_ColToPosVec[MSAIndex][SeqIndex]);
 		}
 	}
 
 void Ensemble::GetColumn(uint MSAIndex, uint ColIndex,
-  string &ColStr, vector<uint> &PosVec) const
+  string &ColStr, vector<int> &PosVec) const
 	{
 	ColStr.clear();
 	PosVec.clear();
@@ -363,26 +365,29 @@ void Ensemble::GetColumn(uint MSAIndex, uint ColIndex,
 	const MSA &M = *m_MSAs[MSAIndex];
 	const uint SeqCount = GetSeqCount();
 	ColStr.resize(SeqCount, '?');
-	PosVec.resize(SeqCount, UINT_MAX);
+	PosVec.resize(SeqCount, INT_MAX);
 	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
 		{
 		char c = M.GetChar(SeqIndex, ColIndex);
 		ColStr[SeqIndex] = c;
 
-		uint Pos = m_ColToPosVec[MSAIndex][SeqIndex][ColIndex];
+		int Pos = m_ColToPosVec[MSAIndex][SeqIndex][ColIndex];
 		PosVec[SeqIndex] = Pos;
 
-		if (Pos != UINT_MAX)
+		if (Pos > 0)
 			{
 			const string &UngappedSeq = m_UngappedSeqs[SeqIndex];
-			asserta(Pos < SIZE(UngappedSeq));
-			char c2 = UngappedSeq[Pos];
+			asserta(uint(Pos) <= UngappedSeq.size());
+			char c2 = UngappedSeq[uint(Pos)-1];
 			asserta(c2 == c);
 			}
 		}
-
+#if DEBUG
+	{
 	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
 		asserta(ColStr[SeqIndex] != '?');
+	}
+#endif
 	}
 
 void Ensemble::SetColumns()
@@ -408,7 +413,7 @@ void Ensemble::SetColumns()
 		for (uint ColIndex = 0; ColIndex < ColCount; ++ColIndex)
 			{
 			string ColStr;
-			vector<uint> PosVec;
+			vector<int> PosVec;
 			GetColumn(MSAIndex, ColIndex, ColStr, PosVec);
 
 			m_ColumnStrings.push_back(ColStr);
@@ -446,8 +451,8 @@ void Ensemble::SetUniqueColMap()
 		asserta(MSAIndex < MSACount);
 		asserta(ColIndex < SIZE(m_MSAColToIx[MSAIndex]));
 		m_MSAColToIx[MSAIndex][ColIndex] = Ix;
-		const vector<uint> &PosVec = m_ColumnPositions[Ix];
-		map<vector<uint>, uint>::const_iterator p =
+		const vector<int> &PosVec = m_ColumnPositions[Ix];
+		map<vector<int>, uint>::const_iterator p =
 		  m_UniqueColMap.find(PosVec);
 		if (p == m_UniqueColMap.end())
 			{
@@ -475,7 +480,7 @@ void Ensemble::ValidateUniqueColMap1(uint MSAIndex, uint ColIndex) const
 	asserta(ColIndex < SIZE(m_MSAColToIx[MSAIndex]));
 	uint Ix = m_MSAColToIx[MSAIndex][ColIndex];
 	asserta(Ix < SIZE(m_ColumnPositions));
-	const vector<uint> &PosVec = m_ColumnPositions[Ix];
+	const vector<int> &PosVec = m_ColumnPositions[Ix];
 
 	asserta(Ix < SIZE(m_IxToUniqueIx));
 	uint UniqueIx = m_IxToUniqueIx[Ix];
@@ -493,7 +498,7 @@ void Ensemble::ValidateUniqueColMap1(uint MSAIndex, uint ColIndex) const
 		}
 	asserta(Found);
 
-	map<vector<uint>, uint>::const_iterator p =
+	map<vector<int>, uint>::const_iterator p =
 	  m_UniqueColMap.find(PosVec);
 	asserta(p != m_UniqueColMap.end());
 	uint UniqueIx2 = p->second;
@@ -508,8 +513,8 @@ void Ensemble::ValidateUniqueIx(uint UniqueIx) const
 	uint Ix = m_UniqueIxs[UniqueIx];
 	asserta(Ix < SIZE(m_ColumnPositions));
 
-	const vector<uint> &PosVec = m_ColumnPositions[Ix];
-	map<vector<uint>, uint>::const_iterator p =
+	const vector<int> &PosVec = m_ColumnPositions[Ix];
+	map<vector<int>, uint>::const_iterator p =
 	  m_UniqueColMap.find(PosVec);
 	asserta(p != m_UniqueColMap.end());
 	asserta(p->first == PosVec);
@@ -522,7 +527,7 @@ void Ensemble::ValidateUniqueIx(uint UniqueIx) const
 		uint UniqueIx2 = m_IxToUniqueIx[Ix2];
 		asserta(UniqueIx2 == UniqueIx);
 
-		const vector<uint> &PosVec2 = m_ColumnPositions[Ix2];
+		const vector<int> &PosVec2 = m_ColumnPositions[Ix2];
 		asserta(PosVec2 == PosVec);
 		}
 	}
@@ -761,11 +766,11 @@ void Ensemble::GetDispersion(double MaxGapFract,
 
 			const MSA &MSAj = *m_MSAs[j];
 			const string &Namej = m_MSANames[j];
-			QS.Run(MSAi, MSAj);
+			QS.Run(Namei, MSAi, MSAj);
 			double Qij = QS.m_Q;
 			double TCij = QS.m_TC;
 
-			QS.Run(MSAj, MSAi);
+			QS.Run(Namej, MSAj, MSAi);
 			double Qji = QS.m_Q;
 			double TCji = QS.m_TC;
 
@@ -817,9 +822,9 @@ void Ensemble::GetRefUniqueIxs(const MSA &Ref,
 	const uint SeqCount = GetSeqCount();
 	const uint RefColCount = Ref.GetColCount();
 
-	vector<vector<uint> > ColToPosVec(SeqCount);
+	vector<vector<int> > ColToPosVec(SeqCount);
 	for (uint RefSeqIndex = 0; RefSeqIndex < SeqCount; ++RefSeqIndex)
-		Ref.GetColToPos(RefSeqIndex, ColToPosVec[RefSeqIndex]);
+		Ref.GetColToPos1(RefSeqIndex, ColToPosVec[RefSeqIndex]);
 
 	for (uint RefColIndex = 0; RefColIndex < RefColCount; ++RefColIndex)
 		{
@@ -827,15 +832,15 @@ void Ensemble::GetRefUniqueIxs(const MSA &Ref,
 		if (!IsUpper)
 			continue;
 
-		vector<uint> PosVec(SeqCount, UINT_MAX);
+		vector<int> PosVec(SeqCount, UINT_MAX);
 		for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
 			{
 			asserta(SeqIndex < SIZE(ColToPosVec));
 			asserta(RefColIndex < SIZE(ColToPosVec[SeqIndex]));
-			uint Pos = ColToPosVec[SeqIndex][RefColIndex];
+			int Pos = ColToPosVec[SeqIndex][RefColIndex];
 			PosVec[SeqIndex] = Pos;
 			}
-		map<vector<uint>, uint >::const_iterator p =
+		map<vector<int>, uint >::const_iterator p =
 		  m_UniqueColMap.find(PosVec);
 		if (p != m_UniqueColMap.end())
 			{
@@ -846,7 +851,7 @@ void Ensemble::GetRefUniqueIxs(const MSA &Ref,
 	}
 
 void Ensemble::GetRefPosSet(const MSA &Ref, double MaxGapFract,
-  set<pair<uint, uint> > &PosSet) const
+  set<pair<uint, int> > &PosSet) const
 	{
 	PosSet.clear();
 
@@ -854,9 +859,9 @@ void Ensemble::GetRefPosSet(const MSA &Ref, double MaxGapFract,
 	const uint SeqCount = GetSeqCount();
 	const uint RefColCount = Ref.GetColCount();
 
-	vector<vector<uint> > ColToPosVec(SeqCount);
+	vector<vector<int> > ColToPosVec(SeqCount);
 	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
-		Ref.GetColToPos(SeqIndex, ColToPosVec[SeqIndex]);
+		Ref.GetColToPos1(SeqIndex, ColToPosVec[SeqIndex]);
 
 	for (uint RefColIndex = 0; RefColIndex < RefColCount; ++RefColIndex)
 		{
@@ -866,15 +871,15 @@ void Ensemble::GetRefPosSet(const MSA &Ref, double MaxGapFract,
 		
 		for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
 			{
-			uint Pos = ColToPosVec[SeqIndex][RefColIndex];
-			pair<uint, uint> SeqPos(SeqIndex, Pos);
+			int Pos = ColToPosVec[SeqIndex][RefColIndex];
+			pair<uint, int> SeqPos(SeqIndex, Pos);
 			PosSet.insert(SeqPos);
 			}
 		}
 	}
 
 void Ensemble::GetTestUniqueIxs(uint MSAIndex,
-  const set<pair<uint, uint> > &RefPosSet, vector<uint> &UniqueIxs,
+  const set<pair<uint, int> > &RefPosSet, vector<uint> &UniqueIxs,
   vector<double> &Confs) const
 	{
 	UniqueIxs.clear();
@@ -892,16 +897,16 @@ void Ensemble::GetTestUniqueIxs(uint MSAIndex,
 		{
 		uint Ix = m_MSAColToIx[MSAIndex][ColIndex];
 		asserta(Ix < SIZE(m_ColumnPositions));
-		const vector<uint> &PosVec = m_ColumnPositions[Ix];
+		const vector<int> &PosVec = m_ColumnPositions[Ix];
 		asserta(SIZE(PosVec) == SeqCount);
 		uint FoundCount = 0;
 		for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
 			{
-			uint Pos = PosVec[SeqIndex];
-			if (Pos == UINT_MAX)
+			int Pos = PosVec[SeqIndex];
+			if (Pos <= 0)
 				continue;
 
-			pair<uint, uint> SeqPos(SeqIndex, Pos);
+			pair<uint, int> SeqPos(SeqIndex, Pos);
 			if (RefPosSet.find(SeqPos) != RefPosSet.end())
 				++FoundCount;
 			}

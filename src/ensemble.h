@@ -11,8 +11,13 @@ public:
 	map<string, uint> m_LabelToSeqIndex0;
 	vector<string> m_UngappedSeqs;
 	vector<string> m_ColumnStrings;
-	vector<vector<uint> > m_ColumnPositions;
-	vector<vector<vector<uint> > > m_ColToPosVec;
+	vector<vector<int> > m_ColumnPositions;
+
+// 1-based positions, if <0 the column has a gap in this
+// sequence which opens at 1-based position (-Pos).
+// If ColToPos[Col] is 0, this is left terminal gap.
+	vector<vector<vector<int> > > m_ColToPosVec;
+
 	vector<uint> m_IxToMSAIndex;
 	vector<uint> m_IxToColIndex;
 	vector<vector<uint> > m_MSAColToIx;
@@ -20,7 +25,7 @@ public:
 	vector<uint> m_UniqueIxs;
 	vector<vector<uint> > m_UniqueIxToIxs;
 	vector<uint> m_IxToUniqueIx;
-	map<vector<uint>, uint> m_UniqueColMap;
+	map<vector<int>, uint> m_UniqueColMap;
 
 public:
 	void Clear()
@@ -53,7 +58,7 @@ public:
 	uint GetSeqCount() const;
 	void SetColumns();
 	void GetColumn(uint MSAIndex, uint ColIndex,
-	  string &ColStr, vector<uint> &ColPos) const;
+	  string &ColStr, vector<int> &ColPos) const;
 	void GetIxSubset(double MaxGapFract, vector<uint> &Ixs) const;
 	double GetGapFract(uint Ix) const;
 	void SubsampleWithReplacement(double MaxGapFract,
@@ -79,9 +84,9 @@ public:
 	void SortMSA(MSA &M);
 	void CheckRefMSA(const MSA &Ref) const;
 	void GetRefPosSet(const MSA &Ref, double MaxGapFract,
-	  set<pair<uint, uint> > &PosSet) const;
+	  set<pair<uint, int> > &PosSet) const;
 	void GetTestUniqueIxs(uint MSAIndex,
-	  const set<pair<uint, uint> > &RefPosSet, vector<uint> &UniqueIxs,
+	  const set<pair<uint, int> > &RefPosSet, vector<uint> &UniqueIxs,
 	  vector<double> &Confs) const;
 	void GetRefUniqueIxs(const MSA &Ref, set<uint> &UniqueIxs,
 	  double MaxGapFract) const;
@@ -95,7 +100,7 @@ public:
 	const string &GetMSAName(uint MSAIndex) const;
 
 	void GetLetterConfsVec(const MSA &Ref, double MaxGapFract,
-	  vector<vector<uint> > &LetterConfsVec) const;
+	  vector<vector<double> > &LetterConfsVec) const;
 
 private:
 	void MapLabels();

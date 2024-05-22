@@ -69,6 +69,12 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
       <Message>SVN version</Message>
@@ -108,7 +114,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_WINNT=0x0400;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -175,7 +181,7 @@
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <OmitFramePointers>true</OmitFramePointers>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_WIN32_WINNT=0x0400;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -208,18 +214,44 @@
   <ItemGroup>
     <ClCompile Include="addconfseq.cpp" />
     <ClCompile Include="align.cpp" />
+    <ClCompile Include="cmd_cmp_msa.cpp" />
+    <ClCompile Include="cmd_m3ensemble.cpp" />
+    <ClCompile Include="cmd_mustang_core.cpp" />
+    <ClCompile Include="cmd_newbench_pfamgroups.cpp" />
+    <ClCompile Include="cmd_newbench_selectpfams.cpp" />
+    <ClCompile Include="cmd_qscoredir_cmp2.cpp" />
+    <ClCompile Include="cmd_squeeze_inserts.cpp" />
+    <ClCompile Include="hscore.cpp" />
+    <ClCompile Include="m3alnparams.cpp" />
     <ClCompile Include="alignpairflat.cpp" />
     <ClCompile Include="allocflat.cpp" />
     <ClCompile Include="alnalnsflat.cpp" />
+    <ClCompile Include="alnmsasbypath.cpp" />
     <ClCompile Include="alnmsasflat.cpp" />
     <ClCompile Include="alnmsasflat3.cpp" />
-    <ClCompile Include="alpha.cpp" />
+    <ClCompile Include="alnprof3sbypath.cpp" />
+    <ClCompile Include="alpha2.cpp" />
     <ClCompile Include="alpha3.cpp" />
+    <ClCompile Include="alpha6.cpp" />
     <ClCompile Include="assertsameseqs.cpp" />
+    <ClCompile Include="bench.cpp" />
+    <ClCompile Include="cmd_bench.cpp" />
+    <ClCompile Include="bittraceback.cpp" />
+    <ClCompile Include="blosum.cpp" />
+    <ClCompile Include="clustalweights.cpp" />
+    <ClCompile Include="cmd_batch.cpp" />
+    <ClCompile Include="cmd_muscle3.cpp" />
+    <ClCompile Include="enumgrid.cpp" />
+    <ClCompile Include="estring.cpp" />
+    <ClCompile Include="build_guide_tree.cpp" />
     <ClCompile Include="calcalnscoresparse.cpp" />
     <ClCompile Include="eesort.cpp" />
+    <ClCompile Include="gtbnode.cpp" />
     <ClCompile Include="heatmapcolors.cpp" />
     <ClCompile Include="jalview.cpp" />
+    <ClCompile Include="kimuradist.cpp" />
+    <ClCompile Include="kmerdist33.cpp" />
+    <ClCompile Include="kmerdist66.cpp" />
     <ClCompile Include="letterconf.cpp" />
     <ClCompile Include="diagbox.cpp" />
     <ClCompile Include="buildposterior3flat.cpp" />
@@ -244,18 +276,28 @@
     <ClCompile Include="fwdflat3.cpp" />
     <ClCompile Include="getpairs.cpp" />
     <ClCompile Include="getpostpairsalignedflat.cpp" />
-    <ClCompile Include="help.cpp" />
     <ClCompile Include="letterconfhtml.cpp" />
     <ClCompile Include="logdistmx.cpp" />
     <ClCompile Include="logmx.cpp" />
+    <ClCompile Include="m3refine.cpp" />
+    <ClCompile Include="m3select.cpp" />
     <ClCompile Include="make_a2m.cpp" />
+    <ClCompile Include="make_a2m_refseq.cpp" />
+    <ClCompile Include="make_substmx.cpp" />
     <ClCompile Include="maxcc.cpp" />
     <ClCompile Include="mpcflat.cpp" />
     <ClCompile Include="eadistmx.cpp" />
     <ClCompile Include="eadistmxmsas.cpp" />
     <ClCompile Include="fasta.cpp" />
     <ClCompile Include="fasta2.cpp" />
+    <ClCompile Include="msaselfscore3.cpp" />
+    <ClCompile Include="muscle3.cpp" />
+    <ClCompile Include="mx.cpp" />
+    <ClCompile Include="myalloc.cpp" />
     <ClCompile Include="mysparsemx.cpp" />
+    <ClCompile Include="nwsmall3.cpp" />
+    <ClCompile Include="objmgr.cpp" />
+    <ClCompile Include="pathinfo.cpp" />
     <ClCompile Include="perturbhmm.cpp" />
     <ClCompile Include="getconsseq.cpp" />
     <ClCompile Include="globalinputms.cpp" />
@@ -270,17 +312,45 @@
     <ClCompile Include="permutetree.cpp" />
     <ClCompile Include="pprog.cpp" />
     <ClCompile Include="pprog2.cpp" />
+    <ClCompile Include="pprog3.cpp" />
     <ClCompile Include="pprogt.cpp" />
+    <ClCompile Include="pprog_tree.cpp" />
     <ClCompile Include="probcons.cpp" />
     <ClCompile Include="msa.cpp" />
     <ClCompile Include="msa2.cpp" />
     <ClCompile Include="myutils.cpp" />
     <ClCompile Include="colscoreefa.cpp" />
+    <ClCompile Include="profalign.cpp" />
+    <ClCompile Include="profile3.cpp" />
+    <ClCompile Include="profpos3.cpp" />
+    <ClCompile Include="profprof3.cpp" />
+    <ClCompile Include="profseq.cpp" />
+    <ClCompile Include="protdist.cpp" />
+    <ClCompile Include="protdistpair.cpp" />
+    <ClCompile Include="protdists.cpp" />
+    <ClCompile Include="qscore.cpp" />
     <ClCompile Include="qscoreefa.cpp" />
+    <ClCompile Include="qscorer2.cpp" />
     <ClCompile Include="randomchaintree.cpp" />
+    <ClCompile Include="randomdistmx.cpp" />
     <ClCompile Include="relabel.cpp" />
+    <ClCompile Include="repredict.cpp" />
     <ClCompile Include="resample.cpp" />
+    <ClCompile Include="scoretest.cpp" />
+    <ClCompile Include="searchpd.cpp" />
+    <ClCompile Include="seqinfo.cpp" />
+    <ClCompile Include="simplecluster.cpp" />
+    <ClCompile Include="spatter.cpp" />
+    <ClCompile Include="stripgappy.cpp" />
     <ClCompile Include="stripgappyrows.cpp" />
+    <ClCompile Include="strip_anchors.cpp" />
+    <ClCompile Include="substmxfromfile.cpp" />
+    <ClCompile Include="super6.cpp" />
+    <ClCompile Include="sweep.cpp" />
+    <ClCompile Include="sweeper.cpp" />
+    <ClCompile Include="test.cpp" />
+    <ClCompile Include="test_malloc.cpp" />
+    <ClCompile Include="tracebackbitmem.cpp" />
     <ClCompile Include="tree.cpp" />
     <ClCompile Include="tree2.cpp" />
     <ClCompile Include="tree4.cpp" />
@@ -289,7 +359,7 @@
     <ClCompile Include="pairhmm.cpp" />
     <ClCompile Include="progalnflat.cpp" />
     <ClCompile Include="project.cpp" />
-    <ClCompile Include="qscore.cpp" />
+    <ClCompile Include="qscore_oldcode.cpp" />
     <ClCompile Include="qscore2.cpp" />
     <ClCompile Include="qscorer.cpp" />
     <ClCompile Include="quarts.cpp" />
@@ -316,16 +386,25 @@
     <ClCompile Include="trimtoref.cpp" />
     <ClCompile Include="trimtorefefa.cpp" />
     <ClCompile Include="uclust.cpp" />
+    <ClCompile Include="uclustpd.cpp" />
+    <ClCompile Include="uclustpd2.cpp" />
     <ClCompile Include="upgma5.cpp" />
+    <ClCompile Include="upgma5_msa.cpp" />
     <ClCompile Include="usage.cpp" />
     <ClCompile Include="usorter.cpp" />
+    <ClCompile Include="viterbifastmem.cpp" />
+    <ClCompile Include="vtml2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="m3alnparams.h" />
     <ClInclude Include="alpha.h" />
     <ClInclude Include="alpha3.h" />
+    <ClInclude Include="bench.h" />
     <ClInclude Include="best3.h" />
+    <ClInclude Include="cachemem3.h" />
     <ClInclude Include="chainer.h" />
     <ClInclude Include="clust.h" />
+    <ClInclude Include="clustalweights.h" />
     <ClInclude Include="cluster.h" />
     <ClInclude Include="clustsetdf.h" />
     <ClInclude Include="clustsetmsa.h" />
@@ -341,18 +420,19 @@
     <ClInclude Include="eacluster.h" />
     <ClInclude Include="edgelist.h" />
     <ClInclude Include="ensemble.h" />
-    <ClInclude Include="enumopts.h" />
     <ClInclude Include="estring.h" />
     <ClInclude Include="filebuffer.h" />
     <ClInclude Include="flatmx.h" />
-    <ClInclude Include="gapscoredimer.h" />
     <ClInclude Include="gobuff.h" />
-    <ClInclude Include="gonnet.h" />
+    <ClInclude Include="gtbnode.h" />
+    <ClInclude Include="gtbuilder.h" />
     <ClInclude Include="heatmapcolors.h" />
     <ClInclude Include="hmmparams.h" />
     <ClInclude Include="hmmscores.h" />
     <ClInclude Include="hmmtrans.h" />
     <ClInclude Include="intmath.h" />
+    <ClInclude Include="kmerdist33.h" />
+    <ClInclude Include="kmerdist66.h" />
     <ClInclude Include="kmerscan.h" />
     <ClInclude Include="locallock.h" />
     <ClInclude Include="mpc.h" />
@@ -360,42 +440,62 @@
     <ClInclude Include="msa.h" />
     <ClInclude Include="multisequence.h" />
     <ClInclude Include="muscle.h" />
+    <ClInclude Include="muscle3.h" />
+    <ClInclude Include="mx.h" />
+    <ClInclude Include="myalloc.h" />
     <ClInclude Include="myopts.h" />
     <ClInclude Include="mysparsemx.h" />
     <ClInclude Include="myutils.h" />
+    <ClInclude Include="obj.h" />
+    <ClInclude Include="objmgr.h" />
     <ClInclude Include="objscore.h" />
+    <ClInclude Include="objtype.h" />
+    <ClInclude Include="objtypes.h" />
+    <ClInclude Include="omplock.h" />
     <ClInclude Include="pairhmm.h" />
     <ClInclude Include="params.h" />
+    <ClInclude Include="pathinfo.h" />
     <ClInclude Include="pprog.h" />
+    <ClInclude Include="pprog3.h" />
     <ClInclude Include="probcons.h" />
-    <ClInclude Include="profile.h" />
+    <ClInclude Include="profile3.h" />
+    <ClInclude Include="profpos3.h" />
     <ClInclude Include="pwpath.h" />
     <ClInclude Include="qscorer.h" />
+    <ClInclude Include="qscorer2.h" />
     <ClInclude Include="qscorer3.h" />
     <ClInclude Include="quarts.h" />
     <ClInclude Include="scorehistory.h" />
     <ClInclude Include="scoretype.h" />
     <ClInclude Include="seq.h" />
+    <ClInclude Include="seqinfo.h" />
     <ClInclude Include="sequence.h" />
+    <ClInclude Include="simplecluster.h" />
     <ClInclude Include="six.h" />
     <ClInclude Include="sort.h" />
     <ClInclude Include="sparsematrix.h" />
     <ClInclude Include="sparsemx.h" />
     <ClInclude Include="super4.h" />
     <ClInclude Include="super5.h" />
+    <ClInclude Include="super6.h" />
+    <ClInclude Include="sweeper.h" />
     <ClInclude Include="textfile.h" />
     <ClInclude Include="timing.h" />
+    <ClInclude Include="tracebit.h" />
     <ClInclude Include="transaln.h" />
     <ClInclude Include="tree.h" />
     <ClInclude Include="treeperm.h" />
     <ClInclude Include="treesplitter.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="uclust.h" />
+    <ClInclude Include="uclustpd.h" />
     <ClInclude Include="unixio.h" />
     <ClInclude Include="upgma5.h" />
     <ClInclude Include="usage.h" />
     <ClInclude Include="usorter.h" />
     <ClInclude Include="hspfinder.h" />
+    <ClInclude Include="viterbiparams.h" />
+    <ClInclude Include="xdpmem.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="usage.txt" />
