@@ -29,11 +29,11 @@ void Mega::FromFile(const string &FileName)
 	vector<string> flds;
 	GetNextFields(flds, 3);
 	asserta(flds[0] == "mega");
-	uint FeatureCount = StrToUint(flds[1]);
+	uint m_FeatureCount = StrToUint(flds[1]);
 	uint ProfileCount = StrToUint(flds[2]);
-	m_FreqsVec.resize(FeatureCount);
-	m_SubstMxVec.resize(FeatureCount);
-	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
+	m_LogProbsVec.resize(m_FeatureCount);
+	m_LogProbMxVec.resize(m_FeatureCount);
+	for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
 		{
 		GetNextFields(flds, 4);
 		asserta(StrToUint(flds[0]) == FeatureIdx);
@@ -45,12 +45,12 @@ void Mega::FromFile(const string &FileName)
 		m_AlphaSizes.push_back(AlphaSize);
 		m_Weights.push_back(Weight);
 
-		vector<float> &Freqs = m_FreqsVec[FeatureIdx];
+		vector<float> &Freqs = m_LogProbsVec[FeatureIdx];
 		GetNextFields(flds, AlphaSize + 1);
 		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-			Freqs.push_back((float) StrToFloat(flds[Letter+1]));
+			Freqs.push_back((float) log(StrToFloat(flds[Letter+1])));
 
-		vector<vector<float> > &SubstMx = m_SubstMxVec[FeatureIdx];
+		vector<vector<float> > &SubstMx = m_LogProbMxVec[FeatureIdx];
 		SubstMx.resize(AlphaSize);
 		for (uint Letter1 = 0; Letter1 < AlphaSize; ++Letter1)
 			SubstMx[Letter1].resize(AlphaSize);
@@ -61,7 +61,7 @@ void Mega::FromFile(const string &FileName)
 			asserta(StrToUint(flds[0]) == Letter1);
 			for (uint Letter2 = 0; Letter2 <= Letter1; ++Letter2)
 				{
-				float Score = (float) StrToFloat(flds[Letter2+1]);
+				float Score = (float) log(StrToFloat(flds[Letter2+1]));
 				SubstMx[Letter1][Letter2] = Score;
 				SubstMx[Letter2][Letter1] = Score;
 				}
@@ -87,8 +87,8 @@ void Mega::FromFile(const string &FileName)
 			asserta(StrToUint(flds[0]) == ProfileIdx);
 			asserta(StrToUint(flds[1]) == Pos);
 			const string &Syms = flds[2];
-			asserta(SIZE(Syms) == FeatureCount);
-			for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
+			asserta(SIZE(Syms) == m_FeatureCount);
+			for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
 				{
 				byte Sym = Syms[FeatureIdx];
 				if (FeatureIdx == 0)
@@ -107,4 +107,37 @@ void Mega::FromFile(const string &FileName)
 			}
 		}
 	m_Lines.clear();
+	}
+
+float Mega::GetInsScore(const vector<vector<byte> > &Profile, uint Pos) const
+	{
+	asserta(Pos < SIZE(Profile));
+	const vector<byte> &ProfCol = Profile[Pos];
+	float Score = 0;
+	for (uint i = 0; i < m_FeatureCount; ++i)
+		{
+		const vector<float> &LogProbs = m_LogProbsVec[i];
+		byte Letter = ProfCol[i];
+		Score += LogProbs[i]*m_Weights[i];
+		}
+	return Score;
+	}
+
+float Mega::GetMatchScore(
+  const vector<vector<byte> > &ProfileX, uint PosX,
+  const vector<vector<byte> > &ProfileY, uint PosY) const
+	{
+	asserta(PosX < SIZE(ProfileX));
+	asserta(PosY < SIZE(ProfileY));
+	const vector<byte> &ProfColX = ProfileX[PosX];
+	const vector<byte> &ProfColY = ProfileY[PosY];
+	float Score = 0;
+	for (uint i = 0; i < m_FeatureCount; ++i)
+		{
+		const vector<vector<float> > &SubstMx = m_LogProbMxVec[i];
+		byte LetterX = ProfColX[i];
+		byte LetterY = ProfColY[i];
+		Score += SubstMx[LetterX][LetterY]*m_Weights[i];
+		}
+	return Score;
 	}

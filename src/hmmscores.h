@@ -12,5 +12,5 @@ const float tIM = PairHMM::m_TransScore[HMMSTATE_IX][HMMSTATE_M];
 const float tJJ = PairHMM::m_TransScore[HMMSTATE_JX][HMMSTATE_JX];
 const float tJM = PairHMM::m_TransScore[HMMSTATE_JX][HMMSTATE_M];
 
-const t_ByteMx &MatchScore = PairHMM::m_MatchScore;
-const t_ByteVec &InsScore = PairHMM::m_InsScore;
+static const t_ByteMx &MatchScore = PairHMM::m_MatchScore;
+static const t_ByteVec &InsScore = PairHMM::m_InsScore;

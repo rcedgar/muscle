@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -214,6 +214,7 @@
   <ItemGroup>
     <ClCompile Include="addconfseq.cpp" />
     <ClCompile Include="align.cpp" />
+    <ClCompile Include="bwdflat_mega.cpp" />
     <ClCompile Include="cmd_cmp_msa.cpp" />
     <ClCompile Include="cmd_m3ensemble.cpp" />
     <ClCompile Include="cmd_mustang_core.cpp" />
@@ -221,6 +222,7 @@
     <ClCompile Include="cmd_newbench_selectpfams.cpp" />
     <ClCompile Include="cmd_qscoredir_cmp2.cpp" />
     <ClCompile Include="cmd_squeeze_inserts.cpp" />
+    <ClCompile Include="fwdflat_mega.cpp" />
     <ClCompile Include="hscore.cpp" />
     <ClCompile Include="m3alnparams.cpp" />
     <ClCompile Include="alignpairflat.cpp" />
