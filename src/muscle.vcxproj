@@ -333,6 +333,7 @@
     <ClCompile Include="qscorer2.cpp" />
     <ClCompile Include="randomchaintree.cpp" />
     <ClCompile Include="randomdistmx.cpp" />
+    <ClCompile Include="mega.cpp" />
     <ClCompile Include="relabel.cpp" />
     <ClCompile Include="repredict.cpp" />
     <ClCompile Include="resample.cpp" />
@@ -435,6 +436,7 @@
     <ClInclude Include="kmerdist66.h" />
     <ClInclude Include="kmerscan.h" />
     <ClInclude Include="locallock.h" />
+    <ClInclude Include="mega.h" />
     <ClInclude Include="mpc.h" />
     <ClInclude Include="mpcflat.h" />
     <ClInclude Include="msa.h" />

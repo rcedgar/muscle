@@ -17,6 +17,7 @@ double hscore(const double *xs, const double *ys, uint N, double X)
 	return ys[N-1];
 	}
 
+#if 0
 static void Test(const double *xs, const double *ys, uint N, double X)
 	{
 	double y = hscore(xs, ys, N, X);
@@ -42,3 +43,4 @@ void cmd_test()
 	Test(xs, ys, N, 0.9);
 	Test(xs, ys, N, 1.0);
 	}
+#endif // 0

@@ -557,6 +557,9 @@
     <ClCompile Include="cmd_mustang_core.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">
@@ -857,6 +860,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="qscorer2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mega.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
