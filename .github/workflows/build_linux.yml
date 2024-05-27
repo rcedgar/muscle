@@ -8,7 +8,8 @@ on:
     branches:
       - main
   # Enable manual run from the Actions tab
-  workflow_dispatch:
+  - workflow_dispatch
+  - push
 
 permissions:
   contents: read    

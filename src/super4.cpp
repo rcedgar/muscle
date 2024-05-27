@@ -46,7 +46,7 @@ void Super4::SplitBigMFA_Random(MultiSequence &InputMFA, uint MaxSize,
 		uint RemainingSeqCount = InputSeqCount - OutputSeqCount;
 		if (RemainingSeqCount == 0)
 			break;
-		
+
 		uint N = RemainingSeqCount;
 		if (N > MaxSize)
 			N = MaxSize;
@@ -250,6 +250,8 @@ void Super4::SetOpts()
 	m_MinEAPass2 = (float) optd(super4_minea2, DEFAULT_MIN_EA_SUPER4_PASS2);
 	m_MPC.m_ConsistencyIterCount = optd(consiters, 2);
 	m_MPC.m_RefineIterCount = optd(refineiters, 100);
+	m_MPC.m_rng.srand_opt();
+	m_PP.m_rng.srand_opt();
 	}
 
 void Super4::CalcConsensusSeqsDistMx()
@@ -337,6 +339,9 @@ void Super4::Run(MultiSequence &InputSeqs, TREEPERM TreePerm)
 
 void cmd_super4()
 	{
+	MWCG rng;
+	rng.srand_opt();
+
 	const string &InputFileName = opt(super4);
 	const string &OutputFileName = opt(output);
 
@@ -347,7 +352,7 @@ void cmd_super4()
 	else if (opt(amino))
 		Nucleo = false;
 	else
-		Nucleo = InputSeqs.GuessIsNucleo();
+		Nucleo = InputSeqs.GuessIsNucleo(rng);
 
 	TREEPERM TP = TP_None;
 	if (optset_perm)

@@ -295,6 +295,7 @@
     <ClCompile Include="quarts.cpp" />
     <ClCompile Include="refineflat.cpp" />
     <ClCompile Include="relaxflat.cpp" />
+    <ClCompile Include="rng.cpp" />
     <ClCompile Include="seb8.cpp" />
     <ClCompile Include="sequence.cpp" />
     <ClCompile Include="setprobconsparams.cpp" />
@@ -373,6 +374,7 @@
     <ClInclude Include="qscorer.h" />
     <ClInclude Include="qscorer3.h" />
     <ClInclude Include="quarts.h" />
+    <ClInclude Include="rng.h" />
     <ClInclude Include="scorehistory.h" />
     <ClInclude Include="scoretype.h" />
     <ClInclude Include="seq.h" />

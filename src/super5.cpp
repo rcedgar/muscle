@@ -223,7 +223,7 @@ void Super5::SetCentroidVecs()
 		bool IsDupe = m_IsDupe[MemberGSI];
 		bool IsMember = m_IsMember[MemberGSI];
 		bool IsCentroid = m_IsCentroid[MemberGSI];
-		
+
 		if (IsDupe || IsMember || IsCentroid)
 			Die("Super5::SetCentroidVecs(), MemberGSI=%u dupe=%c mem=%c cent=%c",
 			   MemberGSI, tof(IsDupe), tof(IsMember), tof(IsCentroid));
@@ -341,6 +341,9 @@ void Super5::AlignDupes()
 
 void cmd_super5()
 	{
+	MWCG rng;
+	rng.srand_opt();
+
 	LoadGlobalInputMS(opt(super5));
 
 	string &OutputPattern = opt(output);
@@ -358,7 +361,7 @@ void cmd_super5()
 	else if (opt(amino))
 		Nucleo = false;
 	else
-		Nucleo = InputSeqs.GuessIsNucleo();
+		Nucleo = InputSeqs.GuessIsNucleo(rng);
 
 	SetAlpha(Nucleo ? ALPHA_Nucleo : ALPHA_Amino);
 	InitProbcons();
@@ -405,7 +408,7 @@ void cmd_super5()
 		uint PerturbSeed = 0;
 		if (optset_perturb)
 			PerturbSeed = opt(perturb);
-		
+
 		string OutputFileName;
 		if (OutputPattern.find('@') == string::npos)
 			OutputFileName = OutputPattern;

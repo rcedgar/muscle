@@ -562,15 +562,15 @@ double Ensemble::GetGapFract(uint Ix) const
 	}
 
 void Ensemble::SubsampleWithReplacement(double MaxGapFract,
-  uint ColCount, MSA &M) const
+  uint ColCount, MSA &M, RNG &rng) const
 	{
 	vector<uint> Ixs;
 	GetIxSubset(MaxGapFract, Ixs);
-	SubsampleWithReplacement(Ixs, ColCount, M);
+	SubsampleWithReplacement(Ixs, ColCount, M, rng);
 	}
 
 void Ensemble::SubsampleWithReplacement(const vector<uint> &Ixs,
-  uint ColCount, MSA &M) const
+  uint ColCount, MSA &M, RNG &rng) const
 	{
 	asserta(ColCount > 0);
 	const uint SeqCount = GetSeqCount();
@@ -586,7 +586,7 @@ void Ensemble::SubsampleWithReplacement(const vector<uint> &Ixs,
 	const uint N = SIZE(Ixs);
 	for (uint i = 0; i < N; ++i)
 		{
-		uint r = randu32()%N;
+		uint r = rng.randu32()%N;
 		uint Ix = Ixs[r];
 		asserta(Ix < SIZE(m_ColumnStrings));
 		const string &ColStr = m_ColumnStrings[Ix];
