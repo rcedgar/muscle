@@ -45,6 +45,7 @@ HDRS = \
   kmerscan.h \
   locallock.h \
   m3alnparams.h \
+  mega.h \
   mpcflat.h \
   msa.h \
   multisequence.h \
@@ -100,6 +101,7 @@ HDRS = \
 OBJS = \
   $(OBJDIR)/addconfseq.o \
   $(OBJDIR)/align.o \
+  $(OBJDIR)/bwdflat_mega.o \
   $(OBJDIR)/cmd_cmp_msa.o \
   $(OBJDIR)/cmd_m3ensemble.o \
   $(OBJDIR)/cmd_mustang_core.o \
@@ -107,6 +109,7 @@ OBJS = \
   $(OBJDIR)/cmd_newbench_selectpfams.o \
   $(OBJDIR)/cmd_qscoredir_cmp2.o \
   $(OBJDIR)/cmd_squeeze_inserts.o \
+  $(OBJDIR)/fwdflat_mega.o \
   $(OBJDIR)/hscore.o \
   $(OBJDIR)/m3alnparams.o \
   $(OBJDIR)/alignpairflat.o \
@@ -219,6 +222,7 @@ OBJS = \
   $(OBJDIR)/qscorer2.o \
   $(OBJDIR)/randomchaintree.o \
   $(OBJDIR)/randomdistmx.o \
+  $(OBJDIR)/mega.o \
   $(OBJDIR)/relabel.o \
   $(OBJDIR)/repredict.o \
   $(OBJDIR)/resample.o \
