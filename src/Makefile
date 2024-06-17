@@ -11,7 +11,7 @@ CXX = ccache g++
 CXXFLAGS := $(CFLAGS) -DNDEBUG -pthread -fopenmp -O3 -ffast-math -march=native --std=c++11
 
 UNAME_S := $(shell uname -s)
-LDFLAGS := $(LDFLAGS) -O3 -pthread -lpthread
+LDFLAGS := $(LDFLAGS) -O3 -pthread  -fopenmp -lpthread
 ifeq ($(UNAME_S),Linux)
     LDFLAGS += -static
 endif
