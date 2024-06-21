@@ -18,6 +18,40 @@ void Mega::GetNextFields(vector<string> &Fields,
 		  ExpectedNrFields, SIZE(Fields), Line.c_str());
 	}
 
+void Mega::CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
+  vector<float> &Freqs) const
+	{
+	AssertSymmetrical(FreqsMx);
+	const uint N = SIZE(FreqsMx);
+	}
+
+void Mega::CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
+  vector<vector<float > > &LogProbMx)
+	{
+	AssertSymmetrical(FreqsMx);
+	const uint N = SIZE(FreqsMx);
+	LogProbMx.clear();
+	LogProbMx.resize(N);
+	for (uint i = 0; i < N; ++i)
+		LogProbMx[i].resize(N);
+
+	const float VERY_SMALL_FREQ = 1e-6f;
+	for (uint i = 0; i < N; ++i)
+		{
+		const vector<float> &FreqsRow = FreqsMx[i];
+		vector<float> &LogProbsRow = LogProbMx[i];
+		for (uint j = 0; j < N; ++j)
+			{
+			float Freq = FreqsRow[j];
+			asserta(Freq <= 1);
+			if (Freq < VERY_SMALL_FREQ)
+				Freq = VERY_SMALL_FREQ;
+			LogProbsRow[j] = logf(Freq);
+			}
+		}
+	AssertSymmetrical(LogProbMx);
+	}
+
 void Mega::FromFile(const string &FileName)
 	{
 	FILE *f = OpenStdioFile(FileName);
@@ -48,12 +82,12 @@ void Mega::FromFile(const string &FileName)
 		vector<float> &Freqs = m_LogProbsVec[FeatureIdx];
 		GetNextFields(flds, AlphaSize + 1);
 		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-			Freqs.push_back((float) log(StrToFloat(flds[Letter+1])));
+			Freqs.push_back((float) StrToFloat(flds[Letter+1]));
 
-		vector<vector<float> > &SubstMx = m_LogProbMxVec[FeatureIdx];
-		SubstMx.resize(AlphaSize);
+		vector<vector<float> > &LogProbMx = m_LogProbMxVec[FeatureIdx];
+		LogProbMx.resize(AlphaSize);
 		for (uint Letter1 = 0; Letter1 < AlphaSize; ++Letter1)
-			SubstMx[Letter1].resize(AlphaSize);
+			LogProbMx[Letter1].resize(AlphaSize, FLT_MAX);
 
 		for (uint Letter1 = 0; Letter1 < AlphaSize; ++Letter1)
 			{
@@ -62,8 +96,8 @@ void Mega::FromFile(const string &FileName)
 			for (uint Letter2 = 0; Letter2 <= Letter1; ++Letter2)
 				{
 				float Score = (float) log(StrToFloat(flds[Letter2+1]));
-				SubstMx[Letter1][Letter2] = Score;
-				SubstMx[Letter2][Letter1] = Score;
+				LogProbMx[Letter1][Letter2] = Score;
+				LogProbMx[Letter2][Letter1] = Score;
 				}
 			}
 		}
@@ -140,4 +174,38 @@ float Mega::GetMatchScore(
 		Score += SubstMx[LetterX][LetterY]*m_Weights[i];
 		}
 	return Score;
+	}
+
+void Mega::LogMx(const string &Name,
+  const vector<vector<float> > &Mx) const
+	{
+	const uint N = SIZE(Mx);
+	Log("\n%s(%u)\n", Name.c_str(), N);
+
+	Log("     ");
+	for (uint j = 0; j < N; ++j)
+		Log(" %10u", j);
+	Log("\n");
+	for (uint i = 0; i < N; ++i)
+		{
+		Log("[%2u] ", i);
+		const vector<float> &Row = Mx[i];
+		asserta(SIZE(Row) == N);
+		for (uint j = 0; j < N; ++j)
+			Log(" %10.3g", Row[j]);
+		Log("\n");
+		}
+	}
+
+void Mega::LogFeatureParams(uint Idx) const
+	{
+	asserta(Idx < SIZE(m_FeatureNames));
+	asserta(Idx < SIZE(m_FreqsMxVec));
+	asserta(Idx < SIZE(m_LogProbMxVec));
+	asserta(Idx < SIZE(m_LogProbsVec));
+	Log("\n");
+	Log("Feature %s, weight %.3g\n",
+	  m_FeatureNames[Idx].c_str(), m_Weights[Idx]);
+	LogMx("Freqs", m_FreqsMxVec[Idx]);
+	LogMx("LogProbs", m_LogProbMxVec[Idx]);
 	}

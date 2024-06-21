@@ -8,6 +8,7 @@ public:
 	vector<string> m_FeatureNames;
 	vector<float> m_Weights;
 	vector<uint> m_AlphaSizes;
+	vector<vector<vector<float> > > m_FreqsMxVec;
 	vector<vector<vector<float> > > m_LogProbMxVec;
 	vector<vector<float> > m_LogProbsVec;
 	vector<string> m_Labels;
@@ -25,4 +26,12 @@ public:
 	float GetMatchScore(
 	  const vector<vector<byte> > &ProfileX, uint PosX,
 	  const vector<vector<byte> > &ProfileY, uint PosY) const;
+	void CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
+	  vector<vector<float > > &LogProbMx);
+	void CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
+	  vector<float> &Freqs);
+	void LogFeatureParams(uint Idx) const;
+	void LogMx(const string &Name,
+	  const vector<vector<float> > &Mx) const;
+	void AssertSymmetrical(const vector<vector<float> > &Mx) const;
 	};
