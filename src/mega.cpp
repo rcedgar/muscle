@@ -2,6 +2,8 @@
 #include "mega.h"
 #include "alpha.h"
 
+static const float VERY_SMALL_FREQ = 1e-6f;
+
 const string &Mega::GetNextLine()
 	{
 	asserta(m_NextLineNr < SIZE(m_Lines));
@@ -18,15 +20,39 @@ void Mega::GetNextFields(vector<string> &Fields,
 		  ExpectedNrFields, SIZE(Fields), Line.c_str());
 	}
 
-void Mega::CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
-  vector<float> &Freqs) const
+void Mega::AssertSymmetrical(const vector<vector<float> > &Mx) const
 	{
+	const uint N = SIZE(Mx);
+	for (uint i = 0; i < N; ++i)
+		{
+		const vector<float> &Row = Mx[i];
+		asserta(SIZE(Row) == N);
+		for (uint j = 0; j < i; ++j)
+			asserta(feq(Mx[i][j], Mx[j][i]));
+		}
+	}
+
+void Mega::CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
+  vector<float> &MarginalFreqs) const
+	{
+	MarginalFreqs.clear();
 	AssertSymmetrical(FreqsMx);
 	const uint N = SIZE(FreqsMx);
+	float SumMarginalFreqs = 0;
+	for (uint i = 0; i < N; ++i)
+		{
+		const vector<float> &Row = FreqsMx[i];
+		float MarginalFreq = 0;
+		for (uint j = 0; j < N; ++j)
+			MarginalFreq += Row[j];
+		MarginalFreqs.push_back(MarginalFreq);
+		SumMarginalFreqs += MarginalFreq;
+		}
+	asserta(feq(SumMarginalFreqs, 1));
 	}
 
 void Mega::CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
-  vector<vector<float > > &LogProbMx)
+  vector<vector<float > > &LogProbMx) const
 	{
 	AssertSymmetrical(FreqsMx);
 	const uint N = SIZE(FreqsMx);
@@ -63,7 +89,7 @@ void Mega::FromFile(const string &FileName)
 	vector<string> flds;
 	GetNextFields(flds, 3);
 	asserta(flds[0] == "mega");
-	uint m_FeatureCount = StrToUint(flds[1]);
+	m_FeatureCount = StrToUint(flds[1]);
 	uint ProfileCount = StrToUint(flds[2]);
 	m_LogProbsVec.resize(m_FeatureCount);
 	m_LogProbMxVec.resize(m_FeatureCount);
@@ -79,25 +105,36 @@ void Mega::FromFile(const string &FileName)
 		m_AlphaSizes.push_back(AlphaSize);
 		m_Weights.push_back(Weight);
 
-		vector<float> &Freqs = m_LogProbsVec[FeatureIdx];
+		vector<float> &LogProbs = m_LogProbsVec[FeatureIdx];
 		GetNextFields(flds, AlphaSize + 1);
+		asserta(flds[0] == "freqs");
 		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-			Freqs.push_back((float) StrToFloat(flds[Letter+1]));
+			{
+		// Probability is estimated as frequency
+			float Prob = (float) StrToFloat(flds[Letter+1]);
+			if (Prob < VERY_SMALL_FREQ)
+				Prob = VERY_SMALL_FREQ;
+			float LogProb = logf(Prob);
+			LogProbs.push_back(LogProb);
+			}
 
 		vector<vector<float> > &LogProbMx = m_LogProbMxVec[FeatureIdx];
 		LogProbMx.resize(AlphaSize);
 		for (uint Letter1 = 0; Letter1 < AlphaSize; ++Letter1)
-			LogProbMx[Letter1].resize(AlphaSize, FLT_MAX);
-
+			LogProbMx[Letter1].resize(AlphaSize);
 		for (uint Letter1 = 0; Letter1 < AlphaSize; ++Letter1)
 			{
 			GetNextFields(flds, Letter1 + 2);
 			asserta(StrToUint(flds[0]) == Letter1);
 			for (uint Letter2 = 0; Letter2 <= Letter1; ++Letter2)
 				{
-				float Score = (float) log(StrToFloat(flds[Letter2+1]));
-				LogProbMx[Letter1][Letter2] = Score;
-				LogProbMx[Letter2][Letter1] = Score;
+			// Probability is estimated as frequency
+				float Prob = (float) StrToFloat(flds[Letter2+1]);
+				if (Prob < VERY_SMALL_FREQ)
+					Prob = VERY_SMALL_FREQ;
+				float LogProb = logf(Prob);
+				LogProbMx[Letter1][Letter2] = LogProb;
+				LogProbMx[Letter2][Letter1] = LogProb;
 				}
 			}
 		}
@@ -176,15 +213,30 @@ float Mega::GetMatchScore(
 	return Score;
 	}
 
+void Mega::LogVec(const string &Name, const vector<float> &Vec) const
+	{
+	const uint N = SIZE(Vec);
+	Log("\n%s/%u", Name.c_str(), N);
+	for (uint i = 0; i < N; ++i)
+		{
+		if (i%10 == 0)
+			Log("\n  ");
+		else
+			Log(" ");
+		Log("[%2u]=%.2f", i, Vec[i]);
+		}
+	Log("\n");
+	}
+
 void Mega::LogMx(const string &Name,
   const vector<vector<float> > &Mx) const
 	{
 	const uint N = SIZE(Mx);
-	Log("\n%s(%u)\n", Name.c_str(), N);
+	Log("\n%s/%u\n", Name.c_str(), N);
 
 	Log("     ");
 	for (uint j = 0; j < N; ++j)
-		Log(" %10u", j);
+		Log(" %7u", j);
 	Log("\n");
 	for (uint i = 0; i < N; ++i)
 		{
@@ -192,7 +244,7 @@ void Mega::LogMx(const string &Name,
 		const vector<float> &Row = Mx[i];
 		asserta(SIZE(Row) == N);
 		for (uint j = 0; j < N; ++j)
-			Log(" %10.3g", Row[j]);
+			Log(" %7.2f", Row[j]);
 		Log("\n");
 		}
 	}
@@ -200,12 +252,12 @@ void Mega::LogMx(const string &Name,
 void Mega::LogFeatureParams(uint Idx) const
 	{
 	asserta(Idx < SIZE(m_FeatureNames));
-	asserta(Idx < SIZE(m_FreqsMxVec));
 	asserta(Idx < SIZE(m_LogProbMxVec));
 	asserta(Idx < SIZE(m_LogProbsVec));
+	const string &Name = m_FeatureNames[Idx];
 	Log("\n");
 	Log("Feature %s, weight %.3g\n",
-	  m_FeatureNames[Idx].c_str(), m_Weights[Idx]);
-	LogMx("Freqs", m_FreqsMxVec[Idx]);
-	LogMx("LogProbs", m_LogProbMxVec[Idx]);
+	  Name.c_str(), m_Weights[Idx]);
+	LogVec(Name, m_LogProbsVec[Idx]);
+	LogMx(Name, m_LogProbMxVec[Idx]);
 	}
