@@ -161,8 +161,9 @@ void Mega::FromFile(const string &FileName)
 			asserta(SIZE(Syms) == m_FeatureCount);
 			for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
 				{
+				const string &FeatureName = m_FeatureNames[FeatureIdx];
 				byte Sym = Syms[FeatureIdx];
-				if (FeatureIdx == 0)
+				if (FeatureName == "AA")
 					{
 					uint Letter = g_CharToLetterAmino[Sym];
 					Profile[Pos].push_back(Letter);
