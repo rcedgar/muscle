@@ -87,5 +87,7 @@ C(squeeze_inserts)
 C(newbench_selectpfams)
 C(newbench_pfamgroups)
 C(mustang_core)
+C(align_mega)
+C(test_mega)
 
 #undef C

@@ -1,8 +1,7 @@
 #include "muscle.h"
 #include "mega.h"
-#include "hmmscores.h"
-#define MatchScore *ERROR*
-#define InsScore *ERROR*
+//#define MatchScore *ERROR*
+//#define InsScore *ERROR*
 
 /***
 Bwd[s][i][j] = 
@@ -11,9 +10,10 @@ Bwd[s][i][j] =
 	last (LY-j) letters of Y.
 ***/
 
-void CalcBwdFlat_Mega(const Mega &M,
+void CalcBwdFlat_mega(const Mega &M,
   uint ProfileIdxX, uint ProfileIdxY, float *Flat)
 	{
+#include "hmmscores.h"
 	asserta(ProfileIdxX < SIZE(M.m_Profiles));
 	asserta(ProfileIdxY < SIZE(M.m_Profiles));
 	const vector<vector<byte> > &ProfileX = M.m_Profiles[ProfileIdxX];

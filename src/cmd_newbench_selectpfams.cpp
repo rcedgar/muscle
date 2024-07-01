@@ -901,6 +901,7 @@ static double GetAnnotCoverage(const vector<uint> &UpRegionIxs)
 			asserta(Upix2 == Upix);
 			}
 		}
+	return 0.0;
 	}
 
 static bool SelectUp(FILE *f, uint Upix)

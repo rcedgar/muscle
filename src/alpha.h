@@ -12,9 +12,9 @@ void ClearInvalidLetterWarning();
 void InvalidLetterWarning(char c, char w);
 void ReportInvalidLetters();
 
-extern byte g_CharToLetter[];
 extern byte g_CharToLetterEx[];
 
+extern byte g_LetterToCharAmino[];
 extern byte g_LetterToChar[];
 extern byte g_LetterExToChar[];
 
@@ -50,5 +50,6 @@ static inline bool isgap(char c)
 
 extern byte g_CharToLetterNucleo[256];
 extern byte g_CharToLetterAmino[256];
+extern byte g_CharToLetter[256];
 
 #endif	// alpha_h

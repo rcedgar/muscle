@@ -214,6 +214,8 @@
   <ItemGroup>
     <ClCompile Include="addconfseq.cpp" />
     <ClCompile Include="align.cpp" />
+    <ClCompile Include="alignpairflat_mega.cpp" />
+    <ClCompile Include="align_mega.cpp" />
     <ClCompile Include="bwdflat_mega.cpp" />
     <ClCompile Include="cmd_cmp_msa.cpp" />
     <ClCompile Include="cmd_m3ensemble.cpp" />
@@ -292,6 +294,7 @@
     <ClCompile Include="eadistmxmsas.cpp" />
     <ClCompile Include="fasta.cpp" />
     <ClCompile Include="fasta2.cpp" />
+    <ClCompile Include="mpcflat_mega.cpp" />
     <ClCompile Include="msaselfscore3.cpp" />
     <ClCompile Include="muscle3.cpp" />
     <ClCompile Include="mx.cpp" />
@@ -353,6 +356,7 @@
     <ClCompile Include="sweeper.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="test_malloc.cpp" />
+    <ClCompile Include="test_mega.cpp" />
     <ClCompile Include="tracebackbitmem.cpp" />
     <ClCompile Include="tree.cpp" />
     <ClCompile Include="tree2.cpp" />

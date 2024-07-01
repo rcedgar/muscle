@@ -35,7 +35,7 @@
 #include "alpha3.h"
 #include "cachemem3.h"
 #include "profile3.h"
-
+#include "mega.h"
 #ifndef _WIN32
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
@@ -112,6 +112,10 @@ void AlignMSAsByPath(const MultiSequence &MSA1, const MultiSequence &MSA2,
 
 void CalcFwdFlat(const byte *X, uint LX, const byte *Y, uint LY, float *Flat);
 void CalcBwdFlat(const byte *X, uint LX, const byte *Y, uint LY, float *Flat);
+
+void CalcFwdFlat_mega(const Mega &M, uint ProfileIdxX, uint ProfileIdxY, float *Flat);
+void CalcBwdFlat_mega(const Mega &M,uint ProfileIdxX, uint ProfileIdxY, float *Flat);
+
 void CalcPostFlat(const float *FlatFwd, const float *FlatBwd,
   uint LX, uint LY, float *Post);
 float CalcAlnFlat(const float *Post, uint LX, uint LY,
@@ -123,8 +127,9 @@ void CalcPosteriorFlat3(const MultiSequence &MSA1,
   const vector<MySparseMx *> &SparseMxs,
   float *Flat);
 float AlignPairFlat(const Sequence *Seq1, const Sequence *Seq2, string &Path);
-float AlignPairFlat_SparsePost(const Sequence *Seq1, const Sequence *Seq2, string &Path,
-  MySparseMx *SparsePost);
+float AlignPairFlat_SparsePost(const Sequence *Seq1, const Sequence *Seq2, string &Path,MySparseMx *SparsePost);
+float AlignPairFlat_mega(const Mega * M, string &Path, uint index_X, uint index_Y);
+float AlignPairFlat_mega_SparsePost(const Mega * M,string &Path, MySparseMx *SparsePost, uint index_X, uint index_Y);
 
 void GetAllPairs(uint SeqCount,
   vector<uint> &SeqIndexes1, vector<uint> &SeqIndexes2);

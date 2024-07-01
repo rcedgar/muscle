@@ -43,6 +43,8 @@ public:
 	map<string, uint> m_RefLabelToSeqIndex;
 	vector<uint> m_TestColToCount;
 
+        map<string, uint> m_RefSeqToSeqIndex;
+
 public:
 	QScorer()
 		{
@@ -55,6 +57,7 @@ public:
 
 	void InitRefLabels();
 	void InitRefToTest();
+	void InitRefToTest_BySequence();
 	void InitColPosVecs();
 	void InitColPosVecs1(uint i);
 	void InitRefCols();
@@ -69,4 +72,6 @@ public:
 	uint GetTestSeqCount() const { return m_Test->GetSeqCount(); }
 	uint GetRefColCount() const { return m_Ref->GetColCount(); }
 	uint GetTestColCount() const { return m_Test->GetColCount(); }
+private:
+	map<string, uint>::const_iterator _FullScanRefSeqs(const string & TestSeq);
 	};

@@ -3,7 +3,9 @@
 #include <set>
 #include "sequence.h"
 
+
 class MSA;
+class Mega;
 
 class MultiSequence
 	{
@@ -48,6 +50,8 @@ public:
 
 	void FromStrings(const vector<string> &Labels, const vector<string> &Seqs);
 	void Copy(const MultiSequence &rhs);
+        
+    void LoadMega(Mega & MM);
 	void LoadMFA(const string& filename, bool stripGaps = false);
 	void LoadMFA(FileBuffer& infile, bool stripGaps = false);
 	void FromFASTA(const string& filename, bool stripGaps = false)
