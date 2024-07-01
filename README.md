@@ -23,5 +23,5 @@ https://github.com/rcedgar/muscle/releases
 
 
 ### Reference
-R.C. Edgar (2021) "MUSCLE v5 enables improved estimates of phylogenetic tree confidence by ensemble bootstrapping"    
-[https://www.biorxiv.org/content/10.1101/2021.06.20.449169v1.full.pdf](https://www.biorxiv.org/content/10.1101/2021.06.20.449169v1.full.pdf)
+Edgar, Robert C. Muscle5: High-accuracy alignment ensembles enable unbiased assessments of sequence homology and phylogeny. <i>Nature Communications</i> 13.1 (2022): 6968.    
+[https://www.nature.com/articles/s41467-022-34630-w.pdf](https://www.nature.com/articles/s41467-022-34630-w.pdf)
