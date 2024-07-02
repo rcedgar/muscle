@@ -222,7 +222,6 @@
     <ClCompile Include="cmd_mustang_core.cpp" />
     <ClCompile Include="cmd_newbench_pfamgroups.cpp" />
     <ClCompile Include="cmd_newbench_selectpfams.cpp" />
-    <ClCompile Include="cmd_qscoredir_cmp2.cpp" />
     <ClCompile Include="cmd_squeeze_inserts.cpp" />
     <ClCompile Include="fwdflat_mega.cpp" />
     <ClCompile Include="hscore.cpp" />

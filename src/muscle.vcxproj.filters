@@ -539,9 +539,6 @@
     <ClCompile Include="cmd_cmp_msa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cmd_qscoredir_cmp2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cmd_squeeze_inserts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -564,6 +561,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="bwdflat_mega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="alignpairflat_mega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="align_mega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mpcflat_mega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_mega.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

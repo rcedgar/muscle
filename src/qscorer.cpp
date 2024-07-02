@@ -37,14 +37,65 @@ void QScorer::Clear()
 	m_RefLabels.clear();
 	m_RefLabelToSeqIndex.clear();
 	m_TestColToCount.clear();
+	}
 
-        m_RefSeqToSeqIndex.clear();
+void QScorer::InitRefLabels_bysequence()
+	{
+	m_RefSeqToSeqIndex.clear();
+	m_RefLabelToSeqIndex.clear(); // remains empty
+	m_RefLabels.clear();
+	const uint RefSeqCount = GetRefSeqCount();
+	for (uint RefSeqIndex = 0; RefSeqIndex < RefSeqCount; ++RefSeqIndex)
+		{
+		const string Label = (const string) m_Ref->GetSeqName(RefSeqIndex);
+		m_RefLabels.push_back(Label);
+
+		string UnSeq;
+		m_Ref->GetUngappedSeqStr(RefSeqIndex, UnSeq);
+		if (m_RefSeqToSeqIndex.find(UnSeq) != m_RefSeqToSeqIndex.end())
+			{
+			Warning("Dupe seq >%s in ref MSA", Label.c_str());
+			continue;
+			}
+		m_RefSeqToSeqIndex[UnSeq] = RefSeqIndex;
+		}
+	}
+
+void QScorer::InitRefToTest_bysequence()
+	{
+	const uint RefSeqCount = GetRefSeqCount();
+	const uint TestSeqCount = GetTestSeqCount();
+
+	m_RefSeqIndexToTestSeqIndex.clear();
+	m_RefSeqIndexToTestSeqIndex.resize(RefSeqCount, UINT_MAX);
+	for (uint TestSeqIndex = 0; TestSeqIndex < TestSeqCount; ++TestSeqIndex)
+		{
+		const string Label = (const string) m_Test->GetSeqName(TestSeqIndex);
+		string UnSeq;
+		m_Test->GetUngappedSeqStr(TestSeqIndex, UnSeq);
+		map<string, uint>::const_iterator p = m_RefSeqToSeqIndex.find(UnSeq);
+		if (p == m_RefSeqToSeqIndex.end())
+			{
+			Warning("Test seq not in ref >%s", Label.c_str());
+			continue;
+			}
+		uint RefSeqIndex = p->second;
+		asserta(RefSeqIndex < RefSeqCount);
+		if (m_RefSeqIndexToTestSeqIndex[RefSeqIndex] != UINT_MAX)
+			Warning("Ref seq found twice in test MSA >%s", Label.c_str());
+		m_RefSeqIndexToTestSeqIndex[RefSeqIndex] = TestSeqIndex;
+
+		m_Labels.push_back(Label);
+		m_RefSeqIndexes.push_back(RefSeqIndex);
+		m_TestSeqIndexes.push_back(TestSeqIndex);
+		}
 	}
 
 void QScorer::InitRefLabels()
 	{
 	m_RefLabels.clear();
 	m_RefLabelToSeqIndex.clear();
+	m_RefSeqToSeqIndex.clear(); // remains empty
 
 	const uint RefSeqCount = GetRefSeqCount();
 	for (uint RefSeqIndex = 0; RefSeqIndex < RefSeqCount; ++RefSeqIndex)
@@ -55,102 +106,13 @@ void QScorer::InitRefLabels()
 
 		m_RefLabels.push_back(Label);
 		m_RefLabelToSeqIndex[Label] = RefSeqIndex;
-		
-		string Seq;
-		m_Ref->GetUngappedSeqStr(RefSeqIndex, Seq);
-		for (auto & c: Seq) c = toupper(c);
-                if (m_RefSeqToSeqIndex.find(Seq) != m_RefSeqToSeqIndex.end())
-		{
-			uint RIndex = m_RefSeqToSeqIndex[Seq];
-                        Die("Dupe ref seqs >%s %s", Label.c_str(),m_RefLabels[RIndex].c_str());
-		}
-
-                m_RefSeqToSeqIndex[Seq] = RefSeqIndex;
-
-
-
 		}
 	}
-map<string, uint>::const_iterator QScorer::_FullScanRefSeqs(const string & TestSeq)
-{
-	map<string, uint>::const_iterator best = m_RefSeqToSeqIndex.end();
-	uint min_dist =  UINT_MAX;
-	for (map<string, uint>::const_iterator p = m_RefSeqToSeqIndex.begin(); p !=  m_RefSeqToSeqIndex.end(); p++)
-	{
-		uint dist = 0;
-		const string & RefSeq = p->first;
-		if (RefSeq.size() != TestSeq.size())
-			continue;
-		for (uint i = 0; i < RefSeq.size(); ++i)
-			if (RefSeq[i] != TestSeq[i]) dist++;
-		if (dist < min_dist)
-		{
-			min_dist = dist;
-			best = p;
-		}
-	}
-	if (min_dist < 4)
-	{
-		return best;
-	}
-	return m_RefSeqToSeqIndex.end();
-}
 
-void QScorer::InitRefToTest_BySequence()
-	{
-        const uint RefSeqCount = GetRefSeqCount();
-        const uint TestSeqCount = GetTestSeqCount();
-
-        m_TestSeqIndexToRefSeqIndex.clear();
-        m_TestSeqIndexToRefSeqIndex.resize(TestSeqCount, UINT_MAX);
-
-        m_RefSeqIndexToTestSeqIndex.clear();
-        m_RefSeqIndexToTestSeqIndex.resize(RefSeqCount, UINT_MAX);
-        for (uint TestSeqIndex = 0; TestSeqIndex < TestSeqCount; ++TestSeqIndex)
-                {
-                const string Label = (const string) m_Test->GetSeqName(TestSeqIndex);
-
-                string Seq;
-                m_Test->GetUngappedSeqStr(TestSeqIndex, Seq);
-		for (auto & c: Seq) c = toupper(c);
-
-                map<string, uint>::const_iterator p = m_RefSeqToSeqIndex.find(Seq);
-
-                if (p == m_RefSeqToSeqIndex.end())
-                {
-			p = _FullScanRefSeqs(Seq);
-			if (p == m_RefSeqToSeqIndex.end())
-			{
-Log("Seq mismatch >%s\n", Label.c_str());
-                        continue;
-			}
-                }
-
-                uint RefSeqIndex = p->second;
-                asserta(RefSeqIndex < RefSeqCount);
-                m_TestSeqIndexToRefSeqIndex[TestSeqIndex] = RefSeqIndex;
-                if (m_RefSeqIndexToTestSeqIndex[RefSeqIndex] != UINT_MAX)
-                        Warning("Ref label found twice in test MSA %s >%s",
-                          m_Name.c_str(), Label.c_str());
-                m_RefSeqIndexToTestSeqIndex[RefSeqIndex] = TestSeqIndex;
-
-                m_Labels.push_back(Label);
-                m_RefSeqIndexes.push_back(RefSeqIndex);
-                m_TestSeqIndexes.push_back(TestSeqIndex);
-                }
-	}
 void QScorer::InitRefToTest()
 	{
-    	if (opt_bysequence)
-         {
-         	InitRefToTest_BySequence();
-         	return;
-         }
 	const uint RefSeqCount = GetRefSeqCount();
 	const uint TestSeqCount = GetTestSeqCount();
-
-	m_TestSeqIndexToRefSeqIndex.clear();
-	m_TestSeqIndexToRefSeqIndex.resize(TestSeqCount, UINT_MAX);
 
 	m_RefSeqIndexToTestSeqIndex.clear();
 	m_RefSeqIndexToTestSeqIndex.resize(RefSeqCount, UINT_MAX);
@@ -159,16 +121,11 @@ void QScorer::InitRefToTest()
 		const string Label = (const string) m_Test->GetSeqName(TestSeqIndex);
 		map<string, uint>::const_iterator p = m_RefLabelToSeqIndex.find(Label);
 		if (p == m_RefLabelToSeqIndex.end())
-		{
-Log("Label mismatch >%s\n", Label.c_str());
 			continue;
-		}
 		uint RefSeqIndex = p->second;
 		asserta(RefSeqIndex < RefSeqCount);
-		m_TestSeqIndexToRefSeqIndex[TestSeqIndex] = RefSeqIndex;
 		if (m_RefSeqIndexToTestSeqIndex[RefSeqIndex] != UINT_MAX)
-			Warning("Ref label found twice in test MSA %s >%s",
-			  m_Name.c_str(), Label.c_str());
+			Warning("Ref label found twice in test MSA >%s", Label.c_str());
 		m_RefSeqIndexToTestSeqIndex[RefSeqIndex] = TestSeqIndex;
 
 		m_Labels.push_back(Label);
@@ -187,16 +144,14 @@ void QScorer::InitColPosVecs1(uint i)
 	const string &Label = m_Labels[i];
 	const string &TestLabel = m_Test->GetSeqName(TestSeqIndex);
 	const string &RefLabel = m_Ref->GetSeqName(RefSeqIndex);
-//	asserta(TestLabel == RefLabel);
+	if (!opt(bysequence))
+		asserta(TestLabel == RefLabel);
 
 	m_Ref->GetPosToCol(RefSeqIndex, m_PosToRefColVec[i]);
 	m_Test->GetPosToCol(TestSeqIndex, m_PosToTestColVec[i]);
 	const uint RefUngappedLength = SIZE(m_PosToRefColVec[i]);
 	const uint TestUngappedLength = SIZE(m_PosToTestColVec[i]);
-	if (RefUngappedLength != TestUngappedLength)
-		Warning("%s >%s ref length %u, test length %u",
-		  m_Name.c_str(), TestLabel.c_str(),
-		  RefUngappedLength, TestUngappedLength);
+	asserta(RefUngappedLength == TestUngappedLength);
 
 	m_Ref->GetColToPos(RefSeqIndex, m_RefColToPosVec[i]);
 	m_Test->GetColToPos(TestSeqIndex, m_TestColToPosVec[i]);
@@ -207,7 +162,7 @@ void QScorer::InitColPosVecs1(uint i)
 	const uint L = SIZE(m_PosToRefColVec[i]);
 	const uint Lt = SIZE(m_PosToTestColVec[i]);
 	if (L != Lt)
-		Warning("Seq lengths differ ref=%u, test=%u >%s",
+		Die("Seq lengths differ ref=%u, test=%u >%s",
 			L, Lt, Label.c_str());
 
 	m_RefColToTestColVec[i].resize(RefColCount, UINT_MAX);
@@ -224,10 +179,8 @@ void QScorer::InitColPosVecs1(uint i)
 			char TestChar = m_Test->GetChar(TestSeqIndex, TestCol);
 			char RefChar = m_Ref->GetChar(RefSeqIndex, RefCol);
 			asserta(!isgap(TestChar) && !isgap(RefChar));
-			char ut = toupper(TestChar);
-			char ur = toupper(RefChar);
-			if (ut != ur && ut != 'X' && ur != 'X')
-				Warning("Sequences differ pos %u test %c ref %c >%s",
+			if (toupper(TestChar) != toupper(RefChar))
+				Die("Sequences differ pos %u test %c ref %c >%s",
 					Pos, TestChar, RefChar, Label.c_str());
 			m_RefColToTestColVec[i][RefCol] = TestCol;
 			}
@@ -236,17 +189,9 @@ void QScorer::InitColPosVecs1(uint i)
 
 void QScorer::InitColPosVecs()
 	{
-	const uint N = SIZE(m_TestSeqIndexes); // UINT_MAX if not in ref
-	const uint NR = SIZE(m_RefLabels);
-	asserta(N <= NR);
-	if (N < NR && !m_MissingTestSeqOk)
-		Die("%u missing sequences in test MSA %s", NR - N, m_Name.c_str());
+	const uint N = SIZE(m_RefSeqIndexes);
 	if (N == 0)
-		{
-		m_Q = -999;
-		m_TC = -999;
-		return;
-		}
+		Die("No ref labels found in test MSA");
 
 	m_PosToTestColVec.clear();
 	m_PosToRefColVec.clear();
@@ -282,7 +227,7 @@ void QScorer::InitRefUngappedCounts()
 	{
 	m_RefAlignedColCount = SIZE(m_RefCols);
 	if (m_RefAlignedColCount == 0)
-		Die("Qscorer: No upper case columns in ref %s", m_Name.c_str());
+		Die("Qscorer: No upper case columns in ref");
 
 	m_RefUngappedCounts.clear();
 	const uint N = SIZE(m_RefSeqIndexes);
@@ -354,7 +299,7 @@ void QScorer::DoRefCol(uint k)
 	m_TotalPairs += UngappedPairCount;
 
 	asserta(UngappedPairCount >= CorrectPairsCol);
-	if (UngappedPairCount == CorrectPairsCol && CorrectPairsCol > 0)
+	if (UngappedPairCount == CorrectPairsCol)
 		++m_CorrectCols;
 	}
 
@@ -391,15 +336,11 @@ void QScorer::SetTestColToBestRefCol()
 
 void QScorer::Run(const string &Name, const MultiSequence &Test, const MultiSequence &Ref)
 	{
-	MSA &msaTest = *new MSA;
-	MSA &msaRef = *new MSA;
-
-	msaTest.FromMultiSequence(Test);
-	msaRef.FromMultiSequence(Ref);
-	Run(Name, msaTest, msaRef);
-
-	//delete &msaTest; // crashes, just leak it
-	//delete &msaRef;
+	MSA *msaTest = new MSA;
+	MSA *msaRef = new MSA;
+	msaTest->FromMultiSequence(Test);
+	msaRef->FromMultiSequence(Ref);
+	Run(Name, *msaTest, *msaRef);
 	}
 
 void QScorer::Run(const string &Name, const MSA &Test, const MSA &Ref)
@@ -407,8 +348,6 @@ void QScorer::Run(const string &Name, const MSA &Test, const MSA &Ref)
 	Clear();
 
 	m_Name = Name;
-	m_Q = 0;
-	m_TC = 0;
 	m_Test = &Test;
 	m_Ref = &Ref;
 
@@ -418,24 +357,22 @@ void QScorer::Run(const string &Name, const MSA &Test, const MSA &Ref)
 	const uint TestColCount = Test.GetColCount();
 	const uint RefColCount = Ref.GetColCount();
 
-	InitRefLabels();
-	asserta(SIZE(m_RefLabels) > 0);
-	InitRefToTest();
-	InitColPosVecs();
-	if (SIZE(m_RefSeqIndexes) <= 1)
+	if (opt(bysequence))
 		{
-		m_Q = -1.0;
-		m_TC = -1.0;
-		return;
+		InitRefLabels_bysequence();
+		InitRefToTest_bysequence();
 		}
+	else
+		{
+		InitRefLabels();
+		InitRefToTest();
+		}
+	InitColPosVecs();
 	InitRefCols();
 	InitRefUngappedCounts();
 	DoRefCols();
 	SetTestColToBestRefCol();
 
-	if (m_TotalPairs == 0)
-		Die("m_TotalPairs=0 (%s)", m_Name.c_str());
-	asserta(m_RefAlignedColCount > 0);
 	m_Q = float(m_CorrectPairs)/float(m_TotalPairs);
 	m_TC = float(m_CorrectCols)/float(m_RefAlignedColCount);
 	}

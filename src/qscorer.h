@@ -3,11 +3,10 @@
 class QScorer
 	{
 public:
-	string m_Name;
-	const MSA *m_Test = 0;
-	const MSA *m_Ref = 0;
+	const MSA *m_Test;
+	const MSA *m_Ref;
 	double m_MaxGapFract = 1.0;
-	bool m_MissingTestSeqOk = false;
+	string m_Name;
 
 	uint m_RefAlignedColCount = 0;
 
@@ -15,7 +14,6 @@ public:
 	vector<uint> m_RefSeqIndexes;
 	vector<uint> m_TestSeqIndexes;
 	vector<uint> m_RefSeqIndexToTestSeqIndex;
-	vector<uint> m_TestSeqIndexToRefSeqIndex;
 	vector<uint> m_RefCols;
 	vector<uint> m_RefUngappedCounts;
 
@@ -41,23 +39,18 @@ public:
 
 	vector<string> m_RefLabels;
 	map<string, uint> m_RefLabelToSeqIndex;
+	map<string, uint> m_RefSeqToSeqIndex;
 	vector<uint> m_TestColToCount;
 
-        map<string, uint> m_RefSeqToSeqIndex;
-
 public:
-	QScorer()
-		{
-		m_MissingTestSeqOk = opt(missingtestseqok);
-		}
-
 	void Clear();
 	void Run(const string &Name, const MSA &Test, const MSA &Ref);
 	void Run(const string &Name, const MultiSequence &Test, const MultiSequence &Ref);
 
 	void InitRefLabels();
 	void InitRefToTest();
-	void InitRefToTest_BySequence();
+	void InitRefLabels_bysequence();
+	void InitRefToTest_bysequence();
 	void InitColPosVecs();
 	void InitColPosVecs1(uint i);
 	void InitRefCols();
@@ -72,6 +65,4 @@ public:
 	uint GetTestSeqCount() const { return m_Test->GetSeqCount(); }
 	uint GetRefColCount() const { return m_Ref->GetColCount(); }
 	uint GetTestColCount() const { return m_Test->GetColCount(); }
-private:
-	map<string, uint>::const_iterator _FullScanRefSeqs(const string & TestSeq);
 	};

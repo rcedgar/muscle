@@ -179,7 +179,7 @@ double Bench::Run(const M3AlnParams &AP)
 			}
 		else
 			{
-			QS->Run(m_RefNames[MSAIndex], *TestMSA, *Ref);
+			QS->Run(RefName, *TestMSA, *Ref);
 			Q = QS->m_Q;
 			TC = QS->m_TC;
 			}

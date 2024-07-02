@@ -684,7 +684,7 @@ void MSA::GetUngappedSeqStr(uint SeqIndex, string &SeqStr) const
 		{
 		char c = m_szSeqs[SeqIndex][i];
 		if (!isgap(c))
-			SeqStr += c;
+			SeqStr += toupper(c);
 		}
 	}
 

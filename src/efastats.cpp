@@ -15,7 +15,7 @@ static void CmpRef(const Ensemble &E, const MSA &RefMSA,
 		{
 		const MSA &TestMSA = E.GetMSA(MSAIndex);
 		const string &TestName = E.GetMSAName(MSAIndex);
-		QS.Run("CmpRef", TestMSA, RefMSA);
+		QS.Run(TestName, TestMSA, RefMSA);
 		double Q = QS.m_Q;
 		double TC = QS.m_TC;
 		Qs.push_back(Q);
