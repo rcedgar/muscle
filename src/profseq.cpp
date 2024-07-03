@@ -80,6 +80,7 @@ void cmd_profseq()
 
 	HMMParams HP;
 	HP.FromDefaults(IsNucleo);
+	HP.CmdLineUpdate();
 	if (PerturbSeed > 0)
 		{
 		ResetRand(PerturbSeed);

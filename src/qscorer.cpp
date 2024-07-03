@@ -191,7 +191,7 @@ void QScorer::InitColPosVecs()
 	{
 	const uint N = SIZE(m_RefSeqIndexes);
 	if (N == 0)
-		Die("No ref labels found in test MSA");
+		Die("No ref labels found in test MSA %s", m_Name.c_str());
 
 	m_PosToTestColVec.clear();
 	m_PosToRefColVec.clear();

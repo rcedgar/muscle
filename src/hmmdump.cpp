@@ -270,6 +270,7 @@ void cmd_hmmdump()
 	HP.FromDefaults(Nucleo);
 	HP.ToFile(OutDir + "hmm.tsv");
 
+	HP.CmdLineUpdate();
 	HP.ToPairHMM();
 	PairHMM::WriteParamsReport(OutDir + "params_report2.txt");
 

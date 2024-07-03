@@ -47,6 +47,7 @@ void cmd_qscoredir()
 	float AvgTC = 0;
 
 	const uint NameCount = SIZE(Names);
+	uint N = 0;
 	for (uint i = 0; i < NameCount; ++i)
 		{
 		ProgressStep(i, NameCount, "%s  Q %.2f TC %.2f",
@@ -58,6 +59,12 @@ void cmd_qscoredir()
 
 		MSA Test;
 		MSA Ref;
+		if (!StdioFileExists(TestFileName))
+			{
+			Warning("Not found %s", TestFileName.c_str());
+			continue;
+			}
+		N += 1;
 		Test.FromFASTAFile(TestFileName);
 
 		extern bool g_FASTA_Upper;
@@ -74,11 +81,11 @@ void cmd_qscoredir()
 		SumQ += QS.m_Q;
 		SumTC += QS.m_TC;
 
-		AvgQ = SumQ/(i+1);
-		AvgTC = SumTC/(i+1);
+		AvgQ = SumQ/N;
+		AvgTC = SumTC/N;
 		}
 
-	Pf(fOut, "testdir=%s n=%u avgq=%.4f	avgtc=%.4f\n", 
-	  TestDir.c_str(), NameCount, AvgQ, AvgTC);
+	Pf(fOut, "testdir=%s n=%u	N=%u	avgq=%.4f	avgtc=%.4f\n", 
+	  TestDir.c_str(), NameCount, N, AvgQ, AvgTC);
 	CloseStdioFile(fOut);
 	}

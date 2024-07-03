@@ -37,6 +37,7 @@ void InitProbcons()
 	if (optset_hmmout)
 		HP.ToFile(opt(hmmout));
 
+	HP.CmdLineUpdate();
 	HP.ToPairHMM();
 
 	g_InitDone = true;

@@ -101,7 +101,11 @@ FLT_OPT(shrink)
 FLT_OPT(gapopen)
 FLT_OPT(gapext)
 FLT_OPT(center)
-//FLT_OPT(addcenter)
+
+FLT_OPT(m_is)
+FLT_OPT(m_il)
+FLT_OPT(is_is)
+FLT_OPT(il_il)
 
 FLAG_OPT(quiet)
 FLAG_OPT(compilerinfo)

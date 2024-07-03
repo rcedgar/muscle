@@ -42,34 +42,68 @@ void cmd_qscore()
 	const uint TestColCount = msaTest.GetColCount();
 
 	map<string, uint> RefSeqNameToIndex;
+	map<string, uint> RefSeqToIndex;
 	vector<uint> RefToTestSeqIndex(RefSeqCount);
 
 	for (uint RefSeqIndex = 0; RefSeqIndex < RefSeqCount; ++RefSeqIndex)
 		{
 		const string SeqName = msaRef.GetSeqName(RefSeqIndex);
+		string USeq;
+		msaRef.GetUngappedSeqStr(RefSeqIndex, USeq);
 		RefToTestSeqIndex[RefSeqIndex] = UINT_MAX;
 		RefSeqNameToIndex[SeqName] = RefSeqIndex;
+		RefSeqToIndex[USeq] = RefSeqIndex;
 		}
 
 	uint FoundCount = 0;
 	for (uint TestSeqIndex = 0; TestSeqIndex < TestSeqCount; ++TestSeqIndex)
 		{
 		const string SeqName = msaTest.GetSeqName(TestSeqIndex);
-		map<string, uint>::const_iterator p =
-		  RefSeqNameToIndex.find(SeqName);
-		if (p != RefSeqNameToIndex.end())
+		if (opt(bysequence))
 			{
-			uint RefSeqIndex = p->second;
-			if (RefSeqIndex == UINT_MAX)
-				Die("UINT_MAX");
-			RefToTestSeqIndex[RefSeqIndex] = TestSeqIndex;
-			++FoundCount;
+			string USeq;
+			msaTest.GetUngappedSeqStr(TestSeqIndex, USeq);
+			map<string, uint>::const_iterator p =
+			  RefSeqToIndex.find(USeq);
+			if (p != RefSeqNameToIndex.end())
+				{
+				uint RefSeqIndex = p->second;
+				if (RefSeqIndex == UINT_MAX)
+					Die("UINT_MAX");
+				RefToTestSeqIndex[RefSeqIndex] = TestSeqIndex;
+				++FoundCount;
+				}
+			}
+		else
+			{
+			map<string, uint>::const_iterator p =
+			  RefSeqNameToIndex.find(SeqName);
+			if (p != RefSeqNameToIndex.end())
+				{
+				uint RefSeqIndex = p->second;
+				if (RefSeqIndex == UINT_MAX)
+					Die("UINT_MAX");
+				RefToTestSeqIndex[RefSeqIndex] = TestSeqIndex;
+				++FoundCount;
+				}
 			}
 		}
-	if (FoundCount == 0)
-		Die("No reference labels found in test MSA");
-	if (FoundCount > RefSeqCount)
-		Warning("%u reference sequences not found in test MSA", RefSeqCount - FoundCount);
+	if (opt(bysequence))
+		{
+		if (FoundCount < 2)
+			Die("%d ref seqs found in test MSA", FoundCount);
+		if (FoundCount > RefSeqCount)
+			Warning("%u / %u ref seqs found in test MSA",
+				FoundCount, RefSeqCount);
+		}
+	else
+		{
+		if (FoundCount < 2)
+			Die("%d ref labels found in test MSA", FoundCount);
+		if (FoundCount > RefSeqCount)
+			Warning("%u / %u ref labels found in test MSA",
+				FoundCount, RefSeqCount);
+		}
 
 // TestColIndex[i] is the one-based (not zero-based!) test column index
 // of the letter found in the current column of the reference alignment

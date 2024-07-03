@@ -15,6 +15,7 @@ static void Align(MPCFlat_mega &M, MultiSequence &InputSeqs,
         HP.FromFile(opt(hmmin));
     else
         HP.FromDefaults(Nucleo);
+	HP.CmdLineUpdate();
     if (PerturbSeed > 0)
         {
         ResetRand(PerturbSeed);

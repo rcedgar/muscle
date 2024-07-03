@@ -59,6 +59,7 @@ public:
 	void FromStrings(const vector<string> &Lines);
 	void FromFile(const string &FileName);
 	void FromDefaults(bool Nucleo);
+	void CmdLineUpdate();
 
 	void PerturbProbs(uint Seed);
 	void ToSingleAffineProbs(HMMParams &Params);
