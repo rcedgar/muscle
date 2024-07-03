@@ -50,6 +50,7 @@ HDRS = \
   m3alnparams.h \
   mega.h \
   mpcflat.h \
+  mpcflat_mega.h \
   msa.h \
   multisequence.h \
   muscle.h \
@@ -104,6 +105,8 @@ HDRS = \
 OBJS = \
   $(OBJDIR)/addconfseq.o \
   $(OBJDIR)/align.o \
+  $(OBJDIR)/alignpairflat_mega.o \
+  $(OBJDIR)/align_mega.o \
   $(OBJDIR)/bwdflat_mega.o \
   $(OBJDIR)/cmd_cmp_msa.o \
   $(OBJDIR)/cmd_m3ensemble.o \
@@ -182,6 +185,7 @@ OBJS = \
   $(OBJDIR)/eadistmxmsas.o \
   $(OBJDIR)/fasta.o \
   $(OBJDIR)/fasta2.o \
+  $(OBJDIR)/mpcflat_mega.o \
   $(OBJDIR)/msaselfscore3.o \
   $(OBJDIR)/muscle3.o \
   $(OBJDIR)/mx.o \
@@ -243,6 +247,7 @@ OBJS = \
   $(OBJDIR)/sweeper.o \
   $(OBJDIR)/test.o \
   $(OBJDIR)/test_malloc.o \
+  $(OBJDIR)/test_mega.o \
   $(OBJDIR)/tracebackbitmem.o \
   $(OBJDIR)/tree.o \
   $(OBJDIR)/tree2.o \

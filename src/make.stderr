@@ -1,2 +1,0 @@
-/usr/bin/ld: /usr/lib/gcc/x86_64-linux-gnu/11/libgomp.a(target.o): in function `gomp_target_init.part.0':
-(.text+0x358): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
