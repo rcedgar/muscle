@@ -113,7 +113,6 @@ OBJS = \
   $(OBJDIR)/cmd_mustang_core.o \
   $(OBJDIR)/cmd_newbench_pfamgroups.o \
   $(OBJDIR)/cmd_newbench_selectpfams.o \
-  $(OBJDIR)/cmd_qscoredir_cmp2.o \
   $(OBJDIR)/cmd_squeeze_inserts.o \
   $(OBJDIR)/fwdflat_mega.o \
   $(OBJDIR)/hscore.o \

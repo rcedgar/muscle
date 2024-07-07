@@ -1,6 +1,6 @@
 #include "myutils.h"
 #include "muscle.h"
-#include "KmerDist33.h"
+#include "kmerdist33.h"
 
 uint KmerDist33::SeqToKmer(const byte *Seq) const
 	{
