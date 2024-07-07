@@ -65,7 +65,7 @@ void cmd_qscore()
 			msaTest.GetUngappedSeqStr(TestSeqIndex, USeq);
 			map<string, uint>::const_iterator p =
 			  RefSeqToIndex.find(USeq);
-			if (p != RefSeqNameToIndex.end())
+			if (p != RefSeqToIndex.end())
 				{
 				uint RefSeqIndex = p->second;
 				if (RefSeqIndex == UINT_MAX)
