@@ -92,7 +92,7 @@ void cmd_qscore()
 		{
 		if (FoundCount < 2)
 			Die("%d ref seqs found in test MSA", FoundCount);
-		if (FoundCount > RefSeqCount)
+		if (FoundCount < RefSeqCount)
 			Warning("%u / %u ref seqs found in test MSA",
 				FoundCount, RefSeqCount);
 		}
@@ -100,7 +100,7 @@ void cmd_qscore()
 		{
 		if (FoundCount < 2)
 			Die("%d ref labels found in test MSA", FoundCount);
-		if (FoundCount > RefSeqCount)
+		if (FoundCount < RefSeqCount)
 			Warning("%u / %u ref labels found in test MSA",
 				FoundCount, RefSeqCount);
 		}
