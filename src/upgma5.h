@@ -54,7 +54,8 @@ public:
 	void Run(const string &sLinkage, Tree &tree);
 	void Run(LINKAGE Linkage, Tree &tree);
 	void ReadDistMx(const string &FileName);
-	void ScaleDistMx();
+	void ReadDistMx2(const string &FileName);
+	void ScaleDistMx(bool InputIsSimilarity = true);
 	void FixEADistMx();
 	void LogMe() const;
 	void AddLabel(const string &Label);

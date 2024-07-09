@@ -132,6 +132,7 @@ FLAG_OPT(q2)
 FLAG_OPT(missingtestseqok)
 FLAG_OPT(missingtestfileok)
 FLAG_OPT(bysequence)
+FLAG_OPT(reseek)
 
 #undef FLAG_OPT
 #undef UNS_OPT

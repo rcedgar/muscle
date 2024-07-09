@@ -433,6 +433,68 @@ void UPGMA5::ReadDistMx(const string &FileName)
 	Progress(" done.\n");
 	}
 
+// Reseek distmx format.
+// first line is distmx\tN
+// next N lines are i\tLabel
+// then distances are idx1\tidx2\tTS
+void UPGMA5::ReadDistMx2(const string &FileName)
+	{
+	Progress("Reading dist mx (reseek format)...");
+// Pass 1, labels
+	FILE *f = OpenStdioFile(FileName);
+
+
+	string Hdr;
+	vector<string> HdrFields;
+	bool Ok = ReadLineStdioFile(f, Hdr);
+	asserta(Ok);
+	Split(Hdr, HdrFields, '\t');
+	asserta(SIZE(HdrFields) == 2);
+	asserta(HdrFields[0] == "distmx");
+	m_LeafCount = StrToUint(HdrFields[1]);
+	asserta(m_LeafCount > 2);
+
+	string Line;
+	vector<string> Fields;
+	m_Labels.clear();
+	m_LabelToIndex.clear();
+	for (uint Idx = 0; Idx < m_LeafCount; ++Idx)
+		{
+		Ok = ReadLineStdioFile(f, Line);
+		asserta(Ok);
+		Split(Line, Fields, '\t');
+		asserta(SIZE(Fields) == 2);
+		
+		asserta(StrToUint(Fields[0]) == Idx);
+		const string &Label = Fields[1];
+		AddLabel(Label);
+		}
+	asserta(SIZE(m_Labels) == m_LeafCount);
+
+	m_DistMx.clear();
+	m_DistMx.resize(m_LeafCount);
+	for (uint i = 0; i < m_LeafCount; ++i)
+		m_DistMx[i].resize(m_LeafCount, 0);
+
+// Pass 2, distances
+	while (ReadLineStdioFile(f, Line))
+		{
+		Split(Line, Fields, '\t');
+		asserta(SIZE(Fields) == 3);
+		uint Index1 = StrToUint(Fields[0]);
+		uint Index2 = StrToUint(Fields[1]);
+		asserta(Index1 < m_LeafCount);
+		asserta(Index2 < m_LeafCount);
+		asserta(Index1 != Index2);
+		float Dist = (float) StrToFloat(Fields[2]);
+		m_DistMx[Index1][Index2] = Dist;
+		m_DistMx[Index2][Index1] = Dist;
+		}
+
+	CloseStdioFile(f);
+	Progress(" done.\n");
+	}
+
 void UPGMA5::FixEADistMx()
 	{
 	for (uint i = 0; i < m_LeafCount; ++i)
@@ -450,7 +512,7 @@ void UPGMA5::FixEADistMx()
 		}
 	}
 
-void UPGMA5::ScaleDistMx()
+void UPGMA5::ScaleDistMx(bool InputIsSimilarity)
 	{
 	const float SCALE = 10.0f;
 	float MinDist = m_DistMx[0][1];
@@ -465,7 +527,7 @@ void UPGMA5::ScaleDistMx()
 			MaxDist = max(MaxDist, d);
 			}
 		}
-	ProgressLog("Min dist %.4g, max %.4g\n", MinDist, MaxDist);
+	ProgressLog("Re-scaling, min %.4g, max %.4g\n", MinDist, MaxDist);
 
 	float MinNewDist = FLT_MAX;
 	float MaxNewDist = FLT_MAX;
@@ -474,7 +536,13 @@ void UPGMA5::ScaleDistMx()
 		for (uint j = 0; j < i; ++j)
 			{
 			float d = m_DistMx[i][j];
-			float NewDist = SCALE*(MaxDist - d)/(MaxDist - MinDist);
+			//float NewDist = SCALE*(MaxDist - d)/(MaxDist - MinDist);
+			float NewDist = FLT_MAX;
+			if (InputIsSimilarity)
+				NewDist = SCALE*(MaxDist - d)/(MaxDist - MinDist);
+			else
+				NewDist = SCALE*(d - MinDist)/(MaxDist - MinDist);
+
 			if (MinNewDist == FLT_MAX || NewDist < MinNewDist)
 				MinNewDist = NewDist;
 			if (MaxNewDist == FLT_MAX || NewDist > MaxNewDist)
@@ -494,11 +562,19 @@ void cmd_upgma5()
 	const string &OutputFileName = opt(output);
 
 	UPGMA5 U;
-	U.ReadDistMx(InputFileName);
-	if (opt(scaledist))
+	if (opt(reseek))
+		{
+		U.ReadDistMx2(InputFileName);
 		U.ScaleDistMx();
-	else if (opt(eadist))
-		U.FixEADistMx();
+		}
+	else
+		{
+		U.ReadDistMx(InputFileName);
+		if (opt(scaledist))
+			U.ScaleDistMx();
+		else if (opt(eadist))
+			U.FixEADistMx();
+		}
 
 	LINKAGE Linkage = LINKAGE_Avg;
 	string sLink = "avg";
