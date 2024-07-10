@@ -42,10 +42,20 @@ public:
 	map<string, uint> m_RefSeqToSeqIndex;
 	vector<uint> m_TestColToCount;
 
+	vector<bool> m_RefColIsAligned;
+	vector<bool> m_TestColIsAligned;
+
+	double m_RefMSAs_Q = 0;
+	uint m_RefMSAs_ComparedColCount = 0;
+	vector<uint> m_RefMSAs_TestCols;
+	vector<uint> m_RefMSAs_RefCols;
+	vector<double> m_RefMSAs_ColQs;
+
 public:
 	void Clear();
 	void Run(const string &Name, const MSA &Test, const MSA &Ref);
 	void Run(const string &Name, const MultiSequence &Test, const MultiSequence &Ref);
+	void CmpRefMSAs(const string &Name, const MSA &Test, const MSA &Ref);
 
 	void InitRefLabels();
 	void InitRefToTest();
@@ -58,6 +68,8 @@ public:
 	void DoRefCols();
 	void DoRefCol(uint k);
 	void SetTestColToBestRefCol();
+	void SetTestColIsAligned();
+	void SetRefColIsAligned();
 	void UpdateRefLetterCounts(vector<vector<uint> > &LetterCountsVec) const;
 	void UpdateRefLetterCountsCol(uint k, vector<vector<uint> > &LetterCountsVec) const;
 

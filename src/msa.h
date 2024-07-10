@@ -91,7 +91,7 @@ public:
 	void DeleteSeq(unsigned uSeqIndex);
 	bool IsEmptyCol(unsigned uColIndex) const;
 
-	ALPHA GuessAlpha() const;
+	//ALPHA GuessAlpha() const;
 	//void FixAlpha();
 
 	unsigned /*Uniq*/ueResidueTypes(unsigned uColIndex) const;
@@ -129,6 +129,7 @@ public:
 // sequence which opens at 1-based position (-Pos).
 	void GetColToPos1(uint SeqIndex, vector<int> &ColToPos) const;
 	bool ColIsUpper(uint ColIndex, double MaxGapFract) const;
+	bool ColIsAligned(uint ColIndex) const;
 
 	static void SetIdCount(unsigned uIdCount);
 

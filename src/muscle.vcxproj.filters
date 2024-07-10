@@ -575,6 +575,12 @@
     <ClCompile Include="test_mega.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cmp_ref_msas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="alignmsasbycols.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

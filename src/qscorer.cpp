@@ -431,3 +431,110 @@ void QScorer::UpdateRefLetterCounts(vector<vector<uint> > &LetterCountsVec) cons
 	for (uint k = 0; k < K; ++k)
 		UpdateRefLetterCountsCol(k, LetterCountsVec);
 	}
+
+void QScorer::SetTestColIsAligned()
+	{
+	m_TestColIsAligned.clear();
+	const uint TestColCount = m_Test->GetColCount();
+	for (uint TestCol = 0; TestCol < TestColCount; ++TestCol)
+		{
+		bool IsAligned = m_Test->ColIsAligned(TestCol);
+		m_TestColIsAligned.push_back(IsAligned);
+		}
+	}
+
+void QScorer::SetRefColIsAligned()
+	{
+	m_RefColIsAligned.clear();
+	const uint RefColCount = m_Ref->GetColCount();
+	for (uint RefCol = 0; RefCol < RefColCount; ++RefCol)
+		{
+		bool IsAligned = m_Ref->ColIsAligned(RefCol);
+		m_RefColIsAligned.push_back(IsAligned);
+		}
+	}
+
+void QScorer::CmpRefMSAs(const string &Name, const MSA &Test, const MSA &Ref)
+	{
+	Clear();
+
+	m_Name = Name;
+	m_Test = &Test;
+	m_Ref = &Ref;
+
+	const uint TestSeqCount = Test.GetSeqCount();
+	const uint RefSeqCount = Ref.GetSeqCount();
+
+	const uint TestColCount = Test.GetColCount();
+	const uint RefColCount = Ref.GetColCount();
+
+	if (opt(bysequence))
+		{
+		InitRefLabels_bysequence();
+		InitRefToTest_bysequence();
+		}
+	else
+		{
+		InitRefLabels();
+		InitRefToTest();
+		}
+	InitColPosVecs();
+	SetTestColIsAligned();
+	SetRefColIsAligned();
+	uint AlignedTestColCount = 0;
+	const uint N = SIZE(m_RefSeqIndexes);
+	asserta(SIZE(m_TestSeqIndexes) == N);
+	if (N == 0)
+		Die("No matched sequences/labels %s", Name.c_str());
+	map<uint, uint> RefColToCount;
+	m_RefMSAs_ComparedColCount = 0;
+	double SumColQ = 0;
+	for (uint TestCol = 0; TestCol < TestColCount; ++TestCol)
+		{
+		if (!m_TestColIsAligned[TestCol])
+			continue;
+		vector<uint> RefCols;
+		++AlignedTestColCount;
+		uint M = 0;
+		uint Bestn = 0;
+		uint BestRefCol = UINT_MAX;
+		for (uint i = 0; i < N; ++i)
+			{
+			uint TestSeqIndex = m_TestSeqIndexes[i];
+			uint RefSeqIndex = m_RefSeqIndexes[i];
+			uint TestPos = m_TestColToPosVec[i][TestCol];
+			if (TestPos == UINT_MAX)
+				continue;
+			++M;
+			uint RefCol = m_PosToRefColVec[i][TestPos];
+			if (!m_RefColIsAligned[RefCol])
+				continue;
+			map<uint, uint>::const_iterator iter = RefColToCount.find(RefCol);
+			uint n = 1;
+			if (iter == RefColToCount.end())
+				RefColToCount[RefCol] = 1;
+			else
+				{
+				n = iter->second + 1;
+				RefColToCount[RefCol] = n;
+				}
+			if (n > Bestn)
+				{
+				BestRefCol = RefCol;
+				Bestn = n;
+				}
+			}
+		if (BestRefCol == UINT_MAX || M < 2)
+			continue;
+		asserta(M > 0);
+		++m_RefMSAs_ComparedColCount;
+		double ColQ = double(Bestn)/M;
+		m_RefMSAs_ColQs.push_back(ColQ);
+		m_RefMSAs_TestCols.push_back(TestCol);
+		m_RefMSAs_RefCols.push_back(BestRefCol);
+		SumColQ += ColQ;
+		}
+	m_RefMSAs_Q = -1;
+	if (m_RefMSAs_ComparedColCount > 0)
+		m_RefMSAs_Q = SumColQ/m_RefMSAs_ComparedColCount;
+	}

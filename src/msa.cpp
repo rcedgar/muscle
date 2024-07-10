@@ -854,42 +854,42 @@ void MSA::ExpandCache(unsigned uSeqCount, unsigned uColCount)
 //	ReportInvalidLetters();
 //	}
 
-ALPHA MSA::GuessAlpha() const
-	{
-// If at least MIN_NUCLEO_PCT of the first CHAR_COUNT non-gap
-// letters belong to the nucleotide alphabet, guess nucleo.
-// Otherwise amino.
-	const unsigned CHAR_COUNT = 100;
-	const unsigned MIN_NUCLEO_PCT = 95;
-
-	const unsigned uSeqCount = GetSeqCount();
-	const unsigned uColCount = GetColCount();
-	if (0 == uSeqCount)
-		return ALPHA_Amino;
-
-	unsigned uNucleoCount = 0;
-	unsigned uTotal = 0;
-	unsigned i = 0;
-	for (;;)
-		{
-		unsigned uSeqIndex = i/uColCount;
-		if (uSeqIndex >= uSeqCount)
-			break;
-		unsigned uColIndex = i%uColCount;
-		++i;
-		char c = GetChar(uSeqIndex, uColIndex);
-		if (IsGapChar(c))
-			continue;
-		if (g_CharToLetterNucleo[c] < 4 || c == 'N' || c == 'n')
-			++uNucleoCount;
-		++uTotal;
-		if (uTotal >= CHAR_COUNT)
-			break;
-		}
-	if (uTotal != 0 && ((uNucleoCount*100)/uTotal) >= MIN_NUCLEO_PCT)
-		return ALPHA_Nucleo;
-	return ALPHA_Amino;
-	}
+//ALPHA MSA::GuessAlpha() const
+//	{
+//// If at least MIN_NUCLEO_PCT of the first CHAR_COUNT non-gap
+//// letters belong to the nucleotide alphabet, guess nucleo.
+//// Otherwise amino.
+//	const unsigned CHAR_COUNT = 100;
+//	const unsigned MIN_NUCLEO_PCT = 95;
+//
+//	const unsigned uSeqCount = GetSeqCount();
+//	const unsigned uColCount = GetColCount();
+//	if (0 == uSeqCount)
+//		return ALPHA_Amino;
+//
+//	unsigned uNucleoCount = 0;
+//	unsigned uTotal = 0;
+//	unsigned i = 0;
+//	for (;;)
+//		{
+//		unsigned uSeqIndex = i/uColCount;
+//		if (uSeqIndex >= uSeqCount)
+//			break;
+//		unsigned uColIndex = i%uColCount;
+//		++i;
+//		char c = GetChar(uSeqIndex, uColIndex);
+//		if (IsGapChar(c))
+//			continue;
+//		if (g_CharToLetterNucleo[c] < 4 || c == 'N' || c == 'n')
+//			++uNucleoCount;
+//		++uTotal;
+//		if (uTotal >= CHAR_COUNT)
+//			break;
+//		}
+//	if (uTotal != 0 && ((uNucleoCount*100)/uTotal) >= MIN_NUCLEO_PCT)
+//		return ALPHA_Nucleo;
+//	return ALPHA_Amino;
+//	}
 
 void MSA::GetPosToCol(uint SeqIndex, vector<uint> &PosToCol) const
 	{
@@ -974,6 +974,40 @@ bool MSA::ColIsUpper(uint ColIndex, double MaxGapFract) const
 		return false;
 
 	if (UpperCount == 0)
+		return false;
+
+	return true;
+	}
+
+bool MSA::ColIsAligned(uint ColIndex) const
+	{
+	const uint SeqCount = GetSeqCount();
+	uint UpperCount = 0;
+	uint LowerCount = 0;
+	uint GapCount = 0;
+	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
+		{
+		char c = GetChar(SeqIndex, ColIndex);
+		if (isgap(c))
+			{
+			++GapCount;
+			continue;
+			}
+		if (!isalpha(c))
+			continue;
+		if (isupper(c))
+			++UpperCount;
+		else
+			++LowerCount;
+		}
+
+	if (UpperCount == 0 && LowerCount == 0)
+		return false;
+
+	if (UpperCount > 0 && LowerCount > 0)
+		Die("Column %u has mixed case letters", ColIndex);
+
+	if (UpperCount < 2)
 		return false;
 
 	return true;

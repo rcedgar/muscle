@@ -82,7 +82,7 @@ void MSAFromSeqSubset(const MSA &msaIn, const unsigned uSeqIndexes[], unsigned u
 		const char *ptrName = msaIn.GetSeqName(uSeqIndexIn);
 		unsigned uId = msaIn.GetSeqId(uSeqIndexIn);
 		msaOut.SetSeqName(uSeqIndexOut, ptrName);
-		msaOut.SetSeqId(uSeqIndexOut, uId);
+		//msaOut.SetSeqId(uSeqIndexOut, uId);
 		for (unsigned uColIndex = 0; uColIndex < uColCount; ++uColIndex)
 			{
 			const char c = msaIn.GetChar(uSeqIndexIn, uColIndex);

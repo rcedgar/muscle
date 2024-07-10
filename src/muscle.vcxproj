@@ -214,6 +214,7 @@
   <ItemGroup>
     <ClCompile Include="addconfseq.cpp" />
     <ClCompile Include="align.cpp" />
+    <ClCompile Include="alignmsasbycols.cpp" />
     <ClCompile Include="alignpairflat_mega.cpp" />
     <ClCompile Include="align_mega.cpp" />
     <ClCompile Include="bwdflat_mega.cpp" />
@@ -223,6 +224,7 @@
     <ClCompile Include="cmd_newbench_pfamgroups.cpp" />
     <ClCompile Include="cmd_newbench_selectpfams.cpp" />
     <ClCompile Include="cmd_squeeze_inserts.cpp" />
+    <ClCompile Include="cmp_ref_msas.cpp" />
     <ClCompile Include="fwdflat_mega.cpp" />
     <ClCompile Include="hscore.cpp" />
     <ClCompile Include="m3alnparams.cpp" />
