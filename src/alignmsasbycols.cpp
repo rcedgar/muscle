@@ -1,32 +1,24 @@
 #include "myutils.h"
 #include "msa.h"
 
+// MergeMap[i] is column in X2 and Y2 where the i'th
+//  entry in ColsX and ColsY is placed in Path.
 void AlignMSAsByCols(const MSA &X, const MSA &Y,
-  const vector<uint> &aColsX, const vector<uint> &aColsY,
-  string &Path, MSA &X2, MSA &Y2)
+  const vector<uint> &ColsX, const vector<uint> &ColsY,
+  string &Path, vector<uint> &MergeMap, MSA &X2, MSA &Y2)
 	{
 	X2.Clear();
 	Y2.Clear();
-	const uint aNC = SIZE(aColsX);
-	asserta(aNC > 0);
-	vector<uint> ColsX;
-	vector<uint> ColsY;
-	ColsX.push_back(aColsX[0]);
-	ColsY.push_back(aColsY[0]);
-	for (uint i = 1; i < aNC; ++i)
-		{
-		uint ColX = aColsX[i];
-		uint ColY = aColsY[i];
-		if (ColX > ColsX.back() && ColY > ColsY.back())
-			{
-			ColsX.push_back(ColX);
-			ColsY.push_back(ColY);
-			}
-		}
-
+	MergeMap.clear();
 	const uint NC = SIZE(ColsX);
 	asserta(SIZE(ColsY) == NC);
 	asserta(NC > 0);
+	for (uint i = 1; i < NC; ++i)
+		{
+		asserta(ColsX[i] > ColsX[i-1]);
+		asserta(ColsY[i] > ColsY[i-1]);
+		}
+
 	const uint ColCountX = X.GetColCount();
 	const uint ColCountY = Y.GetColCount();
 	uint ColX = 0;
@@ -56,6 +48,7 @@ void AlignMSAsByCols(const MSA &X, const MSA &Y,
 		++ColY;
 		}
 	asserta(ColX == FirstColX && ColY == FirstColY);
+	MergeMap.push_back(SIZE(Path));
 	Path += 'M';
 	for (uint i = 1; i < NC; ++i)
 		{
@@ -89,6 +82,7 @@ void AlignMSAsByCols(const MSA &X, const MSA &Y,
 			}
 		asserta(ColX + 1 == NextColX);
 		asserta(ColY + 1 == NextColY);
+		MergeMap.push_back(SIZE(Path));
 		Path += 'M';
 		ColX = NextColX;
 		ColY = NextColY;
@@ -153,7 +147,7 @@ void AlignMSAsByCols(const MSA &X, const MSA &Y,
 
 			case 'y':
 				{
-				X2.SetChar(i, j, '~');
+				X2.SetChar(i, j, '.');
 				break;
 				}
 
@@ -185,7 +179,7 @@ void AlignMSAsByCols(const MSA &X, const MSA &Y,
 
 			case 'x':
 				{
-				Y2.SetChar(i, j, '~');
+				Y2.SetChar(i, j, '.');
 				break;
 				}
 

@@ -1012,3 +1012,33 @@ bool MSA::ColIsAligned(uint ColIndex) const
 
 	return true;
 	}
+
+void MSA::DeleteAllGapCols(MSA &msa) const
+	{
+	const uint ColCount = GetColCount();
+	const uint SeqCount = GetSeqCount();
+	uint NewColCount = 0;
+	for (uint Col = 0; Col < ColCount; ++Col)
+		{
+		uint GapCount = GetGapCount(Col);
+		if (GapCount != SeqCount)
+			++NewColCount;
+		}
+	msa.SetSize(SeqCount, NewColCount);
+	uint NewColIndex = 0;
+	for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
+		msa.m_szNames[SeqIndex] = mystrsave(GetLabel(SeqIndex));
+
+	for (uint Col = 0; Col < ColCount; ++Col)
+		{
+		uint GapCount = GetGapCount(Col);
+		if (GapCount == SeqCount)
+			continue;
+		for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
+			{
+			char c = GetChar(SeqIndex, Col);
+			msa.SetChar(SeqIndex, NewColIndex, c);
+			}
+		++NewColIndex;
+		}
+	}

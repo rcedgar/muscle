@@ -2,8 +2,22 @@
 #include "qscorer.h"
 
 void AlignMSAsByCols(const MSA &X, const MSA &Y,
-  const vector<uint> &aColsX, const vector<uint> &aColsY,
-  string &Path, MSA &X2, MSA &Y2);
+  const vector<uint> &ColsX, const vector<uint> &ColsY,
+  string &Path, vector<uint> &MergeMap, MSA &X2, MSA &Y2);
+
+static char GetQChar(double Q)
+	{
+	asserta(Q >= 0 && Q <= 1);
+	if (Q == 1)
+		return '|';
+	else if (Q >= 0.9)
+		return ':';
+	else if (Q >= 0.5)
+		return '.';
+	else if (Q > 0)
+		return '@';
+	return '*';
+	}
 
 void cmd_cmp_ref_msas()
 	{
@@ -56,6 +70,30 @@ void cmd_cmp_ref_msas()
 		Log("%s  %s  %6.4f\n", TestColStr.c_str(), RefColStr.c_str(), Q);
 		}
 
+	Log("\n");
+	const uint aNC = SIZE(TestCols);
+	asserta(aNC > 0);
+	vector<uint> FixedTestCols;
+	vector<uint> FixedRefCols;
+	vector<double> FixedQs;
+	FixedTestCols.push_back(TestCols[0]);
+	FixedRefCols.push_back(RefCols[0]);
+	FixedQs.push_back(Qs[0]);
+	for (uint i = 1; i < aNC; ++i)
+		{
+		uint ColX = TestCols[i];
+		uint ColY = RefCols[i];
+		if (ColX > FixedTestCols.back() && ColY > FixedRefCols.back())
+			{
+			FixedTestCols.push_back(ColX);
+			FixedRefCols.push_back(ColY);
+			FixedQs.push_back(Qs[i]);
+			}
+		}
+	const uint NF = SIZE(FixedTestCols);
+	asserta(SIZE(FixedRefCols) == NF);
+	asserta(NF > 0);
+
 	MSA TestSubset;
 	MSA RefSubset;
 	MSAFromSeqSubset(Test, TestSeqIndexes.data(), SIZE(TestSeqIndexes), TestSubset);
@@ -64,14 +102,21 @@ void cmd_cmp_ref_msas()
 	MSA Test2;
 	MSA Ref2;
 	string Path;
-	AlignMSAsByCols(TestSubset, RefSubset, TestCols, RefCols, Path, Test2, Ref2);
-	const uint ColCount2 = Test2.GetColCount();
+	vector<uint> MergeMap;
+	AlignMSAsByCols(TestSubset, RefSubset,
+	  FixedTestCols, FixedRefCols, Path, MergeMap, Test2, Ref2);
+	const uint ColCount2 = SIZE(Path);
+	asserta(Test2.GetColCount() == ColCount2);
 	asserta(Ref2.GetColCount() == ColCount2);
+	asserta(SIZE(MergeMap) == NF);
 
-	const uint PL = SIZE(Path);
+	vector<bool> AllGaps;
+	for (uint i = 0; i < ColCount2; ++i)
+		AllGaps.push_back(Test2.IsGapColumn(i) && Ref2.IsGapColumn(i));
+
 	uint FirstM = UINT_MAX;
 	uint LastM = UINT_MAX;
-	for (uint i = 0; i < PL; ++i)
+	for (uint i = 0; i < ColCount2; ++i)
 		{
 		if (Path[i] == 'M')
 			{
@@ -79,6 +124,15 @@ void cmd_cmp_ref_msas()
 				FirstM = i;
 			LastM = i;
 			}
+		}
+
+	string Annot(ColCount2, '_');
+	for (uint i = 0; i < NF; ++i)
+		{
+		uint k = MergeMap[i];
+		double Q = FixedQs[i];
+		asserta(k < SIZE(Annot));
+		Annot[k] = GetQChar(Q);
 		}
 
 	const uint TestSeqCount = Test2.GetSeqCount();
@@ -89,9 +143,16 @@ void cmd_cmp_ref_msas()
 		Test2.GetRowStr(i, Row);
 		string RowM;
 		for (uint j = FirstM; j <= LastM; ++j)
-			RowM += Row[j];
+			if (!AllGaps[j])
+				RowM += Row[j];
 		Log("%s  >%s\n", RowM.c_str(), Label);
 		}
+	Log("\n");
+	string AnnotM;
+	for (uint j = FirstM; j <= LastM; ++j)
+		if (!AllGaps[j])
+			AnnotM += Annot[j];
+	Log("%s\n", AnnotM.c_str());
 	Log("\n");
 	const uint RefSeqCount = Ref2.GetSeqCount();
 	for (uint i = 0; i < RefSeqCount; ++i)
@@ -101,7 +162,8 @@ void cmd_cmp_ref_msas()
 		Ref2.GetRowStr(i, Row);
 		string RowM;
 		for (uint j = FirstM; j <= LastM; ++j)
-			RowM += Row[j];
+			if (!AllGaps[j])
+				RowM += Row[j];
 		Log("%s  >%s\n", RowM.c_str(), Label);
 		}
 	}

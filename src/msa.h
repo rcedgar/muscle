@@ -90,11 +90,10 @@ public:
 	void CopySeq(unsigned uToSeqIndex, const MSA &msaFrom, unsigned uFromSeqIndex);
 	void DeleteSeq(unsigned uSeqIndex);
 	bool IsEmptyCol(unsigned uColIndex) const;
+	void DeleteAllGapCols(MSA &msa) const;
 
 	//ALPHA GuessAlpha() const;
 	//void FixAlpha();
-
-	unsigned /*Uniq*/ueResidueTypes(unsigned uColIndex) const;
 
 	unsigned GetCharCount(unsigned uSeqIndex, unsigned uColIndex) const;
 	const char *GetSeqBuffer(unsigned uSeqIndex) const;
