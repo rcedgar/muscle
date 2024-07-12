@@ -87,5 +87,6 @@ C(newbench_pfamgroups)
 C(mustang_core)
 C(align_mega)
 C(test_mega)
+C(shrub)
 
 #undef C

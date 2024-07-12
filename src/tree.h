@@ -5,7 +5,7 @@
 
 class Clust;
 
-const unsigned NULL_NEIGHBOR = UINT_MAX;
+const uint NULL_NEIGHBOR = UINT_MAX;
 const double MISSING_LENGTH = DBL_MAX;
 
 enum NEWICK_TOKEN_TYPE
@@ -33,11 +33,11 @@ public:
 // Yuck. Data is made public for the convenience of Tree::Copy.
 // There has to be a better way.
 public:
-	unsigned m_uNodeCount;
-	unsigned m_uCacheCount;
-	unsigned *m_uNeighbor1;
-	unsigned *m_uNeighbor2;
-	unsigned *m_uNeighbor3;
+	uint m_uNodeCount;
+	uint m_uCacheCount;
+	uint *m_uNeighbor1;
+	uint *m_uNeighbor2;
+	uint *m_uNeighbor3;
 	double *m_dEdgeLength1;
 	double *m_dEdgeLength2;
 	double *m_dEdgeLength3;
@@ -46,10 +46,10 @@ public:
 	bool *m_bHasEdgeLength2;
 	bool *m_bHasEdgeLength3;
 	bool *m_bHasHeight;
-	unsigned *m_Ids;
+	uint *m_Ids;
 	char **m_ptrName;
 	bool m_bRooted = false;
-	unsigned m_uRootNodeIndex = UINT_MAX;
+	uint m_uRootNodeIndex = UINT_MAX;
 
 	Tree()
 		{
@@ -79,7 +79,7 @@ public:
 
 	void Clear()
 		{
-		for (unsigned n = 0; n < m_uNodeCount; ++n)
+		for (uint n = 0; n < m_uNodeCount; ++n)
 			free(m_ptrName[n]);
 
 		m_uNodeCount = 0;
@@ -126,21 +126,21 @@ public:
 
 	void Copy(const Tree &tree);
 
-	void Create(unsigned uLeafCount, unsigned uRoot, const unsigned Left[],
-	  const unsigned Right[], const float LeftLength[], const float RightLength[],
-	  const unsigned LeafIds[], char *LeafNames[]);
+	void Create(uint uLeafCount, uint uRoot, const uint Left[],
+	  const uint Right[], const float LeftLength[], const float RightLength[],
+	  const uint LeafIds[], char *LeafNames[]);
 	void FromVectors(const vector<string> &Labels, 
 	  const vector<uint> &Parents, const vector<float> &Lengths);
 	void ToVectors(vector<string> &Labels, 
 	  vector<uint> &Parents, vector<float> &Lengths) const;
 
-	unsigned AppendBranch(unsigned uExistingNodeIndex);
-	void SetLeafName(unsigned uNodeIndex, const char *ptrName);
-	void SetLeafId(unsigned uNodeIndex, unsigned uId);
-	void SetEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2,
+	uint AppendBranch(uint uExistingNodeIndex);
+	void SetLeafName(uint uNodeIndex, const char *ptrName);
+	void SetLeafId(uint uNodeIndex, uint uId);
+	void SetEdgeLength(uint uNodeIndex1, uint uNodeIndex2,
 	  double dLength);
 
-	//void RootUnrootedTree(unsigned uNodeIndex1, unsigned uNodeIndex2);
+	//void RootUnrootedTree(uint uNodeIndex1, uint uNodeIndex2);
 	void UnrootByDeletingRoot();
 	uint Ladderize(bool Right);
 
@@ -149,12 +149,12 @@ public:
 	void ToFile(const string &FileName) const;
 
 // Accessor functions
-	unsigned GetNodeCount() const
+	uint GetNodeCount() const
 		{
 		return m_uNodeCount;
 		}
 
-	unsigned GetLeafCount() const
+	uint GetLeafCount() const
 		{
 		if (m_bRooted)
 			{
@@ -173,27 +173,27 @@ public:
 		return m_uRootNodeIndex;
 		}
 
-	unsigned GetNeighbor(unsigned uNodeIndex, unsigned uNeighborSubscript) const;
+	uint GetNeighbor(uint uNodeIndex, uint uNeighborSubscript) const;
 
-	unsigned GetNeighbor1(unsigned uNodeIndex) const
+	uint GetNeighbor1(uint uNodeIndex) const
 		{
 		assert(uNodeIndex < m_uNodeCount);
 		return m_uNeighbor1[uNodeIndex];
 		}
 
-	unsigned GetNeighbor2(unsigned uNodeIndex) const
+	uint GetNeighbor2(uint uNodeIndex) const
 		{
 		assert(uNodeIndex < m_uNodeCount);
 		return m_uNeighbor2[uNodeIndex];
 		}
 
-	unsigned GetNeighbor3(unsigned uNodeIndex) const
+	uint GetNeighbor3(uint uNodeIndex) const
 		{
 		assert(uNodeIndex < m_uNodeCount);
 		return m_uNeighbor3[uNodeIndex];
 		}
 
-	unsigned GetParent(unsigned uNodeIndex) const
+	uint GetParent(uint uNodeIndex) const
 		{
 		assert(m_bRooted && uNodeIndex < m_uNodeCount);
 		return m_uNeighbor1[uNodeIndex];
@@ -206,19 +206,19 @@ public:
 
 	uint GetSibling(uint uNodeIndex) const;
 
-	unsigned GetLeft(unsigned uNodeIndex) const
+	uint GetLeft(uint uNodeIndex) const
 		{
 		assert(m_bRooted && uNodeIndex < m_uNodeCount);
 		return m_uNeighbor2[uNodeIndex];
 		}
 
-	unsigned GetRight(unsigned uNodeIndex) const
+	uint GetRight(uint uNodeIndex) const
 		{
 		assert(m_bRooted && uNodeIndex < m_uNodeCount);
 		return m_uNeighbor3[uNodeIndex];
 		}
 
-	const char *GetName(unsigned uNodeIndex) const
+	const char *GetName(uint uNodeIndex) const
 		{
 		assert(uNodeIndex < m_uNodeCount);
 		return m_ptrName[uNodeIndex];
@@ -234,21 +234,21 @@ public:
 			Label = string(Name);
 		}
 
-	unsigned GetRootNodeIndex() const
+	uint GetRootNodeIndex() const
 		{
 		assert(m_bRooted);
 		return m_uRootNodeIndex;
 		}
 
-	unsigned GetNeighborCount(unsigned uNodeIndex) const
+	uint GetNeighborCount(uint uNodeIndex) const
 		{
-		const unsigned n1 = m_uNeighbor1[uNodeIndex];
-		const unsigned n2 = m_uNeighbor2[uNodeIndex];
-		const unsigned n3 = m_uNeighbor3[uNodeIndex];
+		const uint n1 = m_uNeighbor1[uNodeIndex];
+		const uint n2 = m_uNeighbor2[uNodeIndex];
+		const uint n3 = m_uNeighbor3[uNodeIndex];
 		return (NULL_NEIGHBOR != n1) + (NULL_NEIGHBOR != n2) + (NULL_NEIGHBOR != n3);
 		}
 
-	bool IsLeaf(unsigned uNodeIndex) const
+	bool IsLeaf(uint uNodeIndex) const
 		{
 		assert(uNodeIndex < m_uNodeCount);
 		if (1 == m_uNodeCount)
@@ -256,20 +256,20 @@ public:
 		return 1 == GetNeighborCount(uNodeIndex);
 		}
 
-	bool IsRoot(unsigned uNodeIndex) const
+	bool IsRoot(uint uNodeIndex) const
 		{
 		return IsRooted() && m_uRootNodeIndex == uNodeIndex;
 		}
 
-	unsigned GetLeafId(unsigned uNodeIndex) const;
-	unsigned GetNodeIndex(const char *ptrName) const;
-	unsigned GetNodeIndex(const string &Label) const;
-	bool IsEdge(unsigned uNodeIndex1, unsigned uNodeIndex2) const;
-	bool HasEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2) const;
-	double GetEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2) const;
-	const char *GetLeafName(unsigned uNodeIndex) const;
-	unsigned GetNeighborSubscript(unsigned uNodeIndex, unsigned uNeighborIndex) const;
-	double GetNodeHeight(unsigned uNodeIndex) const;
+	uint GetLeafId(uint uNodeIndex) const;
+	uint GetNodeIndex(const char *ptrName) const;
+	uint GetNodeIndex(const string &Label) const;
+	bool IsEdge(uint uNodeIndex1, uint uNodeIndex2) const;
+	bool HasEdgeLength(uint uNodeIndex1, uint uNodeIndex2) const;
+	double GetEdgeLength(uint uNodeIndex1, uint uNodeIndex2) const;
+	const char *GetLeafName(uint uNodeIndex) const;
+	uint GetNeighborSubscript(uint uNodeIndex, uint uNeighborIndex) const;
+	double GetNodeHeight(uint uNodeIndex) const;
 
 	void AppendLeaves(uint Node, vector<uint> &Leaves) const;
 	uint GetSubtreeLeafCount(uint Node) const;
@@ -280,55 +280,56 @@ public:
 	void GetLeafLabels(vector<string> &Labels) const;
 
 // Depth-first traversal
-	unsigned FirstDepthFirstNode() const;
-	unsigned NextDepthFirstNode(unsigned uNodeIndex) const;
+	uint FirstDepthFirstNode() const;
+	uint NextDepthFirstNode(uint uNodeIndex) const;
 
-	unsigned FirstDepthFirstNodeR() const;
-	unsigned NextDepthFirstNodeR(unsigned uNodeIndex) const;
+	uint FirstDepthFirstNodeR() const;
+	uint NextDepthFirstNodeR(uint uNodeIndex) const;
 
 // Equivalent of GetLeft/Right in unrooted tree, works in rooted tree too.
-	unsigned GetFirstNeighbor(unsigned uNodeIndex, unsigned uNeighborIndex) const;
-	unsigned GetSecondNeighbor(unsigned uNodeIndex, unsigned uNeighborIndex) const;
+	uint GetFirstNeighbor(uint uNodeIndex, uint uNeighborIndex) const;
+	uint GetSecondNeighbor(uint uNodeIndex, uint uNeighborIndex) const;
 
 // Getting parent node in unrooted tree defined iff leaf
-	unsigned GetLeafParent(unsigned uNodeIndex) const;
+	uint GetLeafParent(uint uNodeIndex) const;
 
 // Misc
 	const char *NTTStr(NEWICK_TOKEN_TYPE NTT) const;
-	//void FindCenterByLongestSpan(unsigned *ptrNodeIndex1,
-	//  unsigned *ptrNodeIndex2) const;
-	void PruneTree(const Tree &tree, unsigned Subfams[],
-	  unsigned uSubfamCount);
-	unsigned LeafIndexToNodeIndex(unsigned uLeafIndex) const;
+	//void FindCenterByLongestSpan(uint *ptrNodeIndex1,
+	//  uint *ptrNodeIndex2) const;
+	void PruneTree(const Tree &tree, uint Subfams[],
+	  uint uSubfamCount, const char *LabelPrefix);
+	uint LeafIndexToNodeIndex(uint uLeafIndex) const;
 
 // Debugging & trouble-shooting support
 	void Validate() const;
-	void ValidateNode(unsigned uNodeIndex) const;
-	void AssertAreNeighbors(unsigned uNodeIndex1, unsigned uNodeIndex2) const;
+	void ValidateNode(uint uNodeIndex) const;
+	void AssertAreNeighbors(uint uNodeIndex1, uint uNodeIndex2) const;
 	void LogMe() const;
 	uint GetLCA(uint Node1, uint Node2) const;
+	void GetSubtreeSizes(vector<uint> &Sizes) const;
 
 private:
-	unsigned UnrootFromFile();
+	uint UnrootFromFile();
 	NEWICK_TOKEN_TYPE GetTokenVerbose(TextFile &File, char szToken[],
-	  unsigned uBytes) const
+	  uint uBytes) const
 		{
 		NEWICK_TOKEN_TYPE NTT = GetToken(File, szToken, uBytes);
 		Log("GetToken %10.10s  %s\n", NTTStr(NTT), szToken);
 		return NTT;
 		}
 
-	void InitCache(unsigned uCacheCount);
+	void InitCache(uint uCacheCount);
 	void ExpandCache();
-	NEWICK_TOKEN_TYPE GetToken(TextFile &File, char szToken[], unsigned uBytes) const;
-	bool GetGroupFromFile(TextFile &File, unsigned uNodeIndex, double *ptrdEdgeLength);
-	unsigned GetLeafCountUnrooted(unsigned uNodeIndex1, unsigned uNodeIndex2,
+	NEWICK_TOKEN_TYPE GetToken(TextFile &File, char szToken[], uint uBytes) const;
+	bool GetGroupFromFile(TextFile &File, uint uNodeIndex, double *ptrdEdgeLength);
+	uint GetLeafCountUnrooted(uint uNodeIndex1, uint uNodeIndex2,
 	  double *ptrdTotalDistance) const;
-	void ToFileNodeRooted(TextFile &File, unsigned uNodeIndex) const;
-	void ToFileNodeUnrooted(TextFile &File, unsigned uNodeIndex, unsigned uParent) const;
-	void OrientParent(unsigned uNodeIndex, unsigned uParentNodeIndex);
-	//double FromClustNode(const Clust &C, unsigned uClustNodeIndex, unsigned uPhyNodeIndex);
-	unsigned GetAnyNonLeafNode() const;
+	void ToFileNodeRooted(TextFile &File, uint uNodeIndex) const;
+	void ToFileNodeUnrooted(TextFile &File, uint uNodeIndex, uint uParent) const;
+	void OrientParent(uint uNodeIndex, uint uParentNodeIndex);
+	//double FromClustNode(const Clust &C, uint uClustNodeIndex, uint uPhyNodeIndex);
+	uint GetAnyNonLeafNode() const;
 	};
 
 struct PhyEnumEdgeState
@@ -340,8 +341,8 @@ struct PhyEnumEdgeState
 		m_uNodeIndex2 = NULL_NEIGHBOR;
 		}
 	bool m_bInit;
-	unsigned m_uNodeIndex1;
-	unsigned m_uNodeIndex2;
+	uint m_uNodeIndex1;
+	uint m_uNodeIndex2;
 	};
 
 #endif // tree_h

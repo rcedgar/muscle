@@ -346,6 +346,7 @@
     <ClCompile Include="scoretest.cpp" />
     <ClCompile Include="searchpd.cpp" />
     <ClCompile Include="seqinfo.cpp" />
+    <ClCompile Include="shrub.cpp" />
     <ClCompile Include="simplecluster.cpp" />
     <ClCompile Include="spatter.cpp" />
     <ClCompile Include="stripgappy.cpp" />

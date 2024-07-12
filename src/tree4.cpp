@@ -166,7 +166,7 @@ void GetLeaves(const Tree &tree, unsigned uNodeIndex, unsigned Leaves[],
 	}
 
 void Tree::PruneTree(const Tree &tree, unsigned Subfams[],
-  unsigned uSubfamCount)
+  unsigned uSubfamCount, const char *LabelPrefix)
 	{
 	if (!tree.IsRooted())
 		Die("Tree::PruneTree: requires rooted tree");
@@ -239,7 +239,7 @@ void Tree::PruneTree(const Tree &tree, unsigned Subfams[],
 	for (unsigned uSubfamIndex = 0; uSubfamIndex < uSubfamCount; ++uSubfamIndex)
 		{
 		char szName[32];
-		sprintf(szName, "Subfam_%u", uSubfamIndex + 1);
+		sprintf(szName, "%s%u", LabelPrefix, uSubfamIndex);
 		m_ptrName[uSubfamIndex] = mystrsave(szName);
 		}
 

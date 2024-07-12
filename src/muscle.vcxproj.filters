@@ -581,6 +581,9 @@
     <ClCompile Include="alignmsasbycols.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="shrub.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

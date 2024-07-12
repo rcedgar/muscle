@@ -28,15 +28,15 @@ Tree2 from Newick
 :-----------------------------------------------------------:
 ***/
 
-void Tree::InitCache(unsigned uCacheCount)
+void Tree::InitCache(uint uCacheCount)
 	{
 	m_uCacheCount = uCacheCount;
 
-	m_uNeighbor1 = myalloc(unsigned, m_uCacheCount);
-	m_uNeighbor2 = myalloc(unsigned, m_uCacheCount);
-	m_uNeighbor3 = myalloc(unsigned, m_uCacheCount);
+	m_uNeighbor1 = myalloc(uint, m_uCacheCount);
+	m_uNeighbor2 = myalloc(uint, m_uCacheCount);
+	m_uNeighbor3 = myalloc(uint, m_uCacheCount);
 
-	m_Ids = myalloc(unsigned, m_uCacheCount);
+	m_Ids = myalloc(uint, m_uCacheCount);
 
 	m_dEdgeLength1 = myalloc(double, m_uCacheCount);
 	m_dEdgeLength2 = myalloc(double, m_uCacheCount);
@@ -50,7 +50,7 @@ void Tree::InitCache(unsigned uCacheCount)
 
 	m_ptrName = myalloc(char *, m_uCacheCount);
 
-	for (unsigned uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
+	for (uint uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
 		{
 		m_uNeighbor1[uNodeIndex] = NULL_NEIGHBOR;
 		m_uNeighbor2[uNodeIndex] = NULL_NEIGHBOR;
@@ -68,7 +68,7 @@ void Tree::InitCache(unsigned uCacheCount)
 		}
 	}
 
-void Tree::AssertAreNeighbors(unsigned uNodeIndex1, unsigned uNodeIndex2) const
+void Tree::AssertAreNeighbors(uint uNodeIndex1, uint uNodeIndex2) const
 	{
 	if (uNodeIndex1 >= m_uNodeCount || uNodeIndex2 >= m_uNodeCount)
 		Die("AssertAreNeighbors(%u,%u), are %u nodes",
@@ -122,12 +122,12 @@ void Tree::AssertAreNeighbors(unsigned uNodeIndex1, unsigned uNodeIndex2) const
 		}
 	}
 
-void Tree::ValidateNode(unsigned uNodeIndex) const
+void Tree::ValidateNode(uint uNodeIndex) const
 	{
 	if (uNodeIndex >= m_uNodeCount)
 		Die("ValidateNode(%u), %u nodes", uNodeIndex, m_uNodeCount);
 
-	const unsigned uNeighborCount = GetNeighborCount(uNodeIndex);
+	const uint uNeighborCount = GetNeighborCount(uNodeIndex);
 
 	if (2 == uNeighborCount)
 		{
@@ -145,9 +145,9 @@ void Tree::ValidateNode(unsigned uNodeIndex) const
 			}
 		}
 
-	const unsigned n1 = m_uNeighbor1[uNodeIndex];
-	const unsigned n2 = m_uNeighbor2[uNodeIndex];
-	const unsigned n3 = m_uNeighbor3[uNodeIndex];
+	const uint n1 = m_uNeighbor1[uNodeIndex];
+	const uint n2 = m_uNeighbor2[uNodeIndex];
+	const uint n3 = m_uNeighbor3[uNodeIndex];
 
 	if (NULL_NEIGHBOR == n2 && NULL_NEIGHBOR != n3)
 		{
@@ -204,7 +204,7 @@ void Tree::ValidateNode(unsigned uNodeIndex) const
 
 void Tree::Validate() const
 	{
-	for (unsigned uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
+	for (uint uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
 		ValidateNode(uNodeIndex);
 	}
 
@@ -227,7 +227,7 @@ uint Tree::GetSibling(uint Node) const
 	return UINT_MAX;
 	}
 
-bool Tree::IsEdge(unsigned uNodeIndex1, unsigned uNodeIndex2) const
+bool Tree::IsEdge(uint uNodeIndex1, uint uNodeIndex2) const
 	{
 	assert(uNodeIndex1 < m_uNodeCount && uNodeIndex2 < m_uNodeCount);
 
@@ -236,7 +236,7 @@ bool Tree::IsEdge(unsigned uNodeIndex1, unsigned uNodeIndex2) const
 	  m_uNeighbor3[uNodeIndex1] == uNodeIndex2;
 	}
 
-double Tree::GetEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2) const
+double Tree::GetEdgeLength(uint uNodeIndex1, uint uNodeIndex2) const
 	{
 	assert(uNodeIndex1 < m_uNodeCount && uNodeIndex2 < m_uNodeCount);
 	if (!HasEdgeLength(uNodeIndex1, uNodeIndex2))
@@ -255,14 +255,14 @@ double Tree::GetEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2) const
 
 void Tree::ExpandCache()
 	{
-	const unsigned uNodeCount = 100;
-	unsigned uNewCacheCount = m_uCacheCount + uNodeCount;
-	unsigned *uNewNeighbor1 = myalloc(unsigned, uNewCacheCount);
-	unsigned *uNewNeighbor2 = myalloc(unsigned, uNewCacheCount);
-	unsigned *uNewNeighbor3 = myalloc(unsigned, uNewCacheCount);
+	const uint uNodeCount = 100;
+	uint uNewCacheCount = m_uCacheCount + uNodeCount;
+	uint *uNewNeighbor1 = myalloc(uint, uNewCacheCount);
+	uint *uNewNeighbor2 = myalloc(uint, uNewCacheCount);
+	uint *uNewNeighbor3 = myalloc(uint, uNewCacheCount);
 
-	unsigned *uNewIds = myalloc(unsigned, uNewCacheCount);
-	memset(uNewIds, 0xff, uNewCacheCount*sizeof(unsigned));
+	uint *uNewIds = myalloc(uint, uNewCacheCount);
+	memset(uNewIds, 0xff, uNewCacheCount*sizeof(uint));
 
 	double *dNewEdgeLength1 = myalloc(double, uNewCacheCount);
 	double *dNewEdgeLength2 = myalloc(double, uNewCacheCount);
@@ -279,26 +279,26 @@ void Tree::ExpandCache()
 
 	if (m_uCacheCount > 0)
 		{
-		const unsigned uUnsignedBytes = m_uCacheCount*sizeof(unsigned);
+		const uint uUnsignedBytes = m_uCacheCount*sizeof(uint);
 		memcpy(uNewNeighbor1, m_uNeighbor1, uUnsignedBytes);
 		memcpy(uNewNeighbor2, m_uNeighbor2, uUnsignedBytes);
 		memcpy(uNewNeighbor3, m_uNeighbor3, uUnsignedBytes);
 
 		memcpy(uNewIds, m_Ids, uUnsignedBytes);
 
-		const unsigned uEdgeBytes = m_uCacheCount*sizeof(double);
+		const uint uEdgeBytes = m_uCacheCount*sizeof(double);
 		memcpy(dNewEdgeLength1, m_dEdgeLength1, uEdgeBytes);
 		memcpy(dNewEdgeLength2, m_dEdgeLength2, uEdgeBytes);
 		memcpy(dNewEdgeLength3, m_dEdgeLength3, uEdgeBytes);
 		memcpy(dNewHeight, m_dHeight, uEdgeBytes);
 
-		const unsigned uBoolBytes = m_uCacheCount*sizeof(bool);
+		const uint uBoolBytes = m_uCacheCount*sizeof(bool);
 		memcpy(bNewHasEdgeLength1, m_bHasEdgeLength1, uBoolBytes);
 		memcpy(bNewHasEdgeLength2, m_bHasEdgeLength2, uBoolBytes);
 		memcpy(bNewHasEdgeLength3, m_bHasEdgeLength3, uBoolBytes);
 		memcpy(bNewHasHeight, m_bHasHeight, uBoolBytes);
 
-		const unsigned uNameBytes = m_uCacheCount*sizeof(char *);
+		const uint uNameBytes = m_uCacheCount*sizeof(char *);
 		memcpy(ptrNewName, m_ptrName, uNameBytes);
 
 		myfree(m_uNeighbor1);
@@ -387,7 +387,7 @@ void Tree::CreateUnrooted(double dEdgeLength)
 #endif
 	}
 
-void Tree::SetLeafName(unsigned uNodeIndex, const char *ptrName)
+void Tree::SetLeafName(uint uNodeIndex, const char *ptrName)
 	{
 	assert(uNodeIndex < m_uNodeCount);
 	assert(IsLeaf(uNodeIndex));
@@ -395,21 +395,21 @@ void Tree::SetLeafName(unsigned uNodeIndex, const char *ptrName)
 	m_ptrName[uNodeIndex] = mystrsave(ptrName);
 	}
 
-void Tree::SetLeafId(unsigned uNodeIndex, unsigned uId)
+void Tree::SetLeafId(uint uNodeIndex, uint uId)
 	{
 	assert(uNodeIndex < m_uNodeCount);
 	assert(IsLeaf(uNodeIndex));
 	m_Ids[uNodeIndex] = uId;
 	}
 
-const char *Tree::GetLeafName(unsigned uNodeIndex) const
+const char *Tree::GetLeafName(uint uNodeIndex) const
 	{
 	assert(uNodeIndex < m_uNodeCount);
 	assert(IsLeaf(uNodeIndex));
 	return m_ptrName[uNodeIndex];
 	}
 
-unsigned Tree::GetLeafId(unsigned uNodeIndex) const
+uint Tree::GetLeafId(uint uNodeIndex) const
 	{
 	assert(uNodeIndex < m_uNodeCount);
 	assert(IsLeaf(uNodeIndex));
@@ -419,7 +419,7 @@ unsigned Tree::GetLeafId(unsigned uNodeIndex) const
 // Append a new branch.
 // This adds two new nodes and joins them to an existing leaf node.
 // Return value is k, new nodes have indexes k and k+1 respectively.
-unsigned Tree::AppendBranch(unsigned uExistingLeafIndex)
+uint Tree::AppendBranch(uint uExistingLeafIndex)
 	{
 	if (0 == m_uNodeCount)
 		Die("Tree::AppendBranch: tree has not been created");
@@ -436,8 +436,8 @@ unsigned Tree::AppendBranch(unsigned uExistingLeafIndex)
 	if (m_uNodeCount >= m_uCacheCount - 2)
 		ExpandCache();
 
-	const unsigned uNewLeaf1 = m_uNodeCount;
-	const unsigned uNewLeaf2 = m_uNodeCount + 1;
+	const uint uNewLeaf1 = m_uNodeCount;
+	const uint uNewLeaf2 = m_uNodeCount + 1;
 
 	m_uNodeCount += 2;
 
@@ -502,12 +502,12 @@ void Tree::LogMe() const
 		Log("-----  -----  -------  -----  -------  -----  -------  -----  ----\n");
 		}
 
-	for (unsigned uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
+	for (uint uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
 		{
 		Log("%5u  ", uNodeIndex);
-		const unsigned n1 = m_uNeighbor1[uNodeIndex];
-		const unsigned n2 = m_uNeighbor2[uNodeIndex];
-		const unsigned n3 = m_uNeighbor3[uNodeIndex];
+		const uint n1 = m_uNeighbor1[uNodeIndex];
+		const uint n2 = m_uNeighbor2[uNodeIndex];
+		const uint n3 = m_uNeighbor3[uNodeIndex];
 		if (NULL_NEIGHBOR != n1)
 			{
 			Log("%5u  ", n1);
@@ -543,7 +543,7 @@ void Tree::LogMe() const
 
 		if (m_Ids != 0 && IsLeaf(uNodeIndex))
 			{
-			unsigned uId = m_Ids[uNodeIndex];
+			uint uId = m_Ids[uNodeIndex];
 			if (uId == UINT_MAX)
 				Log("    *");
 			else
@@ -561,7 +561,7 @@ void Tree::LogMe() const
 		}
 	}
 
-void Tree::SetEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2,
+void Tree::SetEdgeLength(uint uNodeIndex1, uint uNodeIndex2,
   double dLength)
 	{
 	assert(uNodeIndex1 < m_uNodeCount && uNodeIndex2 < m_uNodeCount);
@@ -603,7 +603,7 @@ void Tree::SetEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2,
 		}
 	}
 
-unsigned Tree::UnrootFromFile()
+uint Tree::UnrootFromFile()
 	{
 #if	TRACE
 	Log("Before unroot:\n");
@@ -617,7 +617,7 @@ unsigned Tree::UnrootFromFile()
 	assert(IsRoot(0));
 	assert(NULL_NEIGHBOR == m_uNeighbor1[0]);
 
-	const unsigned uThirdNode = m_uNodeCount++;
+	const uint uThirdNode = m_uNodeCount++;
 
 	m_uNeighbor1[0] = uThirdNode;
 	m_uNeighbor1[uThirdNode] = 0;
@@ -647,31 +647,31 @@ unsigned Tree::UnrootFromFile()
 // The labeling as "First" and "Second" neighbor is arbitrary.
 // Calling these functions on a leaf returns NULL_NEIGHBOR, as
 // for GetLeft/Right.
-unsigned Tree::GetFirstNeighbor(unsigned uNodeIndex, unsigned uNeighborIndex) const
+uint Tree::GetFirstNeighbor(uint uNodeIndex, uint uNeighborIndex) const
 	{
 	assert(uNodeIndex < m_uNodeCount);
 	assert(uNeighborIndex < m_uNodeCount);
 	assert(IsEdge(uNodeIndex, uNeighborIndex));
 
-	for (unsigned n = 0; n < 3; ++n)
+	for (uint n = 0; n < 3; ++n)
 		{
-		unsigned uNeighbor = GetNeighbor(uNodeIndex, n);
+		uint uNeighbor = GetNeighbor(uNodeIndex, n);
 		if (NULL_NEIGHBOR != uNeighbor && uNeighborIndex != uNeighbor)
 			return uNeighbor;
 		}
 	return NULL_NEIGHBOR;
 	}
 
-unsigned Tree::GetSecondNeighbor(unsigned uNodeIndex, unsigned uNeighborIndex) const
+uint Tree::GetSecondNeighbor(uint uNodeIndex, uint uNeighborIndex) const
 	{
 	assert(uNodeIndex < m_uNodeCount);
 	assert(uNeighborIndex < m_uNodeCount);
 	assert(IsEdge(uNodeIndex, uNeighborIndex));
 
 	bool bFoundOne = false;
-	for (unsigned n = 0; n < 3; ++n)
+	for (uint n = 0; n < 3; ++n)
 		{
-		unsigned uNeighbor = GetNeighbor(uNodeIndex, n);
+		uint uNeighbor = GetNeighbor(uNodeIndex, n);
 		if (NULL_NEIGHBOR != uNeighbor && uNeighborIndex != uNeighbor)
 			{
 			if (bFoundOne)
@@ -686,7 +686,7 @@ unsigned Tree::GetSecondNeighbor(unsigned uNodeIndex, unsigned uNeighborIndex) c
 // Compute the number of leaves in the sub-tree defined by an edge
 // in an unrooted tree. Conceptually, the tree is cut at this edge,
 // and uNodeIndex2 considered the root of the sub-tree.
-unsigned Tree::GetLeafCountUnrooted(unsigned uNodeIndex1, unsigned uNodeIndex2,
+uint Tree::GetLeafCountUnrooted(uint uNodeIndex1, uint uNodeIndex2,
   double *ptrdTotalDistance) const
 	{
 	assert(!IsRooted());
@@ -699,22 +699,22 @@ unsigned Tree::GetLeafCountUnrooted(unsigned uNodeIndex1, unsigned uNodeIndex2,
 
 // Recurse down the rooted sub-tree defined by cutting the edge
 // and considering uNodeIndex2 as the root.
-	const unsigned uLeft = GetFirstNeighbor(uNodeIndex2, uNodeIndex1);
-	const unsigned uRight = GetSecondNeighbor(uNodeIndex2, uNodeIndex1);
+	const uint uLeft = GetFirstNeighbor(uNodeIndex2, uNodeIndex1);
+	const uint uRight = GetSecondNeighbor(uNodeIndex2, uNodeIndex1);
 
 	double dLeftDistance;
 	double dRightDistance;
 
-	const unsigned uLeftCount = GetLeafCountUnrooted(uNodeIndex2, uLeft,
+	const uint uLeftCount = GetLeafCountUnrooted(uNodeIndex2, uLeft,
 	  &dLeftDistance);
-	const unsigned uRightCount = GetLeafCountUnrooted(uNodeIndex2, uRight,
+	const uint uRightCount = GetLeafCountUnrooted(uNodeIndex2, uRight,
 	  &dRightDistance);
 
 	*ptrdTotalDistance = dLeftDistance + dRightDistance;
 	return uLeftCount + uRightCount;
 	}
 
-bool Tree::HasEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2) const
+bool Tree::HasEdgeLength(uint uNodeIndex1, uint uNodeIndex2) const
 	{
 	assert(uNodeIndex1 < m_uNodeCount);
 	assert(uNodeIndex2 < m_uNodeCount);
@@ -728,7 +728,7 @@ bool Tree::HasEdgeLength(unsigned uNodeIndex1, unsigned uNodeIndex2) const
 	return m_bHasEdgeLength3[uNodeIndex1];
 	}
 
-void Tree::OrientParent(unsigned uNodeIndex, unsigned uParentNodeIndex)
+void Tree::OrientParent(uint uNodeIndex, uint uParentNodeIndex)
 	{
 	if (NULL_NEIGHBOR == uNodeIndex)
 		return;
@@ -757,29 +757,29 @@ void Tree::OrientParent(unsigned uNodeIndex, unsigned uParentNodeIndex)
 	OrientParent(m_uNeighbor3[uNodeIndex], uNodeIndex);
 	}
 
-unsigned Tree::FirstDepthFirstNode() const
+uint Tree::FirstDepthFirstNode() const
 	{
 	assert(IsRooted());
 
 // Descend via left branches until we hit a leaf
-	unsigned uNodeIndex = m_uRootNodeIndex;
+	uint uNodeIndex = m_uRootNodeIndex;
 	while (!IsLeaf(uNodeIndex))
 		uNodeIndex = GetLeft(uNodeIndex);
 	return uNodeIndex;
 	}
 
-unsigned Tree::FirstDepthFirstNodeR() const
+uint Tree::FirstDepthFirstNodeR() const
 	{
 	assert(IsRooted());
 
 // Descend via left branches until we hit a leaf
-	unsigned uNodeIndex = m_uRootNodeIndex;
+	uint uNodeIndex = m_uRootNodeIndex;
 	while (!IsLeaf(uNodeIndex))
 		uNodeIndex = GetRight(uNodeIndex);
 	return uNodeIndex;
 	}
 
-unsigned Tree::NextDepthFirstNode(unsigned uNodeIndex) const
+uint Tree::NextDepthFirstNode(uint uNodeIndex) const
 	{
 #if	TRACE
 	Log("NextDepthFirstNode(%3u) ", uNodeIndex);
@@ -796,7 +796,7 @@ unsigned Tree::NextDepthFirstNode(unsigned uNodeIndex) const
 		return NULL_NEIGHBOR;
 		}
 
-	unsigned uParent = GetParent(uNodeIndex);
+	uint uParent = GetParent(uNodeIndex);
 	if (GetRight(uParent) == uNodeIndex)
 		{
 #if	TRACE
@@ -818,7 +818,7 @@ unsigned Tree::NextDepthFirstNode(unsigned uNodeIndex) const
 	return uNodeIndex;
 	}
 
-unsigned Tree::NextDepthFirstNodeR(unsigned uNodeIndex) const
+uint Tree::NextDepthFirstNodeR(uint uNodeIndex) const
 	{
 #if	TRACE
 	Log("NextDepthFirstNode(%3u) ", uNodeIndex);
@@ -835,7 +835,7 @@ unsigned Tree::NextDepthFirstNodeR(unsigned uNodeIndex) const
 		return NULL_NEIGHBOR;
 		}
 
-	unsigned uParent = GetParent(uNodeIndex);
+	uint uParent = GetParent(uNodeIndex);
 	if (GetLeft(uParent) == uNodeIndex)
 		{
 #if	TRACE
@@ -916,8 +916,8 @@ void Tree::UnrootByDeletingRoot()
 	assert(IsRooted());
 	assert(m_uNodeCount >= 3);
 
-	const unsigned uLeft = GetLeft(m_uRootNodeIndex);
-	const unsigned uRight = GetRight(m_uRootNodeIndex);
+	const uint uLeft = GetLeft(m_uRootNodeIndex);
+	const uint uRight = GetRight(m_uRootNodeIndex);
 
 	m_uNeighbor1[uLeft] = uRight;
 	m_uNeighbor1[uRight] = uLeft;
@@ -933,8 +933,8 @@ void Tree::UnrootByDeletingRoot()
 		}
 
 // Remove root node entry from arrays
-	const unsigned uMoveCount = m_uNodeCount - m_uRootNodeIndex;
-	const unsigned uUnsBytes = uMoveCount*sizeof(unsigned);
+	const uint uMoveCount = m_uNodeCount - m_uRootNodeIndex;
+	const uint uUnsBytes = uMoveCount*sizeof(uint);
 	memmove(m_uNeighbor1 + m_uRootNodeIndex, m_uNeighbor1 + m_uRootNodeIndex + 1,
 	  uUnsBytes);
 	memmove(m_uNeighbor2 + m_uRootNodeIndex, m_uNeighbor2 + m_uRootNodeIndex + 1,
@@ -942,7 +942,7 @@ void Tree::UnrootByDeletingRoot()
 	memmove(m_uNeighbor3 + m_uRootNodeIndex, m_uNeighbor3 + m_uRootNodeIndex + 1,
 	  uUnsBytes);
 
-	const unsigned uDoubleBytes = uMoveCount*sizeof(double);
+	const uint uDoubleBytes = uMoveCount*sizeof(double);
 	memmove(m_dEdgeLength1 + m_uRootNodeIndex, m_dEdgeLength1 + m_uRootNodeIndex + 1,
 	  uDoubleBytes);
 	memmove(m_dEdgeLength2 + m_uRootNodeIndex, m_dEdgeLength2 + m_uRootNodeIndex + 1,
@@ -950,7 +950,7 @@ void Tree::UnrootByDeletingRoot()
 	memmove(m_dEdgeLength3 + m_uRootNodeIndex, m_dEdgeLength3 + m_uRootNodeIndex + 1,
 	  uDoubleBytes);
 
-	const unsigned uBoolBytes = uMoveCount*sizeof(bool);
+	const uint uBoolBytes = uMoveCount*sizeof(bool);
 	memmove(m_bHasEdgeLength1 + m_uRootNodeIndex, m_bHasEdgeLength1 + m_uRootNodeIndex + 1,
 	  uBoolBytes);
 	memmove(m_bHasEdgeLength2 + m_uRootNodeIndex, m_bHasEdgeLength2 + m_uRootNodeIndex + 1,
@@ -958,14 +958,14 @@ void Tree::UnrootByDeletingRoot()
 	memmove(m_bHasEdgeLength3 + m_uRootNodeIndex, m_bHasEdgeLength3 + m_uRootNodeIndex + 1,
 	  uBoolBytes);
 
-	const unsigned uPtrBytes = uMoveCount*sizeof(char *);
+	const uint uPtrBytes = uMoveCount*sizeof(char *);
 	memmove(m_ptrName + m_uRootNodeIndex, m_ptrName + m_uRootNodeIndex + 1, uPtrBytes);
 
 	--m_uNodeCount;
 	m_bRooted = false;
 
 // Fix up table entries
-	for (unsigned uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
+	for (uint uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
 		{
 #define DEC(x)	if (x != NULL_NEIGHBOR && x > m_uRootNodeIndex) --x;
 		DEC(m_uNeighbor1[uNodeIndex])
@@ -977,7 +977,7 @@ void Tree::UnrootByDeletingRoot()
 	Validate();
 	}
 
-unsigned Tree::GetLeafParent(unsigned uNodeIndex) const
+uint Tree::GetLeafParent(uint uNodeIndex) const
 	{
 	assert(IsLeaf(uNodeIndex));
 
@@ -1120,7 +1120,7 @@ void Tree::AppendLeaves(uint Node, vector<uint> &Leaves) const
 	}
 
 // TODO: This is not efficient for large trees, should cache.
-double Tree::GetNodeHeight(unsigned uNodeIndex) const
+double Tree::GetNodeHeight(uint uNodeIndex) const
 	{
 	if (!IsRooted())
 		Die("Tree::GetNodeHeight: undefined unless rooted tree");
@@ -1131,8 +1131,8 @@ double Tree::GetNodeHeight(unsigned uNodeIndex) const
 	if (m_bHasHeight[uNodeIndex])
 		return m_dHeight[uNodeIndex];
 
-	const unsigned uLeft = GetLeft(uNodeIndex);
-	const unsigned uRight = GetRight(uNodeIndex);
+	const uint uLeft = GetLeft(uNodeIndex);
+	const uint uRight = GetRight(uNodeIndex);
 	double dLeftLength = GetEdgeLength(uNodeIndex, uLeft);
 	double dRightLength = GetEdgeLength(uNodeIndex, uRight);
 
@@ -1149,7 +1149,7 @@ double Tree::GetNodeHeight(unsigned uNodeIndex) const
 	return dHeight;
 	}
 
-unsigned Tree::GetNeighborSubscript(unsigned uNodeIndex, unsigned uNeighborIndex) const
+uint Tree::GetNeighborSubscript(uint uNodeIndex, uint uNeighborIndex) const
 	{
 	assert(uNodeIndex < m_uNodeCount);
 	assert(uNeighborIndex < m_uNodeCount);
@@ -1162,7 +1162,7 @@ unsigned Tree::GetNeighborSubscript(unsigned uNodeIndex, unsigned uNeighborIndex
 	return NULL_NEIGHBOR;
 	}
 
-unsigned Tree::GetNeighbor(unsigned uNodeIndex, unsigned uNeighborSubscript) const
+uint Tree::GetNeighbor(uint uNodeIndex, uint uNeighborSubscript) const
 	{
 	switch (uNeighborSubscript)
 		{
@@ -1178,11 +1178,11 @@ unsigned Tree::GetNeighbor(unsigned uNodeIndex, unsigned uNeighborSubscript) con
 	}
 
 // TODO: check if this is a performance issue, could cache a lookup table
-unsigned Tree::LeafIndexToNodeIndex(unsigned uLeafIndex) const
+uint Tree::LeafIndexToNodeIndex(uint uLeafIndex) const
 	{
-	const unsigned uNodeCount = GetNodeCount();
-	unsigned uLeafCount = 0;
-	for (unsigned uNodeIndex = 0; uNodeIndex < uNodeCount; ++uNodeIndex)
+	const uint uNodeCount = GetNodeCount();
+	uint uLeafCount = 0;
+	for (uint uNodeIndex = 0; uNodeIndex < uNodeCount; ++uNodeIndex)
 		{
 		if (IsLeaf(uNodeIndex))
 			{
@@ -1201,10 +1201,10 @@ uint Tree::GetNodeIndex(const string &Label) const
 	return GetNodeIndex(Label.c_str());
 	}
 
-unsigned Tree::GetNodeIndex(const char *ptrName) const
+uint Tree::GetNodeIndex(const char *ptrName) const
 	{
-	const unsigned uNodeCount = GetNodeCount();
-	for (unsigned uNodeIndex = 0; uNodeIndex < uNodeCount; ++uNodeIndex)
+	const uint uNodeCount = GetNodeCount();
+	for (uint uNodeIndex = 0; uNodeIndex < uNodeCount; ++uNodeIndex)
 		{
 		const char *ptrLeafName = m_ptrName[uNodeIndex];
 		if (ptrLeafName != 0 && 0 == strcmp(ptrName, ptrLeafName))
@@ -1216,12 +1216,12 @@ unsigned Tree::GetNodeIndex(const char *ptrName) const
 
 void Tree::Copy(const Tree &tree)
 	{
-	const unsigned uNodeCount = tree.GetNodeCount();
+	const uint uNodeCount = tree.GetNodeCount();
 	InitCache(uNodeCount);
 
 	m_uNodeCount = uNodeCount;
 
-	const size_t UnsignedBytes = uNodeCount*sizeof(unsigned);
+	const size_t UnsignedBytes = uNodeCount*sizeof(uint);
 	const size_t DoubleBytes = uNodeCount*sizeof(double);
 	const size_t BoolBytes = uNodeCount*sizeof(bool);
 
@@ -1246,7 +1246,7 @@ void Tree::Copy(const Tree &tree)
 	m_uRootNodeIndex = tree.m_uRootNodeIndex;
 	m_bRooted = tree.m_bRooted;
 
-	for (unsigned uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
+	for (uint uNodeIndex = 0; uNodeIndex < m_uNodeCount; ++uNodeIndex)
 		{
 		if (tree.IsLeaf(uNodeIndex))
 			{
@@ -1451,26 +1451,26 @@ void Tree::FromVectors(const vector<string> &Labels,
 // has the second leaf (node index 1) as its left child.
 // uRoot gives the vector subscript of the root, so add N
 // to get the node index.
-void Tree::Create(unsigned uLeafCount, unsigned uRoot, const unsigned Left[],
-  const unsigned Right[], const float LeftLength[], const float RightLength[],
-  const unsigned LeafIds[], char **LeafNames)
+void Tree::Create(uint uLeafCount, uint uRoot, const uint Left[],
+  const uint Right[], const float LeftLength[], const float RightLength[],
+  const uint LeafIds[], char **LeafNames)
 	{
 	Clear();
 
 	m_uNodeCount = 2*uLeafCount - 1;
 	InitCache(m_uNodeCount);
 
-	for (unsigned uNodeIndex = 0; uNodeIndex < uLeafCount; ++uNodeIndex)
+	for (uint uNodeIndex = 0; uNodeIndex < uLeafCount; ++uNodeIndex)
 		{
 		m_Ids[uNodeIndex] = LeafIds[uNodeIndex];
 		m_ptrName[uNodeIndex] = mystrsave(LeafNames[uNodeIndex]);
 		}
 
-	for (unsigned uNodeIndex = uLeafCount; uNodeIndex < m_uNodeCount; ++uNodeIndex)
+	for (uint uNodeIndex = uLeafCount; uNodeIndex < m_uNodeCount; ++uNodeIndex)
 		{
-		unsigned v = uNodeIndex - uLeafCount;
-		unsigned uLeft = Left[v];
-		unsigned uRight = Right[v];
+		uint v = uNodeIndex - uLeafCount;
+		uint uLeft = Left[v];
+		uint uRight = Right[v];
 		float fLeft = LeftLength[v];
 		float fRight = RightLength[v];
 
@@ -1497,4 +1497,34 @@ void Tree::Create(unsigned uLeafCount, unsigned uRoot, const unsigned Left[],
 	m_uRootNodeIndex = uRoot + uLeafCount;
 
 	Validate();
+	}
+
+void Tree::GetSubtreeSizes(vector<uint> &Sizes) const
+	{
+	asserta(IsRooted());
+	const uint NodeCount = GetNodeCount();
+	Sizes.clear();
+	Sizes.resize(NodeCount, UINT_MAX);
+	uint Node = FirstDepthFirstNode();
+	do
+		{
+		asserta(Node < NodeCount);
+		if (IsLeaf(Node))
+			Sizes[Node] = 1;
+		else
+			{
+			uint Left = GetLeft(Node);
+			uint Right = GetRight(Node);
+			asserta(Left < NodeCount);
+			asserta(Right < NodeCount);
+			uint SizeLeft = Sizes[Left];
+			uint SizeRight = Sizes[Right];
+			asserta(SizeLeft != UINT_MAX && SizeLeft > 0);
+			asserta(SizeRight != UINT_MAX && SizeRight > 0);
+			asserta(Sizes[Node] == UINT_MAX);
+			Sizes[Node] = SizeLeft + SizeRight;
+			}
+		Node = NextDepthFirstNode(Node);
+		}
+	while (Node != UINT_MAX);
 	}
