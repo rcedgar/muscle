@@ -354,6 +354,7 @@
     <ClCompile Include="strip_anchors.cpp" />
     <ClCompile Include="substmxfromfile.cpp" />
     <ClCompile Include="super6.cpp" />
+    <ClCompile Include="super7.cpp" />
     <ClCompile Include="sweep.cpp" />
     <ClCompile Include="sweeper.cpp" />
     <ClCompile Include="test.cpp" />
@@ -488,6 +489,7 @@
     <ClInclude Include="super4.h" />
     <ClInclude Include="super5.h" />
     <ClInclude Include="super6.h" />
+    <ClInclude Include="super7.h" />
     <ClInclude Include="sweeper.h" />
     <ClInclude Include="textfile.h" />
     <ClInclude Include="timing.h" />

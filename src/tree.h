@@ -274,7 +274,7 @@ public:
 	void AppendLeaves(uint Node, vector<uint> &Leaves) const;
 	uint GetSubtreeLeafCount(uint Node) const;
 	void GetSubtreeLeafLabels(uint Node, vector<string> &Labels) const;
-	void GetSubtreeLeafNodes(uint Node, vector<uint> &Labels) const;
+	void GetSubtreeLeafNodes(uint Node, vector<uint> &Nodes) const;
 	void GetPathToRoot(uint Node, vector<uint> &Path) const;
 	double GetDistance(uint Node, uint AncNode) const;
 	void GetLeafLabels(vector<string> &Labels) const;

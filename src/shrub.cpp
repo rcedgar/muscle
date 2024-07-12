@@ -1,6 +1,41 @@
 #include "myutils.h"
 #include "tree.h"
 
+// ShrubLCAs is non-overlapping subtrees covering entire
+// tree such that max size of subtree is n.
+void GetShrubs(const Tree &T, uint n, vector<uint> &ShrubLCAs)
+	{
+	vector<uint> Sizes;
+	T.GetSubtreeSizes(Sizes);
+
+	uint ShrubLeafCount = 0;
+	const uint NodeCount = T.GetNodeCount();
+	const uint LeafCount = T.GetLeafCount();
+	for (uint Node = 0; Node < NodeCount; ++Node)
+		{
+		uint Size = Sizes[Node];
+		if (T.IsRoot(Node))
+			{
+			if (Size <= n)
+				{
+				asserta(ShrubLCAs.empty());
+				ShrubLCAs.push_back(Node);
+				ShrubLeafCount = T.GetSubtreeLeafCount(Node);
+				break;
+				}
+			continue;
+			}
+		uint Parent = T.GetParent(Node);
+		uint ParentSize = Sizes[Parent];
+		if (Size <= n && ParentSize > n)
+			{
+			ShrubLCAs.push_back(Node);
+			ShrubLeafCount += T.GetSubtreeLeafCount(Node);
+			}
+		}
+	asserta(ShrubLeafCount == LeafCount);
+	}
+
 void cmd_shrub()
 	{
 	Tree T;

@@ -88,5 +88,6 @@ C(mustang_core)
 C(align_mega)
 C(test_mega)
 C(shrub)
+C(super7)
 
 #undef C
