@@ -139,13 +139,14 @@ void cmd_cmp_ref_msas()
 	for (uint i = 0; i < TestSeqCount; ++i)
 		{
 		const char *Label = Test2.GetLabel(i);
+		const char *RefLabel = Ref2.GetLabel(i);
 		string Row;
 		Test2.GetRowStr(i, Row);
 		string RowM;
 		for (uint j = FirstM; j <= LastM; ++j)
 			if (!AllGaps[j])
 				RowM += Row[j];
-		Log("%s  >%s\n", RowM.c_str(), Label);
+		Log("%s  >%s (=%s)\n", RowM.c_str(), Label, RefLabel);
 		}
 	Log("\n");
 	string AnnotM;
@@ -158,12 +159,13 @@ void cmd_cmp_ref_msas()
 	for (uint i = 0; i < RefSeqCount; ++i)
 		{
 		const char *Label = Ref2.GetLabel(i);
+		const char *TestLabel = Test2.GetLabel(i);
 		string Row;
 		Ref2.GetRowStr(i, Row);
 		string RowM;
 		for (uint j = FirstM; j <= LastM; ++j)
 			if (!AllGaps[j])
 				RowM += Row[j];
-		Log("%s  >%s\n", RowM.c_str(), Label);
+		Log("%s  >%s\n", RowM.c_str(), Label, TestLabel);
 		}
 	}
