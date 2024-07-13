@@ -1,15 +1,16 @@
 #pragma once
 
+// Created by Igor Tolstoy 2024-06-19.
+// Updated by Igor Tolstoy & Robert Edgar
+
 #include "mpcflat.h"
 #include "mega.h"
 
-
-// Multi-threaded ProbCons
 class MPCFlat_mega : public MPCFlat
     {
-        Mega & m_MM;
-        void CalcPosterior(uint PairIndex);
-    public:
-        MPCFlat_mega(Mega & MM) : m_MM(MM) {}
-    };
+public:
+    Mega *m_MM = 0;
 
+public:
+    virtual void CalcPosterior(uint PairIndex);
+    };

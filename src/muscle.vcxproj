@@ -215,7 +215,6 @@
     <ClCompile Include="addconfseq.cpp" />
     <ClCompile Include="align.cpp" />
     <ClCompile Include="alignmsasbycols.cpp" />
-    <ClCompile Include="alignpairflat_mega.cpp" />
     <ClCompile Include="align_mega.cpp" />
     <ClCompile Include="blosumsmx.cpp" />
     <ClCompile Include="bwdflat_mega.cpp" />
@@ -409,7 +408,6 @@
     <ClCompile Include="usage.cpp" />
     <ClCompile Include="usorter.cpp" />
     <ClCompile Include="viterbifastmem.cpp" />
-    <ClCompile Include="vtml2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="m3alnparams.h" />
@@ -454,6 +452,7 @@
     <ClInclude Include="mega.h" />
     <ClInclude Include="mpc.h" />
     <ClInclude Include="mpcflat.h" />
+    <ClInclude Include="mpcflat_mega.h" />
     <ClInclude Include="msa.h" />
     <ClInclude Include="multisequence.h" />
     <ClInclude Include="muscle.h" />

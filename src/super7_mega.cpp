@@ -20,6 +20,7 @@ void cmd_super7_mega()
 
 	MultiSequence InputSeqs;
 	InputSeqs.FromStrings(MM.m_Labels, MM.m_Seqs);
+	SetGlobalInputMS(InputSeqs);
 
 	bool Nucleo = InputSeqs.GuessIsNucleo();
 	CheckMegaOpts(Nucleo);
@@ -40,7 +41,9 @@ void cmd_super7_mega()
 	InitProbcons();
 
 	Super7 S7;
-	S7.m_MPC = new MPCFlat_mega(MM);
+	MPCFlat_mega *MPCm = new MPCFlat_mega;
+	MPCm->m_MM = &MM;
+	S7.m_MPC = MPCm;
 	S7.Run(InputSeqs, GuideTree, ShrubSize);
 	S7.m_FinalMSA.ToFasta(opt(output));
 

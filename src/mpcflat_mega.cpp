@@ -1,12 +1,8 @@
-//
-//  mpcflat_mega.cpp
-//  muscle5
-//
-//  Created by Igor Tolstoy on 6/19/24.
-//
+// Created by Igor Tolstoy 2024-06-19.
+// Updated by Igor Tolstoy & Robert Edgar
+
 #include "muscle.h"
 #include "mpcflat_mega.h"
-
 
 void MPCFlat_mega::CalcPosterior(uint PairIndex)
     {
@@ -14,6 +10,8 @@ void MPCFlat_mega::CalcPosterior(uint PairIndex)
 
     const uint SeqIndexX = Pair.first;
     const uint SeqIndexY = Pair.second;
+	const uint ProfileIdxX = SeqIndexX;
+	const uint ProfileIdxY = SeqIndexY;
 
     uint LX = GetL(SeqIndexX);
     uint LY = GetL(SeqIndexY);
@@ -26,6 +24,13 @@ void MPCFlat_mega::CalcPosterior(uint PairIndex)
         Die("HMM overflow, sequence lengths %u, %u (max ~21k)", LX, LY);
         }
 
+	const vector<vector<byte> > &ProfileX = m_MM->m_Profiles[ProfileIdxX];
+	const vector<vector<byte> > &ProfileY = m_MM->m_Profiles[ProfileIdxY];
+	const uint PLX = SIZE(ProfileX);
+	const uint PLY = SIZE(ProfileY);
+	asserta(PLX == LX);
+	asserta(PLY == LY);
+
     float *Fwd = AllocFB(LX, LY);
     float *Bwd = AllocFB(LX, LY);
 
@@ -35,8 +40,8 @@ void MPCFlat_mega::CalcPosterior(uint PairIndex)
 //    CalcFwdFlat(X, LX, Y, LY, Fwd);
 //    CalcBwdFlat(X, LX, Y, LY, Bwd);
 
-    CalcFwdFlat_mega(m_MM, SeqIndexX, SeqIndexY, Fwd);
-    CalcBwdFlat_mega(m_MM, SeqIndexX, SeqIndexY, Bwd);
+    CalcFwdFlat_mega(*m_MM, ProfileIdxX, ProfileIdxY, Fwd);
+    CalcBwdFlat_mega(*m_MM, ProfileIdxX, ProfileIdxY, Bwd);
     
     float *Post = AllocPost(LX, LY);
     CalcPostFlat(Fwd, Bwd, LX, LY, Post);

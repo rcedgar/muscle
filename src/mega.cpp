@@ -5,6 +5,20 @@
 
 static const float VERY_SMALL_FREQ = 1e-6f;
 
+string Mega::m_FileName;
+vector<string> Mega::m_Lines;
+vector<string> Mega::m_FeatureNames;
+vector<float> Mega::m_Weights;
+vector<uint> Mega::m_AlphaSizes;
+vector<string> Mega::m_Labels;
+vector<vector<vector<byte> > > Mega::m_Profiles;
+vector<string> Mega::m_Seqs;
+vector<vector<float> > Mega::m_LogProbsVec;
+vector<vector<vector<float> > > Mega::m_LogProbMxVec;
+vector<string> m_Labels;
+uint Mega::m_NextLineNr;
+uint Mega::m_FeatureCount;
+
 const string &Mega::GetNextLine()
 	{
 	asserta(m_NextLineNr < SIZE(m_Lines));
@@ -80,7 +94,11 @@ void Mega::CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
 	}
 
 void Mega::FromFile(const string &FileName)
-{
+	{
+	asserta(m_FeatureNames.empty());
+	asserta(m_FeatureCount == 0);
+	asserta(m_Profiles.empty());
+
     FILE *f = OpenStdioFile(FileName);
     string Line;
     while (ReadLineStdioFile(f, Line))
@@ -95,7 +113,7 @@ void Mega::FromFile(const string &FileName)
     m_LogProbsVec.resize(m_FeatureCount);
     m_LogProbMxVec.resize(m_FeatureCount);
     for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
-    {
+		{
         GetNextFields(flds, 4);
         asserta(StrToUint(flds[0]) == FeatureIdx);
         const string &FeatureName = flds[1];
@@ -110,25 +128,25 @@ void Mega::FromFile(const string &FileName)
         GetNextFields(flds, AlphaSize + 1);
         asserta(flds[0] == "freqs");
         for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-        {
+			{
             // Probability is estimated as frequency
             float Prob = (float) StrToFloat(flds[Letter+1]);
             if (Prob < VERY_SMALL_FREQ)
                 Prob = VERY_SMALL_FREQ;
             float LogProb = logf(Prob);
             LogProbs.push_back(LogProb);
-        }
+			}
         
         vector<vector<float> > &LogProbMx = m_LogProbMxVec[FeatureIdx];
         LogProbMx.resize(AlphaSize);
         for (uint Letter1 = 0; Letter1 < AlphaSize; ++Letter1)
             LogProbMx[Letter1].resize(AlphaSize);
         for (uint Letter1 = 0; Letter1 < AlphaSize; ++Letter1)
-        {
+			{
             GetNextFields(flds, Letter1 + 2);
             asserta(StrToUint(flds[0]) == Letter1);
             for (uint Letter2 = 0; Letter2 <= Letter1; ++Letter2)
-            {
+				{
                 // Probability is estimated as frequency
                 float Prob = (float) StrToFloat(flds[Letter2+1]);
                 if (Prob < VERY_SMALL_FREQ)
@@ -136,15 +154,14 @@ void Mega::FromFile(const string &FileName)
                 float LogProb = logf(Prob);
                 LogProbMx[Letter1][Letter2] = LogProb;
                 LogProbMx[Letter2][Letter1] = LogProb;
-            }
-        }
-    }
-//    ProfileCount = 2;
+				}
+			}
+		}
     m_Profiles.resize(ProfileCount);
     m_Seqs.resize(ProfileCount);
 
     for (uint ProfileIdx = 0; ProfileIdx < ProfileCount; ++ProfileIdx)
-    {
+	    {
         vector<vector<byte> > &Profile = m_Profiles[ProfileIdx];
         string &S = m_Seqs[ProfileIdx];
         GetNextFields(flds, 4);
@@ -155,53 +172,33 @@ void Mega::FromFile(const string &FileName)
         const uint L = StrToUint(flds[3]);
         Profile.resize(L);
         for (uint Pos = 0; Pos < L; ++Pos)
-        {
+		    {
             GetNextFields(flds, 3);
             asserta(StrToUint(flds[0]) == ProfileIdx);
             asserta(StrToUint(flds[1]) == Pos);
             const string &Syms = flds[2];
             asserta(SIZE(Syms) == m_FeatureCount);
             for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
-            {
+			    {
                 byte Sym = Syms[FeatureIdx];
                 if (FeatureIdx == 0)
-                {
+				    {
                     uint Letter = g_CharToLetterAmino[Sym];
                     Profile[Pos].push_back(Letter);
                     S += Sym;
-                }
+					}
                 else
-                {
+					{
                     uint Letter = uint(Sym - 'A');
                     asserta(Letter < 16);
                     Profile[Pos].push_back(Letter);
-                }
-            }
-        }
-    }
+					}
+				}
+			}
+		}
     m_Lines.clear();
-//    m_FeatureCount = 1;
-//    m_Weights[0] = 1.0;
-/*
-    bool Nucleo = (g_Alpha == ALPHA_Nucleo);
-    HMMParams HP;
-    HP.FromDefaults(Nucleo);
-    HP.ToPairHMM();
-    
-    for (uint Letter1 = 0; Letter1 < 20; ++Letter1)
-        for (uint Letter2 = 0; Letter2 < 20; ++Letter2)
-        {
-            byte c1 = g_LetterToCharAmino[Letter1];
-            byte c2 = g_LetterToCharAmino[Letter2];
-            m_LogProbMxVec[0][Letter1][Letter2] = PairHMM::m_MatchScore[c1][c2];
-        }
-    for (uint Letter1 = 0; Letter1 < 20; ++Letter1)
-    {
-        byte c1 = g_LetterToCharAmino[Letter1];
-        m_LogProbsVec[0][Letter1] = PairHMM::m_InsScore[c1];
-    }
-*/
-}
+	}
+
 float Mega::GetInsScore(const vector<vector<byte> > &Profile, uint Pos) const
 	{
 	asserta(Pos < SIZE(Profile));

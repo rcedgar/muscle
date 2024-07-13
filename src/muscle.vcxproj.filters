@@ -437,9 +437,6 @@
     <ClCompile Include="profpos3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vtml2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="nwsmall3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -561,9 +558,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="bwdflat_mega.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="alignpairflat_mega.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="align_mega.cpp">
@@ -914,6 +908,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="swtrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mpcflat_mega.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

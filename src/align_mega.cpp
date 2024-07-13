@@ -65,7 +65,8 @@ void cmd_align_mega()
 
 	SetAlpha(ALPHA_Amino);
 
-	MPCFlat_mega M(MM);
+	MPCFlat_mega M;
+	M.m_MM = &MM;
 	
 	if (optset_consiters)
 		M.m_ConsistencyIterCount = opt(consiters);

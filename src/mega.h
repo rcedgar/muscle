@@ -3,23 +3,23 @@
 class Mega
 	{
 public:
-	string m_FileName;
-	vector<string> m_Lines;
-	vector<string> m_FeatureNames;
-	vector<float> m_Weights;
-	vector<uint> m_AlphaSizes;
+	static string m_FileName;
+	static vector<string> m_Lines;
+	static vector<string> m_FeatureNames;
+	static vector<float> m_Weights;
+	static vector<uint> m_AlphaSizes;
 
 // log(P_i) for each letter (for HMM Insert states)
-	vector<vector<float> > m_LogProbsVec;
+	static vector<vector<float> > m_LogProbsVec;
 
 // log(P_ij) for each letter pair (for HMM Match state)
-	vector<vector<vector<float> > > m_LogProbMxVec;
+	static vector<vector<vector<float> > > m_LogProbMxVec;
 
-	vector<string> m_Labels;
-	vector<vector<vector<byte> > > m_Profiles;
-	vector<string> m_Seqs;
-	uint m_NextLineNr = 0;
-	uint m_FeatureCount = 0;
+	static vector<string> m_Labels;
+	static vector<vector<vector<byte> > > m_Profiles;
+	static vector<string> m_Seqs;
+	static uint m_NextLineNr;
+	static uint m_FeatureCount;
 
 public:
 	void FromFile(const string &FileName);

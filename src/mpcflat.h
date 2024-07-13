@@ -57,7 +57,7 @@ public:
 	MultiSequence *ProfAlign(const MultiSequence &MSA1, const MultiSequence &MSA2);
 	void ProfSeq(const MultiSequence &MSA1, const Sequence &seq,
 	  string &Path);
-friend class MPCFlat_mega;
+
 protected:
 	void AllocPairCount(uint SeqCount);
 	void FreeProgMSAs();

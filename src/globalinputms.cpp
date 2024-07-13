@@ -5,20 +5,10 @@ static uint g_GlobalMSSeqCount = 0;
 static double g_GlobalMSMeanSeqLength = 0;
 static uint g_GlobalMSMaxSeqLength = 0;
 
-void ClearGlobalInputMS()
-	{
-	if (g_GlobalMS == 0)
-		return;
-	delete g_GlobalMS;
-	g_GlobalMS = 0;
-	}
-
-MultiSequence &LoadGlobalInputMS(const string &FileName)
+void SetGlobalInputMS(MultiSequence &MS)
 	{
 	asserta(g_GlobalMS == 0);
-	g_GlobalMS = new MultiSequence;
-	asserta(g_GlobalMS != 0);
-	g_GlobalMS->FromFASTA(FileName, true);
+	g_GlobalMS = &MS;
 	g_GlobalMSSeqCount = g_GlobalMS->GetSeqCount();
 	g_GlobalMSMeanSeqLength = 0;
 	g_GlobalMSMaxSeqLength = 0;
@@ -35,6 +25,38 @@ MultiSequence &LoadGlobalInputMS(const string &FileName)
 	if (g_GlobalMSSeqCount > 0)
 		g_GlobalMSMeanSeqLength = SumSeqLength/g_GlobalMSSeqCount;
 	ShowSeqStats(*g_GlobalMS);
+	}
+
+void ClearGlobalInputMS()
+	{
+	if (g_GlobalMS == 0)
+		return;
+	delete g_GlobalMS;
+	g_GlobalMS = 0;
+	}
+
+MultiSequence &LoadGlobalInputMS(const string &FileName)
+	{
+	asserta(g_GlobalMS == 0);
+	MultiSequence *MS = new MultiSequence;
+	MS->FromFASTA(FileName, true);
+	//g_GlobalMSSeqCount = g_GlobalMS->GetSeqCount();
+	//g_GlobalMSMeanSeqLength = 0;
+	//g_GlobalMSMaxSeqLength = 0;
+	//double SumSeqLength = 0;
+	//for (uint GSI = 0; GSI < g_GlobalMSSeqCount; ++GSI)
+	//	{
+	//	const Sequence *Seq = g_GlobalMS->GetSequence(GSI);
+	//	uint L = Seq->GetLength();
+	//	g_GlobalMSMaxSeqLength = max(L, g_GlobalMSMaxSeqLength);
+	//	SumSeqLength += L;
+	//	Sequence *HackSeq = (Sequence *) Seq;
+	//	HackSeq->m_GSI = GSI;
+	//	}
+	//if (g_GlobalMSSeqCount > 0)
+	//	g_GlobalMSMeanSeqLength = SumSeqLength/g_GlobalMSSeqCount;
+	//ShowSeqStats(*g_GlobalMS);
+	SetGlobalInputMS(*MS);
 	return *g_GlobalMS;
 	}
 
@@ -74,12 +96,3 @@ const string &GetGlobalInputSeqLabel(uint GSI)
 	const string &Label = Seq.GetLabel();
 	return Label;
 	}
-
-//void ShowGlobalInputSeqStats()
-//	{
-//	ProgressLog("Input: %u seqs, length avg %.0f max %u\n\n",
-//	  g_GlobalMSSeqCount, g_GlobalMSMeanSeqLength, g_GlobalMSMaxSeqLength);
-//
-//	if (g_GlobalMSMaxSeqLength > 15000)
-//		Warning("Sequence length >15k may require excessive memory");
-//	}
