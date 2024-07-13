@@ -298,7 +298,8 @@ public:
 	//void FindCenterByLongestSpan(uint *ptrNodeIndex1,
 	//  uint *ptrNodeIndex2) const;
 	void PruneTree(const Tree &tree, uint Subfams[],
-	  uint uSubfamCount, const char *LabelPrefix);
+	  uint uSubfamCount, const char *LabelPrefix,
+	  vector<string> &Labels);
 	uint LeafIndexToNodeIndex(uint uLeafIndex) const;
 
 // Debugging & trouble-shooting support

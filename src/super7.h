@@ -11,7 +11,8 @@ public:
 	Tree m_ShrubTree;
 
 	MPCFlat m_MPC;
-	vector<MultiSequence *> m_ShrubMSAs;
+	vector<const MultiSequence *> m_ShrubMSAs;
+	vector<string> m_ShrubLabels;
 
 	PProg m_PP;
 	MultiSequence m_FinalMSA;
@@ -29,5 +30,7 @@ public:
 private:
 	void MapLabels();
 	void SetShrubs(uint ShrubSize);
-	void AlignShrubs();
+	void SetShrubTree();
+	void IntraAlignShrubs();
+	void ProgAlign();
 	};

@@ -83,16 +83,7 @@ unsigned GetRequestedThreadCount()
 	if (optset_threads)
 		N = opt(threads);
 	else
-		{
-		if (CoreCount > 20)
-			{
-			Progress("CPU has %u cores, defaulting to 20 threads\n", CoreCount);
-			MessageShown = true;
-			N = 20;
-			}
-		else
-			N = CoreCount;
-		}
+		N = CoreCount;
 	if (N > MaxN)
 		{
 		Warning("Max OMP threads %u", MaxN);

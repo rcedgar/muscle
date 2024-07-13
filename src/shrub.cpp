@@ -88,7 +88,9 @@ void cmd_shrub()
 		}
 
 	Tree PT;
-	PT.PruneTree(T, ShrubLCAs.data(), ShrubCount, "");
+	vector<string> ShrubLabels;
+	PT.PruneTree(T, ShrubLCAs.data(), ShrubCount,
+	  "Shrub_", ShrubLabels);
 
 	PT.LogMe();
 	uint Node = PT.FirstDepthFirstNode();

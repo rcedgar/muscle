@@ -12,13 +12,25 @@ void Super7::Run(const MultiSequence &InputSeqs,
 	m_GuideTree = &GuideTree;
 	MapLabels();
 	SetShrubs(ShrubSize);
-	AlignShrubs();
+	SetShrubTree();
+	IntraAlignShrubs();
+	ProgAlign();
+	}
+
+void Super7::ProgAlign()
+	{
+	m_PP.SetMSAs(m_ShrubMSAs, m_ShrubLabels);
+	m_PP.RunGuideTree(m_ShrubTree);
+	const MultiSequence &FinalMSA = m_PP.GetFinalMSA();
+	m_FinalMSA.Copy(FinalMSA);
+	//m_FinalMSA.LogMe();
 	}
 
 void Super7::SetShrubTree()
 	{
 	const uint ShrubCount = GetShrubCount();
-	m_ShrubTree.PruneTree(*m_GuideTree, m_ShrubLCAs.data(), ShrubCount, "");
+	m_ShrubTree.PruneTree(*m_GuideTree, m_ShrubLCAs.data(),
+	  ShrubCount, "Shrub_", m_ShrubLabels);
 	}
 
 void Super7::SetShrubs(uint ShrubSize)
@@ -89,11 +101,10 @@ void Super7::MakeShrubInput(uint LCA, MultiSequence &ShrubInput)
 		}
 	}
 
-void Super7::AlignShrubs()
+void Super7::IntraAlignShrubs()
 	{
 	asserta(m_ShrubMSAs.empty());
 	uint ShrubCount = GetShrubCount();
-	m_ShrubMSAs.resize(ShrubCount);
 	for (uint ShrubIndex = 0; ShrubIndex < ShrubCount; ++ShrubIndex)
 		{
 		ProgressLog("Aligning shrub %u / %u\n", ShrubIndex+1, ShrubCount);
@@ -105,7 +116,7 @@ void Super7::AlignShrubs()
 		MultiSequence *ShrubMSA = new MultiSequence;
 		ShrubMSA->Copy(*m_MPC.m_MSA);
 		m_ShrubMSAs.push_back(ShrubMSA);
-		ShrubMSA->LogMe();
+		//ShrubMSA->LogMe();
 		}
 	}
 
@@ -160,6 +171,7 @@ void cmd_super7()
 
 	Super7 S7;
 	S7.Run(InputSeqs, GuideTree, ShrubSize);
+	S7.m_FinalMSA.ToFasta(opt(output));
 
 	ProgressLog("Done.\n");
 	}

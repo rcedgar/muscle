@@ -166,7 +166,7 @@ void cmd_qscore()
 						cRef,
 						cTest);
 					}
-				if (isalpha(cRef) && (isupper(cRef) || cRef == 'x'))
+				if (isalpha(cRef) && isupper(cRef))
 					{
 					RefColIsAligned = true;
 					++NonGappedCount;

@@ -166,10 +166,11 @@ void GetLeaves(const Tree &tree, unsigned uNodeIndex, unsigned Leaves[],
 	}
 
 void Tree::PruneTree(const Tree &tree, unsigned Subfams[],
-  unsigned uSubfamCount, const char *LabelPrefix)
+  unsigned uSubfamCount, const char *LabelPrefix, vector<string> &Labels)
 	{
 	if (!tree.IsRooted())
 		Die("Tree::PruneTree: requires rooted tree");
+	Labels.clear();
 
 	Clear();
 
@@ -238,9 +239,10 @@ void Tree::PruneTree(const Tree &tree, unsigned Subfams[],
 // Nodes 0, 1 ... are the leaves
 	for (unsigned uSubfamIndex = 0; uSubfamIndex < uSubfamCount; ++uSubfamIndex)
 		{
-		char szName[32];
-		sprintf(szName, "%s%u", LabelPrefix, uSubfamIndex);
-		m_ptrName[uSubfamIndex] = mystrsave(szName);
+		string Label;
+		Ps(Label, "%s%u", LabelPrefix, uSubfamIndex);
+		m_ptrName[uSubfamIndex] = mystrsave(Label.c_str());
+		Labels.push_back(Label);
 		}
 
 	for (unsigned uPrunedNodeIndex = uSubfamCount; uPrunedNodeIndex < m_uNodeCount;
