@@ -6,16 +6,27 @@
 void GetShrubs(const Tree &T, uint n, vector<uint> &ShrubLCAs);
 void CalcGuideTree_SW_BLOSUM62(const MultiSequence &Input, Tree &T);
 
-void Super7::Run(const MultiSequence &InputSeqs,
+void Super7::Run(MultiSequence &InputSeqs,
   const Tree &GuideTree, uint ShrubSize)
 	{
+	m_MPC.m_D.m_Disable = true;
+
 	m_InputSeqs = &InputSeqs;
 	m_GuideTree = &GuideTree;
 	MapLabels();
 	SetShrubs(ShrubSize);
-	SetShrubTree();
-	IntraAlignShrubs();
-	ProgAlign();
+	const uint ShrubCount = GetShrubCount();
+	if (ShrubCount == 1)
+		{
+		m_MPC.Run(&InputSeqs);
+		m_FinalMSA.Copy(*m_MPC.m_MSA);
+		}
+	else
+		{
+		SetShrubTree();
+		IntraAlignShrubs();
+		ProgAlign();
+		}
 	}
 
 void Super7::ProgAlign()
@@ -24,14 +35,14 @@ void Super7::ProgAlign()
 	m_PP.RunGuideTree(m_ShrubTree);
 	const MultiSequence &FinalMSA = m_PP.GetFinalMSA();
 	m_FinalMSA.Copy(FinalMSA);
-	//m_FinalMSA.LogMe();
 	}
 
 void Super7::SetShrubTree()
 	{
 	const uint ShrubCount = GetShrubCount();
+	asserta(ShrubCount > 1);
 	m_ShrubTree.PruneTree(*m_GuideTree, m_ShrubLCAs.data(),
-	  ShrubCount, "Shrub_", m_ShrubLabels);
+		ShrubCount, "Shrub_", m_ShrubLabels);
 	}
 
 void Super7::SetShrubs(uint ShrubSize)

@@ -6,7 +6,7 @@
 class Super7
 	{
 public:
-	const MultiSequence *m_InputSeqs = 0;
+	MultiSequence *m_InputSeqs = 0;
 	const Tree *m_GuideTree = 0;
 	Tree m_ShrubTree;
 
@@ -22,7 +22,7 @@ public:
 	vector<uint> m_ShrubLCAs;
 
 public:
-	void Run(const MultiSequence &InputSeqs,
+	void Run(MultiSequence &InputSeqs,
 	  const Tree &GuideTree, uint ShrubSize);
 	uint GetShrubCount() const { return SIZE(m_ShrubLCAs); }
 	void MakeShrubInput(uint LCA, MultiSequence &ShrubInput);

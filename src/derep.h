@@ -11,6 +11,8 @@ public:
 	uint m_SlotCount = 0;
 	vector<vector<uint> > m_HashToSeqIndexes;
 
+	bool m_Disable = false;
+
 public:
 	uint CalcHash(const Sequence *Seq) const;
 	void Clear();

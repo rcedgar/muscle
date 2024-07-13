@@ -64,6 +64,8 @@ void Derep::Run(MultiSequence &InputSeqs, bool ShowProgress)
 
 bool Derep::SeqsEq(uint SeqIndex1, uint SeqIndex2) const
 	{
+	if (m_Disable)
+		return false;
 	const Sequence *Seq1 = m_InputSeqs->GetSequence(SeqIndex1);
 	const Sequence *Seq2 = m_InputSeqs->GetSequence(SeqIndex2);
 	const uint L = Seq1->GetLength();
@@ -82,6 +84,8 @@ bool Derep::SeqsEq(uint SeqIndex1, uint SeqIndex2) const
 
 uint Derep::Search(uint SeqIndex) const
 	{
+	if (m_Disable)
+		return UINT_MAX;
 	const Sequence *Seq = m_InputSeqs->GetSequence(SeqIndex);
 	asserta(Seq != 0);
 	uint h = CalcHash(Seq);
