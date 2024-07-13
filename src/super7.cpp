@@ -4,6 +4,7 @@
 #include "super7.h"
 
 void GetShrubs(const Tree &T, uint n, vector<uint> &ShrubLCAs);
+void CalcGuideTree_SW_BLOSUM62(const MultiSequence &Input, Tree &T);
 
 void Super7::Run(const MultiSequence &InputSeqs,
   const Tree &GuideTree, uint ShrubSize)
@@ -122,9 +123,6 @@ void Super7::IntraAlignShrubs()
 
 void cmd_super7()
 	{
-	if (!optset_guidetreein)
-		Die("Must set -guidetreein for -super7");
-
 	string &OutputPattern = opt(output);
 	if (OutputPattern.empty())
 		Die("Must set -output");
@@ -135,14 +133,17 @@ void cmd_super7()
 	if (ShrubSize < 3)
 		Die("-shrub_size must be >= 3");
 
-	Tree GuideTree;
-	GuideTree.FromFile(opt(guidetreein));
-
 	LoadGlobalInputMS(g_Arg1);
 	ShowGlobalInputSeqStats();
 
 	MultiSequence &InputSeqs = GetGlobalInputMS();
 	const uint InputSeqCount = GetGlobalMSSeqCount();
+
+	Tree GuideTree;
+	if (optset_guidetreein)
+		GuideTree.FromFile(opt(guidetreein));
+	else
+		CalcGuideTree_SW_BLOSUM62(InputSeqs, GuideTree);
 
 	bool Nucleo = false;
 	if (opt(nt))

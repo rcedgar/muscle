@@ -84,10 +84,8 @@ static void ThreadBody(uint ThreadIndex, void *ptrData)
 		}
 	}
 
-void cmd_swdistmx()
+void CalcGuideTree_SW_BLOSUM62(const MultiSequence &Input, Tree &T)
 	{
-	MultiSequence Input;
-	Input.FromFASTA(g_Arg1, true);
 	const uint SeqCount = Input.GetSeqCount();
 	vector<string> Labels;
 	for (uint i = 0; i < SeqCount; ++i)
@@ -125,8 +123,14 @@ void cmd_swdistmx()
 	UPGMA5 U;
 	U.Init(Labels, DistMxv);
 	U.ScaleDistMx();
-
-	Tree T;
 	U.Run(LINKAGE_Avg, T);
+	}
+
+void cmd_swdistmx()
+	{
+	MultiSequence Input;
+	Input.FromFASTA(g_Arg1, true);
+	Tree T;
+	CalcGuideTree_SW_BLOSUM62(Input, T);
 	T.ToFile(opt(guidetreeout));
 	}
