@@ -46,6 +46,40 @@ void Super7_mega::GetShrubProfiles(uint LCA,
 		}
 	}
 
+void Super7_mega::Run(MultiSequence &InputSeqs,
+  const Tree &GuideTree, uint ShrubSize)
+	{
+	m_MPC->m_D.m_Disable = true;
+
+	m_InputSeqs = &InputSeqs;
+	m_GuideTree = &GuideTree;
+	MapLabels();
+	SetShrubs(ShrubSize);
+	const uint ShrubCount = GetShrubCount();
+	if (ShrubCount == 1)
+		{
+		MPCFlat_mega &M = (MPCFlat_mega &) *m_MPC;
+		const uint SeqCount = InputSeqs.GetSeqCount();
+		vector<const vector<vector<byte> > *> ProfilePtrVec;
+		for (uint i = 0; i < SeqCount; ++i)
+			{
+			const uint L = InputSeqs.GetSeqLength(i);
+			vector<vector<byte> > *ptrProfile = &Mega::m_Profiles[i];
+			const uint PL = uint(ptrProfile->size());
+			asserta(PL == L);
+			ProfilePtrVec.push_back(ptrProfile);
+			}
+		M.Run(&InputSeqs, ProfilePtrVec);
+		m_FinalMSA.Copy(*M.m_MSA);
+		}
+	else
+		{
+		SetShrubTree();
+		IntraAlignShrubs();
+		ProgAlign();
+		}
+	}
+
 void cmd_super7_mega()
 	{
 	uint ShrubSize = 32;

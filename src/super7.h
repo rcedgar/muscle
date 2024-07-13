@@ -22,17 +22,19 @@ public:
 	vector<uint> m_ShrubLCAs;
 
 public:
-	void Run(MultiSequence &InputSeqs,
-	  const Tree &GuideTree, uint ShrubSize);
 	uint GetShrubCount() const { return SIZE(m_ShrubLCAs); }
 	void MakeShrubInput(uint LCA, MultiSequence &ShrubInput);
 
-private:
+protected:
 	void MapLabels();
 	void SetShrubs(uint ShrubSize);
 	void SetShrubTree();
 	void IntraAlignShrubs();
 	void ProgAlign();
+
+public:
+	virtual void Run(MultiSequence &InputSeqs,
+	  const Tree &GuideTree, uint ShrubSize);
 
 private:
 	virtual void IntraAlignShrub(uint ShrubIndex);
@@ -40,6 +42,10 @@ private:
 
 class Super7_mega : public Super7
 	{
+public:
+	virtual void Run(MultiSequence &InputSeqs,
+	  const Tree &GuideTree, uint ShrubSize);
+
 protected:
 	void GetShrubProfiles(uint LCA,
 	  vector<const vector<vector<byte> > *> &ProfilePtrVec);
