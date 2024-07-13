@@ -43,7 +43,7 @@ static void Align_Mega(MPCFlat_mega &M, MultiSequence &InputSeqs,
 	HP.ToPairHMM();
 
 	M.m_TreePerm = TP;
-	vector<vector<vector<byte> > *> ProfilePtrVec;
+	vector<const vector<vector<byte> > *> ProfilePtrVec;
 	const uint SeqCount = InputSeqs.GetSeqCount();
 	for (uint i = 0; i < SeqCount; ++i)
 		{

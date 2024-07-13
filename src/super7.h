@@ -33,4 +33,17 @@ private:
 	void SetShrubTree();
 	void IntraAlignShrubs();
 	void ProgAlign();
+
+private:
+	virtual void IntraAlignShrub(uint ShrubIndex);
+	};
+
+class Super7_mega : public Super7
+	{
+protected:
+	void GetShrubProfiles(uint LCA,
+	  vector<const vector<vector<byte> > *> &ProfilePtrVec);
+
+protected:
+	virtual void IntraAlignShrub(uint ShrubIndex);
 	};

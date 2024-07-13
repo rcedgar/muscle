@@ -100,7 +100,7 @@ void MPCFlat_mega::CalcPosterior(uint PairIndex)
     }
 
 void MPCFlat_mega::Run(MultiSequence *InputSeqs,
-  const vector<vector<vector<byte> > *> &ProfilePtrVec)
+  const vector<const vector<vector<byte> > *> &ProfilePtrVec)
 	{
 	m_ProfilePtrVec = &ProfilePtrVec;
 	MPCFlat::Run(InputSeqs);

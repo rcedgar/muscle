@@ -10,14 +10,14 @@ class MPCFlat_mega : public MPCFlat
     {
 public:
     Mega *m_MM = 0;
-	const vector<vector<vector<byte> > *> *m_ProfilePtrVec = 0;
+	const vector<const vector<vector<byte> > *> *m_ProfilePtrVec = 0;
 
 private:
 	void Run(MultiSequence *InputSeqs) { Die("MPCFlat_mega::Run()"); }
 
 public:
 	void Run(MultiSequence *InputSeqs,
-	  const vector<vector<vector<byte> > *> &m_ProfilePtrVec);
+	  const vector<const vector<vector<byte> > *> &ProfilePtrVec);
 
 protected:
     virtual void CalcPosterior(uint PairIndex);

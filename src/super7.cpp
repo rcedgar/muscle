@@ -113,6 +113,18 @@ void Super7::MakeShrubInput(uint LCA, MultiSequence &ShrubInput)
 		}
 	}
 
+void Super7::IntraAlignShrub(uint ShrubIndex)
+	{
+	uint LCA = m_ShrubLCAs[ShrubIndex];
+	MultiSequence ShrubInput;
+	MakeShrubInput(LCA, ShrubInput);
+	m_MPC->m_TreePerm = TP_None;
+	m_MPC->Run(&ShrubInput);
+	MultiSequence *ShrubMSA = new MultiSequence;
+	ShrubMSA->Copy(*m_MPC->m_MSA);
+	m_ShrubMSAs.push_back(ShrubMSA);
+	}
+
 void Super7::IntraAlignShrubs()
 	{
 	asserta(m_ShrubMSAs.empty());
@@ -120,15 +132,7 @@ void Super7::IntraAlignShrubs()
 	for (uint ShrubIndex = 0; ShrubIndex < ShrubCount; ++ShrubIndex)
 		{
 		ProgressLog("Aligning shrub %u / %u\n", ShrubIndex+1, ShrubCount);
-		uint LCA = m_ShrubLCAs[ShrubIndex];
-		MultiSequence ShrubInput;
-		MakeShrubInput(LCA, ShrubInput);
-		m_MPC->m_TreePerm = TP_None;
-		m_MPC->Run(&ShrubInput);
-		MultiSequence *ShrubMSA = new MultiSequence;
-		ShrubMSA->Copy(*m_MPC->m_MSA);
-		m_ShrubMSAs.push_back(ShrubMSA);
-		//ShrubMSA->LogMe();
+		IntraAlignShrub(ShrubIndex);
 		}
 	}
 

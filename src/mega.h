@@ -42,4 +42,8 @@ public:
 	void LogMx(const string &Name, const vector<vector<float> > &Mx) const;
 	void LogVec(const string &Name, const vector<float> &Vec) const;
 	void AssertSymmetrical(const vector<vector<float> > &Mx) const;
+
+public:
+	static const vector<vector<byte> >
+	  *GetProfileByLabel(const string &Label);
 	};
