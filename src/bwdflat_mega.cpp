@@ -11,13 +11,10 @@ Bwd[s][i][j] =
 ***/
 
 void CalcBwdFlat_mega(const Mega &M,
-  uint ProfileIdxX, uint ProfileIdxY, float *Flat)
+  const vector<vector<byte> > &ProfileX,
+  const vector<vector<byte> > &ProfileY, float *Flat)
 	{
 #include "hmmscores.h"
-	asserta(ProfileIdxX < SIZE(M.m_Profiles));
-	asserta(ProfileIdxY < SIZE(M.m_Profiles));
-	const vector<vector<byte> > &ProfileX = M.m_Profiles[ProfileIdxX];
-	const vector<vector<byte> > &ProfileY = M.m_Profiles[ProfileIdxY];
 	const uint LX = SIZE(ProfileX);
 	const uint LY = SIZE(ProfileY);
 	if (double(LX)*double(LY)*5 + 100 > double(INT_MAX))

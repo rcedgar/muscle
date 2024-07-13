@@ -39,7 +39,7 @@ void MPCFlat::ConsPair(uint PairIndex)
 		if (SeqIndexZ == SeqIndexX || SeqIndexZ == SeqIndexY)
 			continue;
 		float wZ = m_Weights[SeqIndexZ];
-		wZ = 1.0f;//@@@@@@@@@@@@@@@@@@@@@ TODO
+		wZ = 1.0f;
 
 #if 0//TRACE
 		g_X = GetSequence(SeqIndexX)->GetBytePtr();

@@ -1,4 +1,3 @@
-#include "myutils.h"
 #include "muscle.h"
 #include "textfile.h"
 #include "tree.h"
@@ -53,10 +52,10 @@ void ValidateJoinOrder(const vector<uint> &Indexes1,
 	asserta(NotUsedCount == 1);
 	}
 
-static const char *GetLabel(const map<string, uint> &LabelToIndex,
+static const char *GetLabel(const unordered_map<string, uint> &LabelToIndex,
   uint Index)
 	{
-	for (map<string, uint>::const_iterator p = LabelToIndex.begin();
+	for (unordered_map<string, uint>::const_iterator p = LabelToIndex.begin();
 	  p != LabelToIndex.end(); ++p)
 		{
 		if (p->second == Index)
@@ -67,7 +66,7 @@ static const char *GetLabel(const map<string, uint> &LabelToIndex,
 	}
 
 void LogGuideTreeJoinOrder(const Tree &GuideTree,
-  const map<string, uint> &LabelToIndex,
+  const unordered_map<string, uint> &LabelToIndex,
   const vector<uint> &Indexes1, const vector<uint> &Indexes2)
 	{
 	asserta(GuideTree.IsRooted());
@@ -102,7 +101,7 @@ void LogGuideTreeJoinOrder(const Tree &GuideTree,
 	}
 
 void GetGuideTreeJoinOrder(const Tree &GuideTree,
-  const map<string, uint> &LabelToIndex,
+  const unordered_map<string, uint> &LabelToIndex,
   vector<uint> &Indexes1, vector<uint> &Indexes2)
 	{
 	asserta(GuideTree.IsRooted());
@@ -125,7 +124,7 @@ void GetGuideTreeJoinOrder(const Tree &GuideTree,
 		if (GuideTree.IsLeaf(Node))
 			{
 			const string Label = GuideTree.GetLeafName(Node);
-			map<string, uint>::const_iterator p = LabelToIndex.find(Label);
+			unordered_map<string, uint>::const_iterator p = LabelToIndex.find(Label);
 			if (p == LabelToIndex.end())
 				Die("Label not found >%s", Label.c_str());
 			uint Index = p->second;
@@ -151,9 +150,9 @@ void GetGuideTreeJoinOrder(const Tree &GuideTree,
 		}
 	}
 
-void MakeGuideTreeFromJoinOrder(const vector<uint> &Indexes1,
-  const vector<uint> &Indexes2, const map<string, uint> &LabelToIndex,
-  Tree &GuideTree)
+void MakeGuideTreeFromJoinOrder(
+  const vector<uint> &Indexes1, const vector<uint> &Indexes2,
+  const unordered_map<string, uint> &LabelToIndex, Tree &GuideTree)
 	{
 	const uint JoinCount = SIZE(Indexes1);
 	asserta(SIZE(Indexes2) == JoinCount);
@@ -189,7 +188,7 @@ void cmd_guide_tree_join_order()
 	Tree GuideTree;
 	GuideTree.FromFile(TreeFileName);
 
-	map<string, uint> LabelToIndex;
+	unordered_map<string, uint> LabelToIndex;
 	const uint NodeCount = GuideTree.GetNodeCount();
 	const uint LeafCount = GuideTree.GetLeafCount();
 	const uint JoinCount = LeafCount - 1;

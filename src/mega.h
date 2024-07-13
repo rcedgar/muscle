@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 class Mega
 	{
 public:
@@ -8,6 +10,7 @@ public:
 	static vector<string> m_FeatureNames;
 	static vector<float> m_Weights;
 	static vector<uint> m_AlphaSizes;
+	static unordered_map<string, uint> m_LabelToIdx;
 
 // log(P_i) for each letter (for HMM Insert states)
 	static vector<vector<float> > m_LogProbsVec;

@@ -125,7 +125,7 @@ void Derep::GetUniqueSeqs(MultiSequence &UniqueSeqs)
 	}
 
 void Derep::GetRepLabelToDupeLabels(
-  map<string, vector<string> > &RepLabelToMemberLabels) const
+  unordered_map<string, vector<string> > &RepLabelToMemberLabels) const
 	{
 	RepLabelToMemberLabels.clear();
 	const uint SeqCount = m_InputSeqs->GetSeqCount();

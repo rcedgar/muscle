@@ -18,6 +18,7 @@ vector<vector<vector<float> > > Mega::m_LogProbMxVec;
 vector<string> m_Labels;
 uint Mega::m_NextLineNr;
 uint Mega::m_FeatureCount;
+unordered_map<string, uint> Mega::m_LabelToIdx;
 
 const string &Mega::GetNextLine()
 	{
@@ -168,6 +169,9 @@ void Mega::FromFile(const string &FileName)
         asserta(flds[0] == "chain");
         asserta(StrToUint(flds[1]) == ProfileIdx);
         const string &Label = flds[2];
+		if (m_LabelToIdx.find(Label) != m_LabelToIdx.end())
+			Die("Duplicate label in mega file >%s", Label.c_str());
+		m_LabelToIdx[Label] = ProfileIdx;
         m_Labels.push_back(Label);
         const uint L = StrToUint(flds[3]);
         Profile.resize(L);

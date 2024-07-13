@@ -25,5 +25,5 @@ public:
 	void GetDupeGSIs(vector<uint> &GSIs,
 	  vector<uint> &GlobalRepSeqIndexes) const;
 	void GetRepLabelToDupeLabels(
-	  map<string, vector<string> > &RepLabelToDupeLabels) const;
+	  unordered_map<string, vector<string> > &RepLabelToDupeLabels) const;
 	};

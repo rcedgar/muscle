@@ -30,6 +30,7 @@
 #include <omp.h>
 #include <algorithm>
 #include <map>
+#include <unordered_map>
 #include <inttypes.h>
 #include <thread>
 #include "types.h"

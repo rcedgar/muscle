@@ -4,14 +4,20 @@
 #include "muscle.h"
 #include "mpcflat_mega.h"
 
+// SMI = Sparse Matrix (posterior) Index
+//   same as index into m_InputSeqs
+const vector<vector<byte> > &MPCFlat_mega::GetProfile(uint SMI) const
+	{
+	asserta(SMI < SIZE(*m_ProfilePtrVec));
+	return *(*m_ProfilePtrVec)[SMI];
+	}
+
 void MPCFlat_mega::CalcPosterior(uint PairIndex)
     {
     const pair<uint, uint> &Pair = GetPair(PairIndex);
 
     const uint SeqIndexX = Pair.first;
     const uint SeqIndexY = Pair.second;
-	const uint ProfileIdxX = SeqIndexX;
-	const uint ProfileIdxY = SeqIndexY;
 
     uint LX = GetL(SeqIndexX);
     uint LY = GetL(SeqIndexY);
@@ -24,10 +30,12 @@ void MPCFlat_mega::CalcPosterior(uint PairIndex)
         Die("HMM overflow, sequence lengths %u, %u (max ~21k)", LX, LY);
         }
 
-	const vector<vector<byte> > &ProfileX = m_MM->m_Profiles[ProfileIdxX];
-	const vector<vector<byte> > &ProfileY = m_MM->m_Profiles[ProfileIdxY];
+	const vector<vector<byte> > &ProfileX = GetProfile(SeqIndexX);
+	const vector<vector<byte> > &ProfileY = GetProfile(SeqIndexY);
+
 	const uint PLX = SIZE(ProfileX);
 	const uint PLY = SIZE(ProfileY);
+
 	asserta(PLX == LX);
 	asserta(PLY == LY);
 
@@ -40,8 +48,8 @@ void MPCFlat_mega::CalcPosterior(uint PairIndex)
 //    CalcFwdFlat(X, LX, Y, LY, Fwd);
 //    CalcBwdFlat(X, LX, Y, LY, Bwd);
 
-    CalcFwdFlat_mega(*m_MM, ProfileIdxX, ProfileIdxY, Fwd);
-    CalcBwdFlat_mega(*m_MM, ProfileIdxX, ProfileIdxY, Bwd);
+    CalcFwdFlat_mega(*m_MM, ProfileX, ProfileY, Fwd);
+    CalcBwdFlat_mega(*m_MM, ProfileX, ProfileY, Bwd);
     
     float *Post = AllocPost(LX, LY);
     CalcPostFlat(Fwd, Bwd, LX, LY, Post);
@@ -91,3 +99,9 @@ void MPCFlat_mega::CalcPosterior(uint PairIndex)
     m_DistMx[SeqIndexY][SeqIndexX] = EA;
     }
 
+void MPCFlat_mega::Run(MultiSequence *InputSeqs,
+  const vector<vector<vector<byte> > *> &ProfilePtrVec)
+	{
+	m_ProfilePtrVec = &ProfilePtrVec;
+	MPCFlat::Run(InputSeqs);
+	}

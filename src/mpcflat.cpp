@@ -23,7 +23,6 @@ void MPCFlat::Clear()
 	FreeProgMSAs();
 	}
 
-
 const char *MPCFlat::GetLabel(uint SeqIndex) const
 	{
 	const char *Label = m_InputSeqs->GetLabel(SeqIndex);
@@ -299,7 +298,7 @@ void MPCFlat::Run(MultiSequence *OriginalInputSeqs)
 		m_MSA->Copy(*OriginalInputSeqs);
 		return;
 		}
-	map<string, vector<string> > RepSeqLabelToDupeLabels;
+	unordered_map<string, vector<string> > RepSeqLabelToDupeLabels;
 	m_D.GetRepLabelToDupeLabels(RepSeqLabelToDupeLabels);
 	const uint DupeCount = SIZE(RepSeqLabelToDupeLabels);
 
@@ -346,7 +345,7 @@ void MPCFlat::SortMSA()
 		}
 	}
 
-void MPCFlat::GetLabelToMSASeqIndex(map<string, uint> &LabelToMSASeqIndex) const
+void MPCFlat::GetLabelToMSASeqIndex(unordered_map<string, uint> &LabelToMSASeqIndex) const
 	{
 	LabelToMSASeqIndex.clear();
 	const uint SeqCount = GetSeqCount();
@@ -363,7 +362,7 @@ void MPCFlat::GetLabelToMSASeqIndex(map<string, uint> &LabelToMSASeqIndex) const
 void MPCFlat::SortMSA_ByGuideTree()
 	{
 	const uint SeqCount = GetSeqCount();
-	map<string, uint> LabelToMSASeqIndex;
+	unordered_map<string, uint> LabelToMSASeqIndex;
 	GetLabelToMSASeqIndex(LabelToMSASeqIndex);
 
 	const uint LeafCount = m_GuideTree.GetLeafCount();
@@ -377,7 +376,7 @@ void MPCFlat::SortMSA_ByGuideTree()
 			{
 			string Label;
 			T.GetLabel(Node, Label);
-			map<string, uint>::const_iterator p =
+			unordered_map<string, uint>::const_iterator p =
 			  LabelToMSASeqIndex.find(Label);
 			if (p == LabelToMSASeqIndex.end())
 				Die("MPCFlat::SortMSA_ByGuideTree not found >%s", Label.c_str());
@@ -398,14 +397,14 @@ void MPCFlat::SortMSA_ByGuideTree()
 void MPCFlat::SortMSA_ByInputOrder()
 	{
 	const uint SeqCount = GetSeqCount();
-	map<string, uint> LabelToMSASeqIndex;
+	unordered_map<string, uint> LabelToMSASeqIndex;
 	GetLabelToMSASeqIndex(LabelToMSASeqIndex);
 
 	vector<const Sequence *> SortedSeqs;
 	for (uint i = 0; i < SeqCount; ++i)
 		{
 		const string &Label = m_InputSeqs->GetLabelStr(i);
-		map<string, uint>::const_iterator p =
+		unordered_map<string, uint>::const_iterator p =
 		  LabelToMSASeqIndex.find(Label);
 		if (p == LabelToMSASeqIndex.end())
 			Die("MPCFlat::SortMSA_ByInputOrder(), missing >%s", Label.c_str());
@@ -418,7 +417,7 @@ void MPCFlat::SortMSA_ByInputOrder()
 	}
 
 void MPCFlat::InsertDupes(
-  const map<string, vector<string> > &RepSeqLabelToDupeLabels)
+  const unordered_map<string, vector<string> > &RepSeqLabelToDupeLabels)
 	{
 	MultiSequence *UpdatedMSA = new MultiSequence;
 	const uint SeqCount = m_MSA->GetSeqCount();
@@ -431,7 +430,7 @@ void MPCFlat::InsertDupes(
 		NewSeq->m_CharVec = OldSeq->m_CharVec;
 
 		UpdatedMSA->AddSequence(NewSeq, false);
-		map<string, vector<string> >::const_iterator iter =
+		unordered_map<string, vector<string> >::const_iterator iter =
 		  RepSeqLabelToDupeLabels.find(Label);
 		if (iter != RepSeqLabelToDupeLabels.end())
 			{

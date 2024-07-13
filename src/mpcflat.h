@@ -7,8 +7,12 @@
 #include "mysparsemx.h"
 #include "derep.h"
 #include "clustalweights.h"
+#include <unordered_map>
 
-// Multi-threaded ProbCons
+static const uint DEFAULT_CONSISTENCY_ITERS_FLAT = 2;
+static const uint DEFAULT_REFINE_ITERS_FLAT = 100;
+
+// Multi-threaded ProbCons, flat memory layout
 class MPCFlat
 	{
 public:
@@ -19,11 +23,11 @@ public:
 
 	MultiSequence *m_MSA = 0;
 
-	uint m_ConsistencyIterCount = DEFAULT_CONSISTENCY_ITERS;
-	uint m_RefineIterCount = DEFAULT_REFINE_ITERS;
+	uint m_ConsistencyIterCount = DEFAULT_CONSISTENCY_ITERS_FLAT;
+	uint m_RefineIterCount = DEFAULT_REFINE_ITERS_FLAT;
 	TREEPERM m_TreePerm = TP_None;
 	vector<string> m_Labels;
-	map<string, uint> m_LabelToIndex;
+	unordered_map<string, uint> m_LabelToIndex;
 	UPGMA5 m_Upgma5;
 	Tree m_GuideTree;
 	vector<MultiSequence *> m_ProgMSAs;
@@ -55,8 +59,10 @@ public:
 	uint GetSeqCount() const;
 	void Run_Super4(MultiSequence *InputSeqs);
 	MultiSequence *ProfAlign(const MultiSequence &MSA1, const MultiSequence &MSA2);
-	void ProfSeq(const MultiSequence &MSA1, const Sequence &seq,
-	  string &Path);
+	void ProfSeq(const MultiSequence &MSA1, const Sequence &seq, string &Path);
+
+protected:
+	virtual void CalcPosterior(uint PairIndex);
 
 protected:
 	void AllocPairCount(uint SeqCount);
@@ -67,7 +73,6 @@ protected:
 	void InitPairs();
 	void InitDistMx();
 	void CalcPosteriors();
-	virtual void CalcPosterior(uint PairIndex);
 	void Consistency();
 	void ConsIter(uint Iter);
 	void ConsPair(uint PairIndex);
@@ -90,11 +95,11 @@ protected:
 	const Sequence *GetSequence(uint SeqIndex) const;
 	MultiSequence *AlignAlns(const MultiSequence &MSA1,
 	  const MultiSequence &MSA2, float *ptrScore = 0);
-	void GetLabelToMSASeqIndex(map<string, uint> &LabelToMSASeqIndex) const;
+	void GetLabelToMSASeqIndex(unordered_map<string, uint> &LabelToMSASeqIndex) const;
 	void SortMSA_ByInputOrder();
 	void SortMSA_ByGuideTree();
 	void SortMSA();
-	void InsertDupes(const map<string, vector<string> > &RepSeqLabelToDupeLabels);
+	void InsertDupes(const unordered_map<string, vector<string> > &RepSeqLabelToDupeLabels);
 	};
 
 float *AllocFB(uint LX, uint LY);

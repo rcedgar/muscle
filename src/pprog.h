@@ -14,7 +14,7 @@ public:
 	uint m_TargetPairCount = DEFAULT_TARGET_PAIR_COUNT;
 	uint m_MaxCoarseSeqs = DEFAULT_MAX_COARSE_SEQS;
 
-	map<string, uint> m_MSALabelToIndex;
+	unordered_map<string, uint> m_MSALabelToIndex;
 	vector<string> m_MSALabels;
 	vector<const MultiSequence *> m_MSAs;
 
@@ -50,13 +50,9 @@ public:
 	void WriteGuideTree(const string &FileName) const;
 	};
 
-void MakeGuideTreeFromJoinOrder(const vector<uint> &Indexes1,
-  const vector<uint> &Indexes2, const map<string, uint> &LabelToIndex,
-  Tree &GuideTree);
-
-void GetGuideTreeJoinOrder(const Tree &GuideTree,
-  const map<string, uint> &LabelToIndex,
-  vector<uint> &Indexes1, vector<uint> &Indexes2);
+void MakeGuideTreeFromJoinOrder(
+  const vector<uint> &Indexes1, const vector<uint> &Indexes2,
+  const unordered_map<string, uint> &LabelToIndex, Tree &GuideTree);
 
 void ValidateJoinOrder(const vector<uint> &Indexes1,
   const vector<uint> &Indexes2);

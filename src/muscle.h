@@ -73,7 +73,7 @@ void LogAln(const string &X, const string &Y, const string &PathXY);
 void ReadStringsFromFile(const string &FileName,
   vector<string> &Strings);
 void GetGuideTreeJoinOrder(const Tree &GuideTree,
-  const map<string, uint> &LabelToIndex,
+  const unordered_map<string, uint> &LabelToIndex,
   vector<uint> &Indexes1, vector<uint> &Indexes2);
 void ValidateJoinOrder(const vector<uint> &Indexes1,
   const vector<uint> &Indexes2);
@@ -114,8 +114,12 @@ void AlignMSAsByPath(const MultiSequence &MSA1, const MultiSequence &MSA2,
 void CalcFwdFlat(const byte *X, uint LX, const byte *Y, uint LY, float *Flat);
 void CalcBwdFlat(const byte *X, uint LX, const byte *Y, uint LY, float *Flat);
 
-void CalcFwdFlat_mega(const Mega &M, uint ProfileIdxX, uint ProfileIdxY, float *Flat);
-void CalcBwdFlat_mega(const Mega &M,uint ProfileIdxX, uint ProfileIdxY, float *Flat);
+void CalcFwdFlat_mega(const Mega &M,
+  const vector<vector<byte> > &ProfileX,
+  const vector<vector<byte> > &ProfileY, float *Flat);
+void CalcBwdFlat_mega(const Mega &M,
+  const vector<vector<byte> > &ProfileX,
+  const vector<vector<byte> > &ProfileY, float *Flat);
 
 void CalcPostFlat(const float *FlatFwd, const float *FlatBwd,
   uint LX, uint LY, float *Post);
