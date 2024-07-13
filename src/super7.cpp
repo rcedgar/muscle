@@ -15,6 +15,12 @@ void Super7::Run(const MultiSequence &InputSeqs,
 	AlignShrubs();
 	}
 
+void Super7::SetShrubTree()
+	{
+	const uint ShrubCount = GetShrubCount();
+	m_ShrubTree.PruneTree(*m_GuideTree, m_ShrubLCAs.data(), ShrubCount, "");
+	}
+
 void Super7::SetShrubs(uint ShrubSize)
 	{
 	GetShrubs(*m_GuideTree, ShrubSize, m_ShrubLCAs);

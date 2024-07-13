@@ -8,6 +8,7 @@ class Super7
 public:
 	const MultiSequence *m_InputSeqs = 0;
 	const Tree *m_GuideTree = 0;
+	Tree m_ShrubTree;
 
 	MPCFlat m_MPC;
 	vector<MultiSequence *> m_ShrubMSAs;
