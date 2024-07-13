@@ -35,6 +35,7 @@
 #include "alpha3.h"
 #include "cachemem3.h"
 #include "profile3.h"
+#include "mx.h"
 #include "mega.h"
 #ifndef _WIN32
 #define stricmp strcasecmp

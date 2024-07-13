@@ -89,5 +89,6 @@ C(align_mega)
 C(test_mega)
 C(shrub)
 C(super7)
+C(swdistmx)
 
 #undef C

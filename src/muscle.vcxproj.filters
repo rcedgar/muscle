@@ -587,6 +587,18 @@
     <ClCompile Include="super7.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="runthreads.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swdistmx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="blosumsmx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">
@@ -893,6 +905,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="super7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="swtrace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

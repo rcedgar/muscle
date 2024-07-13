@@ -55,7 +55,7 @@ float ScoreProfPos2(const ProfPos3 &PPA, const ProfPos3 &PPB)
 	return Score;
 	}
 
-static const float MINUS_INFINITY = -9e9f;
+//static const float MINUS_INFINITY = -9e9f;
 
 #define ALLOC_TRACE()
 #define SetDPM(i, j, x)		/* empty  */

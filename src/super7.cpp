@@ -164,10 +164,7 @@ void cmd_super7()
 
 	TREEPERM Perm = TP_None;
 	if (optset_perm)
-		Perm = StrToTREEPERM(opt(perm));
-
-	if (Perm == TP_All && OutputPattern.find('@') == string::npos)
-		Die("Must be '@' in output filename with -perm all");
+		Die("-perm not supported");
 
 	Super7 S7;
 	S7.Run(InputSeqs, GuideTree, ShrubSize);

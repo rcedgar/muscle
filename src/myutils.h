@@ -31,6 +31,7 @@
 #include <algorithm>
 #include <map>
 #include <inttypes.h>
+#include <thread>
 #include "types.h"
 
 // isatty()
@@ -396,5 +397,7 @@ void Shuffle(vector<unsigned> &v);
 #define REMOVEME		1
 
 extern string g_Arg1;
+typedef void fn_thread_body(uint ThreadIndex, void *ptrUserData);
+void RunThreads(fn_thread_body Body, void *ptrUserData);
 
 #endif	// myutils_h
