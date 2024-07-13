@@ -10,7 +10,7 @@ public:
 	const Tree *m_GuideTree = 0;
 	Tree m_ShrubTree;
 
-	MPCFlat m_MPC;
+	MPCFlat *m_MPC = 0;
 	vector<const MultiSequence *> m_ShrubMSAs;
 	vector<string> m_ShrubLabels;
 

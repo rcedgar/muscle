@@ -599,6 +599,12 @@
     <ClCompile Include="blosumsmx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="showseqstats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="super7_mega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

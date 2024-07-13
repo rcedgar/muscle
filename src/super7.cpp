@@ -9,7 +9,7 @@ void CalcGuideTree_SW_BLOSUM62(const MultiSequence &Input, Tree &T);
 void Super7::Run(MultiSequence &InputSeqs,
   const Tree &GuideTree, uint ShrubSize)
 	{
-	m_MPC.m_D.m_Disable = true;
+	m_MPC->m_D.m_Disable = true;
 
 	m_InputSeqs = &InputSeqs;
 	m_GuideTree = &GuideTree;
@@ -18,8 +18,8 @@ void Super7::Run(MultiSequence &InputSeqs,
 	const uint ShrubCount = GetShrubCount();
 	if (ShrubCount == 1)
 		{
-		m_MPC.Run(&InputSeqs);
-		m_FinalMSA.Copy(*m_MPC.m_MSA);
+		m_MPC->Run(&InputSeqs);
+		m_FinalMSA.Copy(*m_MPC->m_MSA);
 		}
 	else
 		{
@@ -123,10 +123,10 @@ void Super7::IntraAlignShrubs()
 		uint LCA = m_ShrubLCAs[ShrubIndex];
 		MultiSequence ShrubInput;
 		MakeShrubInput(LCA, ShrubInput);
-		m_MPC.m_TreePerm = TP_None;
-		m_MPC.Run(&ShrubInput);
+		m_MPC->m_TreePerm = TP_None;
+		m_MPC->Run(&ShrubInput);
 		MultiSequence *ShrubMSA = new MultiSequence;
-		ShrubMSA->Copy(*m_MPC.m_MSA);
+		ShrubMSA->Copy(*m_MPC->m_MSA);
 		m_ShrubMSAs.push_back(ShrubMSA);
 		//ShrubMSA->LogMe();
 		}
@@ -134,10 +134,6 @@ void Super7::IntraAlignShrubs()
 
 void cmd_super7()
 	{
-	string &OutputPattern = opt(output);
-	if (OutputPattern.empty())
-		Die("Must set -output");
-
 	uint ShrubSize = 32;
 	if (optset_shrub_size)
 		ShrubSize = opt(shrub_size);
@@ -145,9 +141,11 @@ void cmd_super7()
 		Die("-shrub_size must be >= 3");
 
 	LoadGlobalInputMS(g_Arg1);
-	ShowGlobalInputSeqStats();
 
 	MultiSequence &InputSeqs = GetGlobalInputMS();
+	bool Nucleo = InputSeqs.GuessIsNucleo();
+	CheckMegaOpts(Nucleo);
+
 	const uint InputSeqCount = GetGlobalMSSeqCount();
 
 	Tree GuideTree;
@@ -156,29 +154,11 @@ void cmd_super7()
 	else
 		CalcGuideTree_SW_BLOSUM62(InputSeqs, GuideTree);
 
-	bool Nucleo = false;
-	if (opt(nt))
-		Nucleo = true;
-	else if (opt(amino))
-		Nucleo = false;
-	else
-		Nucleo = InputSeqs.GuessIsNucleo();
-
-	SetAlpha(Nucleo ? ALPHA_Nucleo : ALPHA_Amino);
+	SetAlpha(ALPHA_Amino);
 	InitProbcons();
 
-	if (optset_diversified)
-		Die("-diversified not supported");
-	if (optset_replicates)
-		Die("-replicates not supported");
-	if (optset_stratified)
-		Die("-stratified not supported");
-
-	TREEPERM Perm = TP_None;
-	if (optset_perm)
-		Die("-perm not supported");
-
 	Super7 S7;
+	S7.m_MPC = new MPCFlat;
 	S7.Run(InputSeqs, GuideTree, ShrubSize);
 	S7.m_FinalMSA.ToFasta(opt(output));
 

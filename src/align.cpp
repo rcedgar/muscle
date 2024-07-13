@@ -67,21 +67,14 @@ void cmd_align()
 		return;
 		}
 
+	if (InputSeqCount > 1000)
+		Warning(">1k sequences, may be slow or use excessive memory, consider using -super5");
+
 	const string &OutputPattern = opt(output);
 	if (OutputPattern.empty())
 		Die("Must set -output");
 
-	double MeanSeqLength = InputSeqs.GetMeanSeqLength();
-	uint MaxSeqLength = InputSeqs.GetMaxSeqLength();
-	uint MinSeqLength = InputSeqs.GetMinSeqLength();
-	ProgressLog("Input: %u seqs, avg length %.0f, max %u, min %u\n\n",
-	  InputSeqCount, MeanSeqLength, MaxSeqLength, MinSeqLength);
-	if (MaxSeqLength > 100000)
-		Die("Sequences too long, not appropriate for global alignment");
-	if (MaxSeqLength > 50000)
-		Warning("Long sequences, likey to crash / not globally alignable, max allowed is ~21k");
-	if (InputSeqCount > 1000)
-		Warning(">1k sequences, may be slow or use excessive memory, consider using -super5");
+	ShowSeqStats(InputSeqs);
 
 	bool OutputWildcard = OutputPattern.find('@') != string::npos;
 	FILE *fOut = 0;

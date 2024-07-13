@@ -34,6 +34,7 @@ MultiSequence &LoadGlobalInputMS(const string &FileName)
 		}
 	if (g_GlobalMSSeqCount > 0)
 		g_GlobalMSMeanSeqLength = SumSeqLength/g_GlobalMSSeqCount;
+	ShowSeqStats(*g_GlobalMS);
 	return *g_GlobalMS;
 	}
 
@@ -74,11 +75,11 @@ const string &GetGlobalInputSeqLabel(uint GSI)
 	return Label;
 	}
 
-void ShowGlobalInputSeqStats()
-	{
-	ProgressLog("Input: %u seqs, length avg %.0f max %u\n\n",
-	  g_GlobalMSSeqCount, g_GlobalMSMeanSeqLength, g_GlobalMSMaxSeqLength);
-
-	if (g_GlobalMSMaxSeqLength > 15000)
-		Warning("Sequence length >15k may require excessive memory");
-	}
+//void ShowGlobalInputSeqStats()
+//	{
+//	ProgressLog("Input: %u seqs, length avg %.0f max %u\n\n",
+//	  g_GlobalMSSeqCount, g_GlobalMSMeanSeqLength, g_GlobalMSMaxSeqLength);
+//
+//	if (g_GlobalMSMaxSeqLength > 15000)
+//		Warning("Sequence length >15k may require excessive memory");
+//	}

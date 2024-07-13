@@ -184,7 +184,6 @@ void cmd_uclust()
 	const float MinEA = (float) optd(minea, 0.9);
 
 	LoadGlobalInputMS(InputFileName);
-	ShowGlobalInputSeqStats();
 	MultiSequence &InputSeqs = GetGlobalInputMS();
 
 	bool IsNucleo = InputSeqs.GuessIsNucleo();

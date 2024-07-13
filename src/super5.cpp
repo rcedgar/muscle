@@ -557,8 +557,6 @@ void cmd_super5()
 	if (OutputPattern.empty())
 		Die("Must set -output");
 
-	ShowGlobalInputSeqStats();
-
 	MultiSequence &InputSeqs = GetGlobalInputMS();
 	const uint InputSeqCount = GetGlobalMSSeqCount();
 

@@ -59,7 +59,6 @@ void MakeReplicateFileName(const string &Pattern, TREEPERM TP,
   uint PerturbSeed, string &FileName);
 MultiSequence &LoadGlobalInputMS(const string &FileName);
 MultiSequence &GetGlobalInputMS();
-void ShowGlobalInputSeqStats();
 double GetGlobalMSMeanSeqLength();
 uint GetGlobalMSSeqCount();
 uint GetGSICount();
@@ -170,3 +169,5 @@ double hscore(const double *xs, const double *ys, uint N, double X);
 
 typedef bool (*ptr_GetMSAColIsAligned)(const MSA &Aln, uint Col);
 uint GetOverlap(uint Lo1, uint Hi1, uint Lo2, uint Hi2);
+void ShowSeqStats(const MultiSequence &InputSeqs);
+void CheckMegaOpts(bool Nucleo);

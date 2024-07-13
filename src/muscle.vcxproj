@@ -348,6 +348,7 @@
     <ClCompile Include="scoretest.cpp" />
     <ClCompile Include="searchpd.cpp" />
     <ClCompile Include="seqinfo.cpp" />
+    <ClCompile Include="showseqstats.cpp" />
     <ClCompile Include="shrub.cpp" />
     <ClCompile Include="simplecluster.cpp" />
     <ClCompile Include="spatter.cpp" />
@@ -357,6 +358,7 @@
     <ClCompile Include="substmxfromfile.cpp" />
     <ClCompile Include="super6.cpp" />
     <ClCompile Include="super7.cpp" />
+    <ClCompile Include="super7_mega.cpp" />
     <ClCompile Include="sw.cpp" />
     <ClCompile Include="swdistmx.cpp" />
     <ClCompile Include="sweep.cpp" />
