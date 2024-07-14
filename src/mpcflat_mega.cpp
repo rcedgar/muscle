@@ -103,5 +103,6 @@ void MPCFlat_mega::Run(MultiSequence *InputSeqs,
   const vector<const vector<vector<byte> > *> &ProfilePtrVec)
 	{
 	m_ProfilePtrVec = &ProfilePtrVec;
+	m_D.m_Disable = true;
 	MPCFlat::Run(InputSeqs);
 	}

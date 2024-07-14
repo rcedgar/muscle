@@ -105,6 +105,7 @@ void cmd_super7_mega()
 		{
 		UPGMA5 U;
 		U.ReadDistMx2(opt(distmxin));
+		U.ScaleDistMx();
 		U.Run(LINKAGE_Avg, GuideTree);
 		}
 	else
