@@ -53,7 +53,7 @@ static void Align_Mega(MPCFlat_mega &M, MultiSequence &InputSeqs,
 		asserta(PL == L);
 		ProfilePtrVec.push_back(ptrProfile);
 		}
-	M.Run(&InputSeqs, ProfilePtrVec);
+	M.Run(&InputSeqs);
 
 	asserta(M.m_MSA != 0);
 	M.m_MSA->WriteMFA(fOut);
@@ -65,6 +65,7 @@ void cmd_align_mega()
 
 	MultiSequence InputSeqs;
 	InputSeqs.FromStrings(Mega::m_Labels, Mega::m_Seqs);
+	SetGlobalInputMS(InputSeqs);
 	const uint InputSeqCount = InputSeqs.GetSeqCount();
 
 	ShowSeqStats(InputSeqs);

@@ -26,6 +26,22 @@ void CalcPostFlat(const float *FlatFwd, const float *FlatBwd,
 		}
 	}
 
+void MPCFlat::CalcFwdFlat_MPCFlat(uint GSIX, uint LX,
+  uint GSIY, uint LY, float *Flat)
+	{
+	const byte *X = GetByteSeqByGSI(GSIX);
+	const byte *Y = GetByteSeqByGSI(GSIY);
+	CalcFwdFlat(X, LX, Y, LY, Flat);
+	}
+
+void MPCFlat::CalcBwdFlat_MPCFlat(uint GSIX, uint LX,
+  uint GSIY, uint LY, float *Flat)
+	{
+	const byte *X = GetByteSeqByGSI(GSIX);
+	const byte *Y = GetByteSeqByGSI(GSIY);
+	CalcBwdFlat(X, LX, Y, LY, Flat);
+	}
+
 void MPCFlat::CalcPosterior(uint PairIndex)
 	{
 	const pair<uint, uint> &Pair = GetPair(PairIndex);
@@ -44,14 +60,25 @@ void MPCFlat::CalcPosterior(uint PairIndex)
 		Die("HMM overflow, sequence lengths %u, %u (max ~21k)", LX, LY);
 		}
 
+	const string LabelX = string(m_MyInputSeqs->GetLabel(SeqIndexX));
+	const string LabelY = string(m_MyInputSeqs->GetLabel(SeqIndexY));
+
 	float *Fwd = AllocFB(LX, LY);
 	float *Bwd = AllocFB(LX, LY);
 
-	const byte *X = GetBytePtr(SeqIndexX);
-	const byte *Y = GetBytePtr(SeqIndexY);
+	//CalcFwdFlat(X, LX, Y, LY, Fwd);
+	//CalcBwdFlat(X, LX, Y, LY, Bwd);
 
-	CalcFwdFlat(X, LX, Y, LY, Fwd);
-	CalcBwdFlat(X, LX, Y, LY, Bwd);
+	uint GSIX = GetGSIByLabel(LabelX);
+	uint GSIY = GetGSIByLabel(LabelY);
+	uint LX2 = GetSeqLengthByGSI(GSIX);
+	uint LY2 = GetSeqLengthByGSI(GSIY);
+	asserta(LX2 == LX);
+	asserta(LY2 == LY);
+
+	CalcFwdFlat_MPCFlat(GSIX, LX, GSIY, LY, Fwd);
+	CalcBwdFlat_MPCFlat(GSIX, LX, GSIY, LY, Bwd);
+
 	float *Post = AllocPost(LX, LY);
 	CalcPostFlat(Fwd, Bwd, LX, LY, Post);
 #if 0//TRACE
@@ -70,6 +97,9 @@ void MPCFlat::CalcPosterior(uint PairIndex)
 
 	MySparseMx &SparsePost = GetSparsePost(PairIndex);
 	SparsePost.FromPost(Post, LX, LY);
+
+	const byte *X = GetBytePtr(SeqIndexX);
+	const byte *Y = GetBytePtr(SeqIndexY);
 	SparsePost.m_X = X;
 	SparsePost.m_Y = Y;
 

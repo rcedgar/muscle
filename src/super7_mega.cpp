@@ -17,7 +17,7 @@ void Super7_mega::IntraAlignShrub(uint ShrubIndex)
 	GetShrubProfiles(LCA, ProfilePtrVec);
 
 	MPCm->m_TreePerm = TP_None;
-	MPCm->Run(&ShrubInput, ProfilePtrVec);
+	MPCm->Run(&ShrubInput);
 	MultiSequence *ShrubMSA = new MultiSequence;
 	ShrubMSA->Copy(*MPCm->m_MSA);
 	m_ShrubMSAs.push_back(ShrubMSA);
@@ -68,7 +68,7 @@ void Super7_mega::Run(MultiSequence &InputSeqs,
 			asserta(PL == L);
 			ProfilePtrVec.push_back(ptrProfile);
 			}
-		M.Run(&InputSeqs, ProfilePtrVec);
+		M.Run(&InputSeqs);
 		m_FinalMSA.Copy(*M.m_MSA);
 		}
 	else

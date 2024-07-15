@@ -60,7 +60,10 @@ public:
 	void Run_Super4(MultiSequence *InputSeqs);
 
 public:
-	virtual void CalcPosterior(uint PairIndex);
+	virtual void CalcFwdFlat_MPCFlat(uint GSIX, uint LX,
+	  uint GSIY, uint LY, float *Flat);
+	virtual void CalcBwdFlat_MPCFlat(uint GSIX, uint LX,
+	  uint GSIY, uint LY, float *Flat);
 
 public:
 	void AllocPairCount(uint SeqCount);
@@ -70,6 +73,7 @@ public:
 	void InitSeqs(MultiSequence *InputSeqs);
 	void InitPairs();
 	void InitDistMx();
+	void CalcPosterior(uint PairIndex);
 	void CalcPosteriors();
 	void Consistency();
 	void ConsIter(uint Iter);

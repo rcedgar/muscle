@@ -55,6 +55,7 @@ void cmd_align()
 	{
 	MultiSequence InputSeqs;
 	InputSeqs.LoadMFA(opt(align), true);
+	SetGlobalInputMS(InputSeqs);
 	const uint InputSeqCount = InputSeqs.GetSeqCount();
 	if (optset_minsuper && InputSeqCount >= opt(minsuper))
 		{

@@ -9,19 +9,8 @@
 class MPCFlat_mega : public MPCFlat
     {
 public:
-    //Mega *m_MM = 0;
-	const vector<const vector<vector<byte> > *> *m_ProfilePtrVec = 0;
-
-private:
-	void Run(MultiSequence *InputSeqs) { Die("MPCFlat_mega::Run()"); }
-
-public:
-	void Run(MultiSequence *InputSeqs,
-	  const vector<const vector<vector<byte> > *> &ProfilePtrVec);
-
-protected:
-    virtual void CalcPosterior(uint PairIndex);
-
-protected:
-	const vector<vector<byte> > &GetProfile(uint SMI) const;
+	virtual void CalcFwdFlat_MPCFlat(uint GSIX, uint LX,
+	  uint GSIY, uint LY, float *Flat);
+	virtual void CalcBwdFlat_MPCFlat(uint GSIX, uint LX,
+	  uint GSIY, uint LY, float *Flat);
     };
