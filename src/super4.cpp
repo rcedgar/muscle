@@ -337,10 +337,10 @@ void Super4::Run(MultiSequence &InputSeqs, TREEPERM TreePerm)
 
 void cmd_super4()
 	{
-	const string &InputFileName = opt(super4);
-	const string &OutputFileName = opt(output);
+	MultiSequence InputSeqs;
+	LoadInput(InputSeqs);
 
-	MultiSequence &InputSeqs = LoadGlobalInputMS(InputFileName);
+	const string &OutputFileName = opt(output);
 	bool Nucleo = false;
 	if (opt(nt))
 		Nucleo = true;

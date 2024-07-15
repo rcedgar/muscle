@@ -611,6 +611,9 @@
     <ClCompile Include="calcpost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="loadinput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

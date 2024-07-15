@@ -204,13 +204,16 @@ void Super6::InitPP()
 
 void cmd_super6()
 	{
-	LoadGlobalInputMS(opt(super6));
+	MultiSequence InputSeqs;
+	LoadInput(InputSeqs);
+
+	//LoadGlobalInputMS(opt(super6));
 
 	string &OutputPattern = opt(output);
 	if (OutputPattern.empty())
 		Die("Must set -output");
 
-	MultiSequence &InputSeqs = GetGlobalInputMS();
+	//MultiSequence &InputSeqs = GetGlobalInputMS();
 	const uint InputSeqCount = GetGlobalMSSeqCount();
 
 	bool Nucleo = false;

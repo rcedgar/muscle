@@ -144,9 +144,12 @@ void cmd_super7()
 	if (ShrubSize < 3)
 		Die("-shrub_size must be >= 3");
 
-	LoadGlobalInputMS(g_Arg1);
+	//LoadGlobalInputMS(g_Arg1);
 
-	MultiSequence &InputSeqs = GetGlobalInputMS();
+	//MultiSequence &InputSeqs = GetGlobalInputMS();
+	MultiSequence InputSeqs;
+	LoadInput(InputSeqs);
+
 	bool Nucleo = InputSeqs.GuessIsNucleo();
 	CheckMegaOpts(Nucleo);
 

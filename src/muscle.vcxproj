@@ -230,6 +230,7 @@
     <ClCompile Include="fwdflat_mega.cpp" />
     <ClCompile Include="getpostpairsalignedflat_mega.cpp" />
     <ClCompile Include="hscore.cpp" />
+    <ClCompile Include="loadinput.cpp" />
     <ClCompile Include="m3alnparams.cpp" />
     <ClCompile Include="alignpairflat.cpp" />
     <ClCompile Include="allocflat.cpp" />

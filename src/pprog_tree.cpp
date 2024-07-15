@@ -7,11 +7,12 @@
 
 void cmd_pprog_tree()
 	{
-	const string &InputFileName = opt(pprog_tree);
+	//const string &InputFileName = opt(pprog_tree);
 	asserta(optset_guidetreein);
 	const string &OutputFileName = opt(output);
 
-	MultiSequence &InputSeqs = LoadGlobalInputMS(InputFileName);
+	MultiSequence InputSeqs;
+	LoadInput(InputSeqs);
 	//InputSeqs.FromFASTA(InputFileName);
 	bool IsNucleo = InputSeqs.GuessIsNucleo();
 

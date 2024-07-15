@@ -184,8 +184,10 @@ void cmd_uclust()
 	const string &OutputFileName = opt(output);
 	const float MinEA = (float) optd(minea, 0.9);
 
-	LoadGlobalInputMS(InputFileName);
-	MultiSequence &InputSeqs = GetGlobalInputMS();
+	//LoadGlobalInputMS(InputFileName);
+	//MultiSequence &InputSeqs = GetGlobalInputMS();
+	MultiSequence InputSeqs;
+	LoadInput(InputSeqs);
 
 	bool IsNucleo = InputSeqs.GuessIsNucleo();
 	if (IsNucleo)

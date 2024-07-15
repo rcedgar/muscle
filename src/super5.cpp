@@ -552,13 +552,14 @@ void Super5::SortMSA_ByInputOrder(MultiSequence &Aln)
 
 void cmd_super5()
 	{
-	LoadGlobalInputMS(opt(super5));
+	//LoadGlobalInputMS(opt(super5));
+	MultiSequence InputSeqs;
+	LoadInput(InputSeqs);
 
 	string &OutputPattern = opt(output);
 	if (OutputPattern.empty())
 		Die("Must set -output");
 
-	MultiSequence &InputSeqs = GetGlobalInputMS();
 	const uint InputSeqCount = GetGlobalMSSeqCount();
 
 	bool Nucleo = false;
@@ -633,7 +634,6 @@ void cmd_super5()
 	S5.m_FinalMSA_ABC.Clear();
 	S5.m_FinalMSA_ACB.Clear();
 	S5.m_FinalMSA_BCA.Clear();
-	ClearGlobalInputMS();
 #if SEQ_TRACE
 	Sequence::AllocReport("final");
 #endif

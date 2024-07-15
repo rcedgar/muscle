@@ -57,7 +57,7 @@ void StringsToFile(const string &FileName, const vector<string> &v);
 void MakeReplicateFileName_N(const string &Pattern, uint N, string &FileName);
 void MakeReplicateFileName(const string &Pattern, TREEPERM TP,
   uint PerturbSeed, string &FileName);
-MultiSequence &LoadGlobalInputMS(const string &FileName);
+//MultiSequence &LoadGlobalInputMS(const string &FileName);
 MultiSequence &GetGlobalInputMS();
 void SetGlobalInputMS(MultiSequence &MS);
 double GetGlobalMSMeanSeqLength();
@@ -68,7 +68,6 @@ const Sequence &GetGlobalInputSeqByIndex(uint GSI);
 const Sequence &GetGlobalInputSeqByLabel(const string &Label);
 uint GetGSIByLabel(const string &Label);
 void GetLabelByGSI(uint GSI, string &Label);
-void ClearGlobalInputMS();
 void CharVecToStr(const vector<char> &Vec, string &Str);
 void LogAln(const Sequence &X, const Sequence &Y, const string &PathXY);
 void LogAln(const string &X, const string &Y, const string &PathXY);
@@ -172,4 +171,4 @@ void GetLabelByGSI(uint GSI, string &Label);
 uint GetSeqLengthByGSI(uint GSI);
 const Sequence *GetSequenceByGSI(uint GSI);
 const byte *GetByteSeqByGSI(uint GSI);
-
+void LoadInput(MultiSequence &InputSeqs);

@@ -229,9 +229,10 @@ void EACluster::Validate() const
 
 void cmd_eacluster()
 	{
-	LoadGlobalInputMS(opt(eacluster));
+	//LoadGlobalInputMS(opt(eacluster));
 
-	MultiSequence &InputSeqs = GetGlobalInputMS();
+	MultiSequence InputSeqs;
+	LoadInput(InputSeqs);
 
 	const float MinEA = (float) optd(minea, 0.9);
 	string OutputFileNamePattern = optd(output, "cluster%.afa");
