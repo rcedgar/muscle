@@ -216,6 +216,7 @@
     <ClCompile Include="align.cpp" />
     <ClCompile Include="alignmsasbycols.cpp" />
     <ClCompile Include="align_mega.cpp" />
+    <ClCompile Include="alnmsasflat_mega.cpp" />
     <ClCompile Include="blosumsmx.cpp" />
     <ClCompile Include="bwdflat_mega.cpp" />
     <ClCompile Include="cmd_cmp_msa.cpp" />
@@ -226,6 +227,7 @@
     <ClCompile Include="cmd_squeeze_inserts.cpp" />
     <ClCompile Include="cmp_ref_msas.cpp" />
     <ClCompile Include="fwdflat_mega.cpp" />
+    <ClCompile Include="getpostpairsalignedflat_mega.cpp" />
     <ClCompile Include="hscore.cpp" />
     <ClCompile Include="m3alnparams.cpp" />
     <ClCompile Include="alignpairflat.cpp" />

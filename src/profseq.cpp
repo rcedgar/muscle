@@ -1,7 +1,9 @@
 #include "muscle.h"
 #include "locallock.h"
 
-void MPCFlat::ProfSeq(const MultiSequence &MSA1,
+//void MPCFlat::ProfSeq(const MultiSequence &MSA1,
+//  const Sequence &seq2, string &Path)
+static void ProfSeq(MPCFlat &M, const MultiSequence &MSA1,
   const Sequence &seq2, string &Path)
 	{
 	Path.clear();
@@ -27,12 +29,12 @@ void MPCFlat::ProfSeq(const MultiSequence &MSA1,
 	Sequence *HackSeq = (Sequence *) &seq2;
 	HackSeq->m_SMI = SMI++;
 
-	InitSeqs(&CombinedSeqs);
-	InitPairs();
-	uint PairCount = SIZE(m_Pairs);
+	M.InitSeqs(&CombinedSeqs);
+	M.InitPairs();
+	uint PairCount = SIZE(M.m_Pairs);
 	asserta(PairCount > 0);
-	AllocPairCount(PairCount);
-	InitDistMx();
+	M.AllocPairCount(PairCount);
+	M.InitDistMx();
 	unsigned ThreadCount = GetRequestedThreadCount();
 	uint PairCounter = 0;
 #pragma omp parallel for num_threads(ThreadCount)
@@ -42,15 +44,15 @@ void MPCFlat::ProfSeq(const MultiSequence &MSA1,
 		ProgressStep(PairCounter++, SeqCount1, "Calc posteriors");
 		Unlock();
 
-		uint PairIndex = GetPairIndex(SeqIndex1, SeqCount1);
-		CalcPosterior(PairIndex);
+		uint PairIndex = M.GetPairIndex(SeqIndex1, SeqCount1);
+		M.CalcPosterior(PairIndex);
 		}
 
 	MultiSequence MSA2;
 	MSA2.AddSequence(&seq2, false);
 
 	float *Post = AllocPost(ColCount1, SeqLength2);
-	BuildPost(MSA1, MSA2, Post);
+	M.BuildPost(MSA1, MSA2, Post);
 	float *DPRows = AllocDPRows(ColCount1, SeqLength2);
 	char *TB = AllocTB(ColCount1, SeqLength2);
 
@@ -94,7 +96,7 @@ void cmd_profseq()
 		const Sequence *seq = Query.GetSequence(QuerySeqIndex);
 		MPCFlat M;
 		string Path;
-		M.ProfSeq(MSA1, *seq, Path);
+		ProfSeq(M, MSA1, *seq, Path);
 		Log("%s\n", Path.c_str());
 		}
 	}

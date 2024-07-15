@@ -20,11 +20,30 @@ uint Mega::m_NextLineNr;
 uint Mega::m_FeatureCount;
 unordered_map<string, uint> Mega::m_LabelToIdx;
 
-const vector<vector<byte> >
-	  *Mega::GetProfileByLabel(const string &Label)
+uint Mega::GetGSIByLabel(const string &Label)
 	{
-	unordered_map<string, uint>::const_iterator iter =
-	  m_LabelToIdx.find(Label);
+	unordered_map<string, uint>::const_iterator iter = m_LabelToIdx.find(Label);
+	if (iter == m_LabelToIdx.end())
+		Die("Mega::GetGSIByLabel(%s)", Label.c_str());
+	uint GSI = iter->second;
+	return GSI;
+	}
+
+const string &Mega::GetLabelByGSI(uint GSI)
+	{
+	asserta(GSI < SIZE(m_Labels));
+	return m_Labels[GSI];
+	}
+
+const vector<vector<byte> > *Mega::GetProfileByGSI(uint GSI)
+	{
+	asserta(GSI < SIZE(m_Profiles));
+	return &m_Profiles[GSI];
+	}
+
+const vector<vector<byte> > *Mega::GetProfileByLabel(const string &Label)
+	{
+	unordered_map<string, uint>::const_iterator iter = m_LabelToIdx.find(Label);
 	if (iter == m_LabelToIdx.end())
 		Die("Mega::GetProfileByLabel(%s)", Label.c_str());
 	uint Idx = iter->second;

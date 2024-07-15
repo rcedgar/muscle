@@ -599,6 +599,12 @@
     <ClCompile Include="super7_mega.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="alnmsasflat_mega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="getpostpairsalignedflat_mega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

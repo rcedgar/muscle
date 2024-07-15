@@ -44,6 +44,8 @@ public:
 	void AssertSymmetrical(const vector<vector<float> > &Mx) const;
 
 public:
-	static const vector<vector<byte> >
-	  *GetProfileByLabel(const string &Label);
+	static uint GetGSIByLabel(const string &Label);
+	static const string &GetLabelByGSI(uint GSI);
+	static const vector<vector<byte> > *GetProfileByGSI(uint GSI);
+	static const vector<vector<byte> > *GetProfileByLabel(const string &Label);
 	};

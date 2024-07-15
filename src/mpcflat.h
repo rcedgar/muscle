@@ -58,13 +58,11 @@ public:
 	void Run(MultiSequence *InputSeqs);
 	uint GetSeqCount() const;
 	void Run_Super4(MultiSequence *InputSeqs);
-	MultiSequence *ProfAlign(const MultiSequence &MSA1, const MultiSequence &MSA2);
-	void ProfSeq(const MultiSequence &MSA1, const Sequence &seq, string &Path);
 
-protected:
+public:
 	virtual void CalcPosterior(uint PairIndex);
 
-protected:
+public:
 	void AllocPairCount(uint SeqCount);
 	void FreeProgMSAs();
 	void FreeSparsePosts();

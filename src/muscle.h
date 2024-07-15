@@ -176,3 +176,6 @@ typedef bool (*ptr_GetMSAColIsAligned)(const MSA &Aln, uint Col);
 uint GetOverlap(uint Lo1, uint Hi1, uint Lo2, uint Hi2);
 void ShowSeqStats(const MultiSequence &InputSeqs);
 void CheckMegaOpts(bool Nucleo);
+uint GetGSIByLabel(const string &Label);
+void GetLabelByGSI(uint GSI, string &Label);
+

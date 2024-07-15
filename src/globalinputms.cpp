@@ -4,6 +4,22 @@ static MultiSequence *g_GlobalMS;
 static uint g_GlobalMSSeqCount = 0;
 static double g_GlobalMSMeanSeqLength = 0;
 static uint g_GlobalMSMaxSeqLength = 0;
+static unordered_map<string, uint> m_LabelToIdx;
+
+uint GetGSIByLabel(const string &Label)
+	{
+	unordered_map<string, uint>::const_iterator iter =
+	  m_LabelToIdx.find(Label);
+	if (iter == m_LabelToIdx.end())
+		Die("GetGSIByLabel(%s)", Label.c_str());
+	uint GSI = iter->second;
+	return GSI;
+	}
+
+void GetLabelByGSI(uint GSI, string &Label)
+	{
+	Label = string(g_GlobalMS->GetLabel(GSI));
+	}
 
 void SetGlobalInputMS(MultiSequence &MS)
 	{
@@ -16,10 +32,17 @@ void SetGlobalInputMS(MultiSequence &MS)
 	for (uint GSI = 0; GSI < g_GlobalMSSeqCount; ++GSI)
 		{
 		const Sequence *Seq = g_GlobalMS->GetSequence(GSI);
+		string Label;
+		g_GlobalMS->GetLabel(GSI);
+		unordered_map<string, uint>::const_iterator iter =
+		  m_LabelToIdx.find(Label);
+		if (iter != m_LabelToIdx.end())
+			Die("Error duplicate label in input >%s", Label.c_str());
+		m_LabelToIdx[Label] = GSI;
 		uint L = Seq->GetLength();
 		g_GlobalMSMaxSeqLength = max(L, g_GlobalMSMaxSeqLength);
 		SumSeqLength += L;
-		Sequence *HackSeq = (Sequence *) Seq;
+		Sequence *HackSeq = (Sequence *) Seq; // cast away const
 		HackSeq->m_GSI = GSI;
 		}
 	if (g_GlobalMSSeqCount > 0)

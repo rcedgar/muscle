@@ -1,6 +1,11 @@
 #include "muscle.h"
 
-float AlignMSAsFlat(const string &ProgressStr,
+float GetPostPairsAlignedFlat_mega(const string &aProgressStr,
+  const MultiSequence &MSA1, const MultiSequence &MSA2,
+  const vector<uint> &SeqIndexes1, const vector<uint> &SeqIndexes2, 
+  vector<MySparseMx *> &SparsePosts);
+
+float AlignMSAsFlat_mega(const string &ProgressStr,
   const MultiSequence &MSA1, const MultiSequence &MSA2,
   uint TargetPairCount, string &Path)
 	{
@@ -23,7 +28,7 @@ float AlignMSAsFlat(const string &ProgressStr,
 	asserta(SIZE(SeqIndexes2) == PairCount);
 
 	vector<MySparseMx *> SparseMxs;
-	float AvgEA = GetPostPairsAlignedFlat(ProgressStr, MSA1, MSA2,
+	float AvgEA = GetPostPairsAlignedFlat_mega(ProgressStr, MSA1, MSA2,
 	  SeqIndexes1, SeqIndexes2, SparseMxs);
 
 	const uint L1 = ColCount1;

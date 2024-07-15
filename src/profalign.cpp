@@ -1,8 +1,10 @@
 #include "muscle.h"
 #include "locallock.h"
 
-MultiSequence *MPCFlat::ProfAlign(const MultiSequence &MSA1,
-  const MultiSequence &MSA2)
+//MultiSequence *MPCFlat::ProfAlign(const MultiSequence &MSA1,
+//  const MultiSequence &MSA2)
+static MultiSequence *ProfAlign(MPCFlat &M,
+  const MultiSequence &MSA1,const MultiSequence &MSA2)
 	{
 	uint SeqCount1 = MSA1.GetSeqCount();
 	uint ColCount1 = MSA1.GetColCount();
@@ -31,12 +33,12 @@ MultiSequence *MPCFlat::ProfAlign(const MultiSequence &MSA1,
 		HackSeq->m_SMI = SMI++;
 		}
 
-	InitSeqs(&CombinedSeqs);
-	InitPairs();
-	uint PairCount = SIZE(m_Pairs);
+	M.InitSeqs(&CombinedSeqs);
+	M.InitPairs();
+	uint PairCount = SIZE(M.m_Pairs);
 	asserta(PairCount > 0);
-	AllocPairCount(PairCount);
-	InitDistMx();
+	M.AllocPairCount(PairCount);
+	M.InitDistMx();
 	unsigned ThreadCount = GetRequestedThreadCount();
 	uint PairCounter = 0;
 	uint PairCount2 = SeqCount1*SeqCount2;
@@ -49,13 +51,13 @@ MultiSequence *MPCFlat::ProfAlign(const MultiSequence &MSA1,
 			ProgressStep(PairCounter++, PairCount2, "Calc posteriors");
 			Unlock();
 
-			uint PairIndex = GetPairIndex(SeqIndex1, SeqCount1 + SeqIndex2);
-			CalcPosterior(PairIndex);
+			uint PairIndex = M.GetPairIndex(SeqIndex1, SeqCount1 + SeqIndex2);
+			M.CalcPosterior(PairIndex);
 			}
 		}
 
 	float Score = 0;
-	MultiSequence *MSA = AlignAlns(MSA1, MSA2, &Score);
+	MultiSequence *MSA = M.AlignAlns(MSA1, MSA2, &Score);
 	return MSA;
 	}
 
@@ -88,7 +90,7 @@ void cmd_profalign()
 	HP.ToPairHMM();
 
 	MPCFlat M;
-	MultiSequence *MSA = M.ProfAlign(MSA1, MSA2);
+	MultiSequence *MSA = ProfAlign(M, MSA1, MSA2);
 	MSA->WriteMFA(opt(output));
 	}
  
