@@ -3,7 +3,6 @@
 #include "pprog.h"
 #include "super7.h"
 #include "mpcflat_mega.h"
-#include "mega.h"
 
 void CalcGuideTree_SW_BLOSUM62(const MultiSequence &Input, Tree &T);
 

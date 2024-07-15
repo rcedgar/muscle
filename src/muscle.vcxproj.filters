@@ -605,6 +605,9 @@
     <ClCompile Include="getpostpairsalignedflat_mega.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pprog_mega.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">
@@ -917,6 +920,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mpcflat_mega.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pprog_mega.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

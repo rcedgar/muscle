@@ -26,7 +26,29 @@ public:
 	vector<uint> m_JoinMSAIndexes1;
 	vector<uint> m_JoinMSAIndexes2;
 
+// Member which know about HMM are virtual to
+//  allow subclass override in PProg_mega.
 public:
+	virtual void CalcFwdFlat_PProg(uint GSI1, uint L1, 
+	  uint GSI2, uint L2, float *Flat);
+
+	virtual void CalcBwdFlat_PProg(uint GSI1, uint L1, 
+	  uint GSI2, uint L2, float *Flat);
+
+public:
+	float GetPostPairsAlignedFlat(const string &aProgressStr,
+	  const MultiSequence &MSA1, const MultiSequence &MSA2,
+	  const vector<uint> &SeqIndexes1, const vector<uint> &SeqIndexes2, 
+	  vector<MySparseMx *> &SparsePosts);
+	float AlignMSAsFlat(const string &ProgressStr,
+	  const MultiSequence &MSA1, const MultiSequence &MSA2,
+	  uint TargetPairCount, string &Path);
+	float AlignMSAsFlat3(const string &ProgressStr,
+	  const MultiSequence &MSA1, const MultiSequence &MSA2,
+	  const vector<MySparseMx *> &SparseMxVec,
+	  uint Index1, uint Index2,
+	  uint TargetPairCount, string &Path);
+
 	void LoadMSAs(const vector<string> &FileNames, bool &IsNucleo);
 	void SetMSAs(const vector<const MultiSequence *> &MSAs,
 	  const vector<string> &MSALabels);

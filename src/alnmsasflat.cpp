@@ -1,6 +1,7 @@
 #include "muscle.h"
+#include "pprog.h"
 
-float AlignMSAsFlat(const string &ProgressStr,
+float PProg::AlignMSAsFlat(const string &ProgressStr,
   const MultiSequence &MSA1, const MultiSequence &MSA2,
   uint TargetPairCount, string &Path)
 	{

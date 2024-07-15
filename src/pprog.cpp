@@ -415,6 +415,22 @@ void PProg::WriteGuideTree(const string &FileName) const
 	GuideTree.ToFile(FileName);
 	}
 
+void PProg::CalcFwdFlat_PProg(uint GSI1, uint L1, 
+  uint GSI2, uint L2, float *Flat)
+	{
+	const byte *ByteSeq1 = GetByteSeqByGSI(GSI1);
+	const byte *ByteSeq2 = GetByteSeqByGSI(GSI2);
+	CalcFwdFlat(ByteSeq1, L1, ByteSeq2, L2, Flat);
+	}
+
+void PProg::CalcBwdFlat_PProg(uint GSI1, uint L1, 
+  uint GSI2, uint L2, float *Flat)
+	{
+	const byte *ByteSeq1 = GetByteSeqByGSI(GSI1);
+	const byte *ByteSeq2 = GetByteSeqByGSI(GSI2);
+	CalcBwdFlat(ByteSeq1, L1, ByteSeq2, L2, Flat);
+	}
+
 void cmd_pprog()
 	{
 	PProg PP;

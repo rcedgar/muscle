@@ -1,6 +1,7 @@
 #include "muscle.h"
+#include "pprog.h"
 
-float AlignMSAsFlat3(const string &ProgressStr,
+float PProg::AlignMSAsFlat3(const string &ProgressStr,
   const MultiSequence &MSA1, const MultiSequence &MSA2,
   const vector<MySparseMx *> &SparseMxVec,
   uint Index1, uint Index2,

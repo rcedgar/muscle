@@ -144,10 +144,6 @@ void GetAllPairs(uint SeqCount1, uint SeqCount2,
   vector<uint> &SeqIndexes1, vector<uint> &SeqIndexes2);
 void GetPairs(uint SeqCount1, uint SeqCount2, uint TargetPairCount,
   vector<uint> &SeqIndexes1, vector<uint> &SeqIndexes2);
-float GetPostPairsAlignedFlat(const string &aProgressStr,
-  const MultiSequence &MSA1, const MultiSequence &MSA2,
-  const vector<uint> &SeqIndexes1, const vector<uint> &SeqIndexes2, 
-  vector<MySparseMx *> &SparsePosts);
 void SeqToFasta(FILE *f, const byte *Seq, unsigned L, const char *Label);
 void SeqToFasta(FILE *f, const char *Seq, unsigned L, const char *Label);
 
@@ -180,4 +176,7 @@ void ShowSeqStats(const MultiSequence &InputSeqs);
 void CheckMegaOpts(bool Nucleo);
 uint GetGSIByLabel(const string &Label);
 void GetLabelByGSI(uint GSI, string &Label);
+uint GetSeqLengthByGSI(uint GSI);
+const Sequence *GetSequenceByGSI(uint GSI);
+const byte *GetByteSeqByGSI(uint GSI);
 

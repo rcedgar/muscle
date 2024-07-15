@@ -21,6 +21,24 @@ void GetLabelByGSI(uint GSI, string &Label)
 	Label = string(g_GlobalMS->GetLabel(GSI));
 	}
 
+uint GetSeqLengthByGSI(uint GSI)
+	{
+	uint L = g_GlobalMS->GetSeqLength(GSI);
+	return L;
+	}
+
+const Sequence *GetSequenceByGSI(uint GSI)
+	{
+	return g_GlobalMS->GetSequence(GSI);
+	}
+
+const byte *GetByteSeqByGSI(uint GSI)
+	{
+	const Sequence *seq = GetSequenceByGSI(GSI);
+	const byte *ByteSeq = seq->GetBytePtr();
+	return ByteSeq;
+	}
+
 void SetGlobalInputMS(MultiSequence &MS)
 	{
 	asserta(g_GlobalMS == 0);

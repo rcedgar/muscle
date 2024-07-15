@@ -322,6 +322,7 @@
     <ClCompile Include="pprog2.cpp" />
     <ClCompile Include="pprog3.cpp" />
     <ClCompile Include="pprogt.cpp" />
+    <ClCompile Include="pprog_mega.cpp" />
     <ClCompile Include="pprog_tree.cpp" />
     <ClCompile Include="probcons.cpp" />
     <ClCompile Include="msa.cpp" />
@@ -475,6 +476,7 @@
     <ClInclude Include="pathinfo.h" />
     <ClInclude Include="pprog.h" />
     <ClInclude Include="pprog3.h" />
+    <ClInclude Include="pprog_mega.h" />
     <ClInclude Include="probcons.h" />
     <ClInclude Include="profile3.h" />
     <ClInclude Include="profpos3.h" />
