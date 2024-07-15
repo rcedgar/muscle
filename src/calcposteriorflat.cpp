@@ -62,6 +62,8 @@ void MPCFlat::CalcPosterior(uint PairIndex)
 
 	const string LabelX = string(m_MyInputSeqs->GetLabel(SeqIndexX));
 	const string LabelY = string(m_MyInputSeqs->GetLabel(SeqIndexY));
+	uint GSIX = GetGSIByLabel(LabelX);
+	uint GSIY = GetGSIByLabel(LabelY);
 
 	float *Fwd = AllocFB(LX, LY);
 	float *Bwd = AllocFB(LX, LY);
@@ -69,31 +71,31 @@ void MPCFlat::CalcPosterior(uint PairIndex)
 	//CalcFwdFlat(X, LX, Y, LY, Fwd);
 	//CalcBwdFlat(X, LX, Y, LY, Bwd);
 
-	uint GSIX = GetGSIByLabel(LabelX);
-	uint GSIY = GetGSIByLabel(LabelY);
 	uint LX2 = GetSeqLengthByGSI(GSIX);
 	uint LY2 = GetSeqLengthByGSI(GSIY);
 	asserta(LX2 == LX);
 	asserta(LY2 == LY);
 
-	CalcFwdFlat_MPCFlat(GSIX, LX, GSIY, LY, Fwd);
-	CalcBwdFlat_MPCFlat(GSIX, LX, GSIY, LY, Bwd);
-
-	float *Post = AllocPost(LX, LY);
-	CalcPostFlat(Fwd, Bwd, LX, LY, Post);
-#if 0//TRACE
-	LogFlatMxs("FwdFlat", Fwd, LX, LY);
-	LogFlatMxs("BwdFlat", Bwd, LX, LY);
-	LogFlatMx("PostFlat", Post, LX, LY);
-#endif
-	myfree(Fwd);
-	myfree(Bwd);
-
-#if 0//TRACE
-	LogFlatMx1("Fwd", Fwd, LX, LY);
-	LogFlatMx1("Bwd", Bwd, LX, LY);
-	LogFlatMx("Post", Post, LX, LY);
-#endif
+//	CalcFwdFlat_MPCFlat(GSIX, LX, GSIY, LY, Fwd);
+//	CalcBwdFlat_MPCFlat(GSIX, LX, GSIY, LY, Bwd);
+//
+//	float *Post = AllocPost(LX, LY);
+//	CalcPostFlat(Fwd, Bwd, LX, LY, Post);
+//#if 0//TRACE
+//	LogFlatMxs("FwdFlat", Fwd, LX, LY);
+//	LogFlatMxs("BwdFlat", Bwd, LX, LY);
+//	LogFlatMx("PostFlat", Post, LX, LY);
+//#endif
+//	myfree(Fwd);
+//	myfree(Bwd);
+//
+//#if 0//TRACE
+//	LogFlatMx1("Fwd", Fwd, LX, LY);
+//	LogFlatMx1("Bwd", Bwd, LX, LY);
+//	LogFlatMx("Post", Post, LX, LY);
+//#endif
+	float *CalcPost(uint GSIX, uint GSIY);
+	float *Post = CalcPost(GSIX, GSIY);
 
 	MySparseMx &SparsePost = GetSparsePost(PairIndex);
 	SparsePost.FromPost(Post, LX, LY);

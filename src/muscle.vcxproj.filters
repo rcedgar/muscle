@@ -608,6 +608,9 @@
     <ClCompile Include="pprog_mega.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="calcpost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

@@ -23,6 +23,7 @@ public:
 	static vector<string> m_Seqs;
 	static uint m_NextLineNr;
 	static uint m_FeatureCount;
+	static bool m_Loaded;
 
 public:
 	static void FromFile(const string &FileName);

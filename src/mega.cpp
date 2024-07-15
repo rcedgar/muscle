@@ -18,6 +18,7 @@ vector<vector<vector<float> > > Mega::m_LogProbMxVec;
 vector<string> m_Labels;
 uint Mega::m_NextLineNr;
 uint Mega::m_FeatureCount;
+bool Mega::m_Loaded = false;
 unordered_map<string, uint> Mega::m_LabelToIdx;
 
 uint Mega::GetGSIByLabel(const string &Label)
@@ -127,6 +128,8 @@ void Mega::CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
 
 void Mega::FromFile(const string &FileName)
 	{
+	m_Loaded = true;
+
 	asserta(m_FeatureNames.empty());
 	asserta(m_FeatureCount == 0);
 	asserta(m_Profiles.empty());

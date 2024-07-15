@@ -219,6 +219,7 @@
     <ClCompile Include="alnmsasflat_mega.cpp" />
     <ClCompile Include="blosumsmx.cpp" />
     <ClCompile Include="bwdflat_mega.cpp" />
+    <ClCompile Include="calcpost.cpp" />
     <ClCompile Include="cmd_cmp_msa.cpp" />
     <ClCompile Include="cmd_m3ensemble.cpp" />
     <ClCompile Include="cmd_mustang_core.cpp" />
