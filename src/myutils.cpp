@@ -916,9 +916,7 @@ void Die_(const char *Format, ...)
 	Log("Elapsed time: %s\n", sstr);
 
 	const char *szStr = Msg.c_str();
-	//fprintf(stderr, "Elapsed time %s\n", SecsToHHMMSS(ElapsedSeconds));
-	//fprintf(stderr, "Max memory %s\n", MemBytesToStr(g_PeakMemUseBytes));
-	fprintf(stderr, "\n**ABORT** %s\n", szStr);
+	fprintf(stderr, "\n---Fatal error---\n%s\n", szStr); 
 	Log("\n---Fatal error---\n%s\n", szStr); 
 
 #ifdef _MSC_VER

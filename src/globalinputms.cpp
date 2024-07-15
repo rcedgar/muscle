@@ -32,8 +32,7 @@ void SetGlobalInputMS(MultiSequence &MS)
 	for (uint GSI = 0; GSI < g_GlobalMSSeqCount; ++GSI)
 		{
 		const Sequence *Seq = g_GlobalMS->GetSequence(GSI);
-		string Label;
-		g_GlobalMS->GetLabel(GSI);
+		string Label = string(g_GlobalMS->GetLabel(GSI));
 		unordered_map<string, uint>::const_iterator iter =
 		  m_LabelToIdx.find(Label);
 		if (iter != m_LabelToIdx.end())
