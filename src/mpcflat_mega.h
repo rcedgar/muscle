@@ -9,7 +9,7 @@
 class MPCFlat_mega : public MPCFlat
     {
 public:
-    Mega *m_MM = 0;
+    //Mega *m_MM = 0;
 	const vector<const vector<vector<byte> > *> *m_ProfilePtrVec = 0;
 
 private:

@@ -116,13 +116,6 @@ void AlignMSAsByPath(const MultiSequence &MSA1, const MultiSequence &MSA2,
 void CalcFwdFlat(const byte *X, uint LX, const byte *Y, uint LY, float *Flat);
 void CalcBwdFlat(const byte *X, uint LX, const byte *Y, uint LY, float *Flat);
 
-void CalcFwdFlat_mega(const Mega &M,
-  const vector<vector<byte> > &ProfileX,
-  const vector<vector<byte> > &ProfileY, float *Flat);
-void CalcBwdFlat_mega(const Mega &M,
-  const vector<vector<byte> > &ProfileX,
-  const vector<vector<byte> > &ProfileY, float *Flat);
-
 void CalcPostFlat(const float *FlatFwd, const float *FlatBwd,
   uint LX, uint LY, float *Post);
 float CalcAlnFlat(const float *Post, uint LX, uint LY,

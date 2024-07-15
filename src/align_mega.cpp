@@ -61,11 +61,10 @@ static void Align_Mega(MPCFlat_mega &M, MultiSequence &InputSeqs,
 
 void cmd_align_mega()
 	{
-	Mega MM;
-	MM.FromFile(g_Arg1);
+	Mega::FromFile(g_Arg1);
 
 	MultiSequence InputSeqs;
-	InputSeqs.FromStrings(MM.m_Labels, MM.m_Seqs);
+	InputSeqs.FromStrings(Mega::m_Labels, Mega::m_Seqs);
 	const uint InputSeqCount = InputSeqs.GetSeqCount();
 
 	ShowSeqStats(InputSeqs);
@@ -76,7 +75,6 @@ void cmd_align_mega()
 	SetAlpha(ALPHA_Amino);
 
 	MPCFlat_mega M;
-	M.m_MM = &MM;
 	
 	if (optset_consiters)
 		M.m_ConsistencyIterCount = opt(consiters);

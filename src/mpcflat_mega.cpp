@@ -48,8 +48,8 @@ void MPCFlat_mega::CalcPosterior(uint PairIndex)
 //    CalcFwdFlat(X, LX, Y, LY, Fwd);
 //    CalcBwdFlat(X, LX, Y, LY, Bwd);
 
-    CalcFwdFlat_mega(*m_MM, ProfileX, ProfileY, Fwd);
-    CalcBwdFlat_mega(*m_MM, ProfileX, ProfileY, Bwd);
+    Mega::CalcFwdFlat_mega(ProfileX, ProfileY, Fwd);
+    Mega::CalcBwdFlat_mega(ProfileX, ProfileY, Bwd);
     
     float *Post = AllocPost(LX, LY);
     CalcPostFlat(Fwd, Bwd, LX, LY, Post);

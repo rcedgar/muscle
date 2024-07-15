@@ -115,7 +115,7 @@ void cmd_super7_mega()
 
 	Super7_mega S7;
 	MPCFlat_mega *MPCm = new MPCFlat_mega;
-	MPCm->m_MM = &MM;
+	//MPCm->m_MM = &MM;
 	S7.m_MPC = MPCm;
 	S7.Run(InputSeqs, GuideTree, ShrubSize);
 	S7.m_FinalMSA.ToFasta(opt(output));

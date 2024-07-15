@@ -10,7 +10,7 @@ Bwd[s][i][j] =
 	last (LY-j) letters of Y.
 ***/
 
-void CalcBwdFlat_mega(const Mega &M,
+void Mega::CalcBwdFlat_mega(
   const vector<vector<byte> > &ProfileX,
   const vector<vector<byte> > &ProfileY, float *Flat)
 	{
@@ -52,7 +52,7 @@ void CalcBwdFlat_mega(const Mega &M,
 		{
 		//char x = (i == iLX ? 0 : X[i]);
 		//float Emit_x = InsScore[x];
-		float Emit_x = (i == iLX ? 0 : M.GetInsScore(ProfileX, i));
+		float Emit_x = (i == iLX ? 0 : Mega::GetInsScore(ProfileX, i));
 
 		for (int j = iLY; j >= 0; --j)
 			{
@@ -75,9 +75,9 @@ void CalcBwdFlat_mega(const Mega &M,
 			//char y = (j == iLY ? 0 : Y[j]);
 			//float Emit_y = InsScore[y];
 			//float Emit_xy = MatchScore[x][y];
-			float Emit_y = (j == iLY ? 0 : M.GetInsScore(ProfileY, j));
+			float Emit_y = (j == iLY ? 0 : Mega::GetInsScore(ProfileY, j));
 			float Emit_xy = (i == iLX || j == iLY ? 0 : 
-			  M.GetMatchScore(ProfileX, i, ProfileY, j));
+			  Mega::GetMatchScore(ProfileX, i, ProfileY, j));
 
 			if (i < iLX && j < iLY)
 				{

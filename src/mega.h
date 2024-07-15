@@ -25,23 +25,29 @@ public:
 	static uint m_FeatureCount;
 
 public:
-	void FromFile(const string &FileName);
-	uint GetFeatureCount() const { return m_FeatureCount; }
-	const string &GetNextLine();
-	void GetNextFields(vector<string> &Fields,
+	static void FromFile(const string &FileName);
+	static uint GetFeatureCount() { return m_FeatureCount; }
+	static const string &GetNextLine();
+	static void GetNextFields(vector<string> &Fields,
 	  uint ExpectedNrFields = UINT_MAX);
-	float GetInsScore(const vector<vector<byte> > &Profile, uint Pos) const;
-	float GetMatchScore(
+	static float GetInsScore(const vector<vector<byte> > &Profile, uint Pos);
+	static float GetMatchScore(
 	  const vector<vector<byte> > &ProfileX, uint PosX,
-	  const vector<vector<byte> > &ProfileY, uint PosY) const;
-	void CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
-	  vector<vector<float > > &LogProbMx) const;
-	void CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
-	  vector<float> &Freqs) const;
-	void LogFeatureParams(uint Idx) const;
-	void LogMx(const string &Name, const vector<vector<float> > &Mx) const;
-	void LogVec(const string &Name, const vector<float> &Vec) const;
-	void AssertSymmetrical(const vector<vector<float> > &Mx) const;
+	  const vector<vector<byte> > &ProfileY, uint PosY);
+	static void CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
+	  vector<vector<float > > &LogProbMx);
+	static void CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
+	  vector<float> &Freqs);
+	static void LogFeatureParams(uint Idx);
+	static void LogMx(const string &Name, const vector<vector<float> > &Mx);
+	static void LogVec(const string &Name, const vector<float> &Vec);
+	static void AssertSymmetrical(const vector<vector<float> > &Mx);
+	static void CalcFwdFlat_mega(
+	  const vector<vector<byte> > &ProfileX,
+	  const vector<vector<byte> > &ProfileY, float *Flat);
+	static void CalcBwdFlat_mega(
+	  const vector<vector<byte> > &ProfileX,
+	  const vector<vector<byte> > &ProfileY, float *Flat);
 
 public:
 	static uint GetGSIByLabel(const string &Label);

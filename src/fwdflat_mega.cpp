@@ -11,7 +11,7 @@ Fwd[s][i][j] =
 	ending in state s.
 ***/
 
-void CalcFwdFlat_mega(const Mega &M,
+void Mega::CalcFwdFlat_mega(
   const vector<vector<byte> > &ProfileX,
   const vector<vector<byte> > &ProfileY, float *Flat)
 	{
@@ -26,9 +26,9 @@ void CalcFwdFlat_mega(const Mega &M,
 	//float Ins_x0 = InsScore[x0];
 	//float Ins_y0 = InsScore[y0];
 	//float Emit_x0_y0 = MatchScore[x0][y0];
-	float Ins_x0 = M.GetInsScore(ProfileX, 0);
-	float Ins_y0 = M.GetInsScore(ProfileY, 0);
-	float Emit_x0_y0 = M.GetMatchScore(ProfileX, 0, ProfileY, 0);
+	float Ins_x0 = Mega::GetInsScore(ProfileX, 0);
+	float Ins_y0 = Mega::GetInsScore(ProfileY, 0);
+	float Emit_x0_y0 = Mega::GetMatchScore(ProfileX, 0, ProfileY, 0);
 
 	const uint LY1 = LY+1;
 	const uint Base_0_0 = HMMSTATE_COUNT*(0*(LY1) + 0);
@@ -77,7 +77,7 @@ void CalcFwdFlat_mega(const Mega &M,
 		{
 		//char x = X[i];
 		//float Emit_x = InsScore[x];
-		float Emit_x = M.GetInsScore(ProfileX, i);
+		float Emit_x = Mega::GetInsScore(ProfileX, i);
 
 		Flat[NextBase + HMMSTATE_IX] = Flat[Base + HMMSTATE_IX] + tII + Emit_x;
 		Flat[NextBase + HMMSTATE_JX] = Flat[Base + HMMSTATE_JX] + tJJ + Emit_x;
@@ -92,7 +92,7 @@ void CalcFwdFlat_mega(const Mega &M,
 		{
 		//char y = Y[j];
 		//float Emit_y = InsScore[y];
-		float Emit_y = M.GetInsScore(ProfileY, j);
+		float Emit_y = Mega::GetInsScore(ProfileY, j);
 
 		Flat[NextBase + HMMSTATE_IY] = Flat[Base + HMMSTATE_IY] + tII + Emit_y;
 		Flat[NextBase + HMMSTATE_JY] = Flat[Base + HMMSTATE_JY] + tJJ + Emit_y;
@@ -110,15 +110,15 @@ void CalcFwdFlat_mega(const Mega &M,
 		{
 		//char x = X[i-1];
 		//float Emit_x = InsScore[x];
-		float Emit_x = M.GetInsScore(ProfileX, i-1);
+		float Emit_x = Mega::GetInsScore(ProfileX, i-1);
 
 		for (uint j = 1; j <= LY; ++j)
 			{
 			//char y = Y[j-1];
 			//float Emit_y = InsScore[y];
 			//float Emit_Pair = MatchScore[x][y];
-			float Emit_y = M.GetInsScore(ProfileY, j-1);
-			float Emit_Pair = M.GetMatchScore(ProfileX, i-1, ProfileY, j-1);
+			float Emit_y = Mega::GetInsScore(ProfileY, j-1);
+			float Emit_Pair = Mega::GetMatchScore(ProfileX, i-1, ProfileY, j-1);
 			if (i == 1 && j == 1)
 				Flat[Base_1_1 + HMMSTATE_M] = tSM + Emit_x0_y0;
 			else

@@ -67,7 +67,7 @@ void Mega::GetNextFields(vector<string> &Fields,
 		  ExpectedNrFields, SIZE(Fields), Line.c_str());
 	}
 
-void Mega::AssertSymmetrical(const vector<vector<float> > &Mx) const
+void Mega::AssertSymmetrical(const vector<vector<float> > &Mx)
 	{
 	const uint N = SIZE(Mx);
 	for (uint i = 0; i < N; ++i)
@@ -80,7 +80,7 @@ void Mega::AssertSymmetrical(const vector<vector<float> > &Mx) const
 	}
 
 void Mega::CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
-  vector<float> &MarginalFreqs) const
+  vector<float> &MarginalFreqs)
 	{
 	MarginalFreqs.clear();
 	AssertSymmetrical(FreqsMx);
@@ -99,7 +99,7 @@ void Mega::CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
 	}
 
 void Mega::CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
-  vector<vector<float > > &LogProbMx) const
+  vector<vector<float > > &LogProbMx)
 	{
 	AssertSymmetrical(FreqsMx);
 	const uint N = SIZE(FreqsMx);
@@ -234,7 +234,7 @@ void Mega::FromFile(const string &FileName)
     m_Lines.clear();
 	}
 
-float Mega::GetInsScore(const vector<vector<byte> > &Profile, uint Pos) const
+float Mega::GetInsScore(const vector<vector<byte> > &Profile, uint Pos)
 	{
 	asserta(Pos < SIZE(Profile));
 	const vector<byte> &ProfCol = Profile[Pos];
@@ -250,7 +250,7 @@ float Mega::GetInsScore(const vector<vector<byte> > &Profile, uint Pos) const
 
 float Mega::GetMatchScore(
   const vector<vector<byte> > &ProfileX, uint PosX,
-  const vector<vector<byte> > &ProfileY, uint PosY) const
+  const vector<vector<byte> > &ProfileY, uint PosY)
 	{
 	asserta(PosX < SIZE(ProfileX));
 	asserta(PosY < SIZE(ProfileY));
@@ -267,7 +267,7 @@ float Mega::GetMatchScore(
 	return Score;
 	}
 
-void Mega::LogVec(const string &Name, const vector<float> &Vec) const
+void Mega::LogVec(const string &Name, const vector<float> &Vec)
 	{
 	const uint N = SIZE(Vec);
 	Log("\n%s/%u", Name.c_str(), N);
@@ -283,7 +283,7 @@ void Mega::LogVec(const string &Name, const vector<float> &Vec) const
 	}
 
 void Mega::LogMx(const string &Name,
-  const vector<vector<float> > &Mx) const
+  const vector<vector<float> > &Mx)
 	{
 	const uint N = SIZE(Mx);
 	Log("\n%s/%u\n", Name.c_str(), N);
@@ -303,7 +303,7 @@ void Mega::LogMx(const string &Name,
 		}
 	}
 
-void Mega::LogFeatureParams(uint Idx) const
+void Mega::LogFeatureParams(uint Idx)
 	{
 	asserta(Idx < SIZE(m_FeatureNames));
 	asserta(Idx < SIZE(m_LogProbMxVec));
