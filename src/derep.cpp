@@ -208,14 +208,14 @@ void Derep::GetDupeGSIs(vector<uint> &GSIs,
 		  m_RepSeqIndexToSeqIndexes[RepSeqIndex];
 		const uint MemberCount = SIZE(MemberSeqIndexes);
 		const Sequence *Seq = m_InputSeqs->GetSequence(RepSeqIndex);
-		uint GlobalRepSeqIndex = Seq->GetGSI();
+		uint GlobalRepSeqIndex = GetGSIByLabel(Seq->m_Label);
 		asserta(GlobalRepSeqIndex < GlobalMSSeqCount);
 		asserta(MemberSeqIndexes[0] == RepSeqIndex);
 		for (uint i = 1; i < MemberCount; ++i)
 			{
 			uint MemberSeqIndex = MemberSeqIndexes[i];
 			const Sequence *Seq = m_InputSeqs->GetSequence(MemberSeqIndex);
-			uint GlobalMemberSeqIndex = Seq->GetGSI();
+			uint GlobalMemberSeqIndex = GetGSIByLabel(Seq->m_Label);
 			asserta(GlobalMemberSeqIndex < GlobalMSSeqCount);
 			GSIs.push_back(GlobalMemberSeqIndex);
 			GlobalRepSeqIndexes.push_back(GlobalRepSeqIndex);

@@ -18,8 +18,8 @@ class MPCFlat
 public:
 	MultiSequence *m_OriginalInputSeqs = 0;
 
-// m_InputSeqs are unique seqs after derep of m_OriginalInputSeqs
-	MultiSequence *m_InputSeqs = 0;
+// m_MyInputSeqs are unique seqs after derep of m_OriginalInputSeqs
+	MultiSequence *m_MyInputSeqs = 0;
 
 	MultiSequence *m_MSA = 0;
 
@@ -83,6 +83,7 @@ public:
 	void ProgAln(uint JoinIndex);
 	const pair<uint, uint> &GetPair(uint PairIndex) const;
 	const char *GetLabel(uint SeqIndex) const;
+	uint GetMyInputSeqIndex(const string &Label) const;
 	const byte *GetBytePtr(uint SeqIndex) const;
 	uint GetPairIndex(uint SMI1, uint SMI2) const;
 	MySparseMx &GetSparsePost(uint PairIndex);

@@ -72,13 +72,13 @@ void MPCFlat::ProgAln(uint JoinIndex)
 
 void MPCFlat::ProgressiveAlign()
 	{
-	const uint SeqCount = m_InputSeqs->GetSeqCount();
+	const uint SeqCount = m_MyInputSeqs->GetSeqCount();
 	const uint JoinCount = SeqCount - 1;
 	const uint NodeCount = SeqCount + JoinCount;
 
 	for (uint i = 0; i < SeqCount; ++i)
 		{
-		const Sequence *Seq = m_InputSeqs->GetSequence(i);
+		const Sequence *Seq = m_MyInputSeqs->GetSequence(i);
 		MultiSequence *MS = new MultiSequence;
 		MS->AddSequence(Seq, false);
 		m_ProgMSAs.push_back(MS);

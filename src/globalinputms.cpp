@@ -42,8 +42,6 @@ void SetGlobalInputMS(MultiSequence &MS)
 		uint L = Seq->GetLength();
 		g_GlobalMSMaxSeqLength = max(L, g_GlobalMSMaxSeqLength);
 		SumSeqLength += L;
-		Sequence *HackSeq = (Sequence *) Seq; // cast away const
-		HackSeq->m_GSI = GSI;
 		}
 	if (g_GlobalMSSeqCount > 0)
 		g_GlobalMSMeanSeqLength = SumSeqLength/g_GlobalMSSeqCount;
@@ -104,7 +102,7 @@ uint GetGSICount()
 	return GetGlobalMSSeqCount();
 	}
 
-const Sequence &GetGlobalInputSeq(uint GSI)
+const Sequence &GetGlobalInputSeqByIndex(uint GSI)
 	{
 	asserta(GSI < g_GlobalMSSeqCount);
 	asserta(g_GlobalMS != 0);
@@ -113,9 +111,11 @@ const Sequence &GetGlobalInputSeq(uint GSI)
 	return *Seq;
 	}
 
-const string &GetGlobalInputSeqLabel(uint GSI)
+const Sequence &GetGlobalInputSeqByLabel(const string &Label)
 	{
-	const Sequence &Seq = GetGlobalInputSeq(GSI);
-	const string &Label = Seq.GetLabel();
-	return Label;
+	uint GSI = GetGSIByLabel(Label);
+	const Sequence &Seq = GetGlobalInputSeqByIndex(GSI);
+	const string &Label2 = Seq.GetLabel();
+	asserta(Label2 == Label);
+	return Seq;
 	}

@@ -41,7 +41,6 @@ void cmd_batch()
 
 		MultiSequence *MS = new MultiSequence;
 		MS->LoadMFA(FastaFileName, true);
-		MS->SetSequentialGSIs();
 
 		string OutputFileName = OutputDir + Name;
 

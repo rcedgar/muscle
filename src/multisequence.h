@@ -171,14 +171,8 @@ public:
 		}
 
 	bool GuessIsNucleo() const;
-	void LogGSIs(const char *Msg = 0) const;
-	void AssertGSIs() const;
 	void GetLengthOrder(vector<uint> &SeqIndexes) const;
 	uint GetSeqLength(uint SeqIndex) const;
-	uint GetGSI(uint SeqIndex) const;
 	void LogMe() const;
-	void SetSequentialGSIs();
-	void AssertSequentialGSIs() const;
 	bool ColIsAllGaps(uint Col) const;
-	void SetGSIs();
 	};

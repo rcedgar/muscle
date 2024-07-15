@@ -27,12 +27,10 @@ void Sequence::_DeleteSequence(const Sequence *Seq)
 	delete Seq;
 	}
 
-void Sequence::Create(const vector<char> *a_data, string a_label, uint GSI, uint SMI)
+void Sequence::Create(const vector<char> *a_data, string a_label)
 	{
 	m_CharVec = *a_data;
 	m_Label = a_label;
-	m_GSI = GSI;
-	m_SMI = SMI;
 	}
 
 bool Sequence::FromFileBuffer(FileBuffer& infile, bool stripGaps)
@@ -40,9 +38,7 @@ bool Sequence::FromFileBuffer(FileBuffer& infile, bool stripGaps)
 	if (infile.eof())
 		return false;
 
-	m_GSI = UINT_MAX;
-	m_SMI = UINT_MAX;
-	m_Label = "~";
+	m_Label.clear();
 
 // Skip blank lines
 	for (;;)
@@ -109,8 +105,8 @@ Sequence* Sequence::Clone() const
 
 	ret->m_Label = m_Label;
 	ret->m_CharVec = m_CharVec;
-	ret->m_GSI = m_GSI;
-	ret->m_SMI = m_SMI;
+	//ret->m_GSI = m_GSI;
+	//ret->m_SMI = m_SMI;
 
 	return ret;
 	}
@@ -120,8 +116,8 @@ Sequence* Sequence::AddGapsPath(const string &Path, char id) const
 	Sequence* ret = NewSequence();
 	assert(ret);
 
-	ret->m_GSI = m_GSI;
-	ret->m_SMI = m_SMI;
+	//ret->m_GSI = m_GSI;
+	//ret->m_SMI = m_SMI;
 
 	ret->m_Label = m_Label;
 	ret->m_CharVec.clear();
@@ -186,8 +182,8 @@ Sequence *Sequence::CopyDeleteGaps() const
 	asserta(ret);
 
 	ret->m_Label = m_Label;
-	ret->m_GSI = m_GSI;
-	ret->m_SMI = m_SMI;
+	//ret->m_GSI = m_GSI;
+	//ret->m_SMI = m_SMI;
 	ret->m_CharVec.clear();
 	int L = GetLength();
 	for (int i = 0; i < L; ++i)
@@ -201,8 +197,8 @@ Sequence *Sequence::CopyDeleteGaps() const
 
 void Sequence::FromString(const string &Label, const string &Seq)
 	{
-	m_GSI = UINT_MAX;
-	m_SMI = UINT_MAX;
+	//m_GSI = UINT_MAX;
+	//m_SMI = UINT_MAX;
 
 	m_Label = Label;
 	m_CharVec.clear();

@@ -13,8 +13,8 @@ void _AssertSeqsEq(const char *FileName, uint LineNr,
 		uint SeqIndex2 = MSA2.GetSeqIndex(Label);
 		const Sequence *Seq2 = MSA2.GetSequence((int) SeqIndex2);
 
-		uint GSI1 = Seq1->GetGSI();
-		uint GSI2 = Seq2->GetGSI();
+		//uint GSI1 = Seq1->GetGSI();
+		//uint GSI2 = Seq2->GetGSI();
 
 		Sequence *uSeq1 = Seq1->CopyDeleteGaps();
 		Sequence *uSeq2 = Seq2->CopyDeleteGaps();
@@ -23,11 +23,10 @@ void _AssertSeqsEq(const char *FileName, uint LineNr,
 
 		const vector<char> &v1 = uSeq1->m_CharVec;
 		const vector<char> &v2 = uSeq2->m_CharVec;
-		if (v1 != v2 || GSI1 != GSI2)
+		if (v1 != v2)
 			{
 			Log("\n");
 			Log("AssertSeqsEq >%s\n", Label.c_str());
-			Log("GI1 %u, GI2 %u\n", GSI1, GSI2);
 			Log("Seq1[%d]  ", Length1);
 			for (int i = 1; i < Length1; ++i)
 				Log("%c", v1[i]);
@@ -55,26 +54,12 @@ void _AssertSeqsEqInput(const char *File, uint Line, const MultiSequence &MS)
 	for (uint i = 0; i < SeqCount; ++i)
 		{
 		const Sequence *Seq = MS.GetSequence(i);
-		uint GSI = Seq->GetGSI();
-		if (GSI >= GN)
-			{
-			MS.LogGSIs();
-			Die("%s:%u AssertSeqsEqInput GSI1=%u > GN=%u",
-			  File, Line, GSI, GN);
-			}
-		if (GSIs.find(GSI) != GSIs.end())
-			{
-			MS.LogGSIs();
-			Die("%s:%u AssertSeqsEqInput dupe GSI=%u",
-			  File, Line, GSI);
-			}
-
-		const Sequence *InputSeq = GlobalMS.GetSequence(GSI);
+		const Sequence *InputSeq = &GetGlobalInputSeqByLabel(Seq->m_Label);
 		const string &Label = string(MS.GetLabel(i));
 		const string &GlobalLabel = InputSeq->m_Label;
+		uint GSI = GetGSIByLabel(Label);
 		if (GlobalLabel != Label)
 			{
-			MS.LogGSIs();
 			Die("%s:%u AssertSeqsEqInput Seq(%u) GSI %u label '%s' != '%s'",
 			  File, Line, i, GSI, Label.c_str(), GlobalLabel.c_str());
 			}
@@ -168,28 +153,19 @@ void _AssertSameLabels(const char *File, uint Line, const MultiSequence &MS)
 	for (uint i = 0; i < SeqCount; ++i)
 		{
 		const Sequence *Seq = MS.GetSequence(i);
-		uint GSI = Seq->GetGSI();
+		uint GSI = GetGSIByLabel(Seq->m_Label);
 		if (GSI >= GN)
-			{
-			MS.LogGSIs();
 			Die("%s:%u AssertSameLabels GSI1=%u > GN=%u",
 			  File, Line, GSI, GN);
-			}
 		if (GSIs.find(GSI) != GSIs.end())
-			{
-			MS.LogGSIs();
 			Die("%s:%u AssertSameLabels dupe GSI=%u",
 			  File, Line, GSI);
-			}
 
 		const string &Label = string(MS.GetLabel(i));
 		const string &GlobalLabel = string(GlobalMS.GetLabel(GSI));
 		if (GlobalLabel != Label)
-			{
-			MS.LogGSIs();
 			Die("%s:%u AssertSameLabels Seq(%u) GSI %u label '%s' != '%s'",
 			  File, Line, i, GSI, Label.c_str(), GlobalLabel.c_str());
-			}
 
 		GSIs.insert(GSI);
 		}
@@ -213,8 +189,8 @@ void _AssertSameSeqs(const char *File, uint Line,
 		{
 		const Sequence *Seq1 = MS1.GetSequence(i);
 		const Sequence *Seq2 = MS2.GetSequence(i);
-		uint GSI1 = Seq1->GetGSI();
-		uint GSI2 = Seq2->GetGSI();
+		uint GSI1 = GetGSIByLabel(Seq1->m_Label);
+		uint GSI2 = GetGSIByLabel(Seq2->m_Label);
 		if (GSI1 >= GN)
 			Die("%s:%u AssertSameSeqs GSI1=%u > GN=%u",
 			  File, Line, GSI1, GN);
@@ -222,17 +198,11 @@ void _AssertSameSeqs(const char *File, uint Line,
 			Die("%s:%u AssertSameSeqs GSI2=%u > GN=%u",
 			  File, Line, GSI2, GN);
 		if (GSIs1.find(GSI1) != GSIs1.end())
-			{
-			MS1.LogGSIs();
 			Die("%s:%u AssertSameSeqs dupe GSI1=%u",
 			  File, Line, GSI1);
-			}
 		if (GSIs2.find(GSI2) != GSIs2.end())
-			{
-			MS2.LogGSIs();
 			Die("%s:%u AssertSameSeqs dupe GSI2=%u",
 			  File, Line, GSI2, GN);
-			}
 
 		const string &Label1 = string(MS1.GetLabel(i));
 		const string &Label2 = string(MS2.GetLabel(i));

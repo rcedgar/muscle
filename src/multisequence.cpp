@@ -54,16 +54,6 @@ void MultiSequence::Copy(const MultiSequence &rhs)
 		}
 	}
 
-void MultiSequence::AssertSequentialGSIs() const
-	{
-	const uint SeqCount = GetSeqCount();
-	for (uint i = 0; i < SeqCount; ++i)
-		{
-		const Sequence *r = m_Seqs[i];
-		asserta(r->m_GSI == i);
-		}
-	}
-
 bool MultiSequence::ColIsAllGaps(uint Col) const
 	{
 	const uint SeqCount = GetSeqCount();
@@ -76,29 +66,12 @@ bool MultiSequence::ColIsAllGaps(uint Col) const
 	return true;
 	}
 
-void MultiSequence::SetSequentialGSIs()
-	{
-	const uint SeqCount = GetSeqCount();
-	for (uint i = 0; i < SeqCount; ++i)
-		{
-		Sequence *r = (Sequence *) m_Seqs[i];
-		r->m_GSI = i;
-		}
-	}
-
 void MultiSequence::LogMe() const
 	{
 	Log("\n");
 	Log("MultiSequence::LogMe(%p), %u seqs\n", this, GetSeqCount());
 	for (uint i = 0; i < GetSeqCount(); ++i)
 		m_Seqs[i]->LogMe();
-	}
-
-uint MultiSequence::GetGSI(uint SeqIndex) const
-	{
-	const Sequence *Seq = GetSequence(SeqIndex);
-	uint L = (uint) Seq->GetGSI();
-	return L;
 	}
 
 uint MultiSequence::GetSeqLength(uint SeqIndex) const
@@ -121,48 +94,6 @@ void MultiSequence::GetLengthOrder(vector<uint> &SeqIndexes) const
 	const uint *PtrLs = Ls.data();
 	uint *PtrOrder = SeqIndexes.data();
 	QuickSortOrderDesc<uint>(PtrLs, SeqCount, PtrOrder);
-	}
-
-void MultiSequence::AssertGSIs() const
-	{
-	const uint GlobalSeqCount = GetGlobalMSSeqCount();
-	const uint SeqCount = GetSeqCount();
-	for (uint i = 0; i < SeqCount; ++i)
-		{
-		const Sequence *Seq = GetSequence(i);
-		asserta(Seq != 0);
-		uint GSI = Seq->GetGSI();
-		asserta(GSI < GlobalSeqCount);
-		}
-	}
-
-void MultiSequence::LogGSIs(const char *Msg) const
-	{
-	const MultiSequence &GlobalMS = GetGlobalInputMS();
-	const uint GlobalSeqCount = GlobalMS.GetSeqCount();
-	Log("\n");
-	Log("LogGSIs()");
-	if (Msg != 0)
-		Log("  %s  ", Msg);
-	const uint SeqCount = GetSeqCount();
-	Log("%u seqs\n", SeqCount);
-	for (uint i = 0; i < SeqCount; ++i)
-		{
-		Log("[%5u]", i);
-		const Sequence *Seq = GetSequence(i);
-		uint GSI = (uint) Seq->GetGSI();
-		string Label = Seq->GetLabel();
-		asserta(GSI < GlobalSeqCount);
-		const Sequence *GlobalSeq = GlobalMS.GetSequence(GSI);
-		string GlobalLabel = GlobalSeq->GetLabel();
-
-		Log("  %5d", GSI);
-		Log("  >%s", Label.c_str());
-		Log("  (%s)", GlobalLabel.c_str());
-		if (Label != GlobalLabel)
-			Log("  <<< ERROR");
-		Log("\n");
-		}
 	}
 
 void MultiSequence::LoadMFA(FileBuffer& infile, bool stripGaps)

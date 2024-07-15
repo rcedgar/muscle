@@ -19,7 +19,6 @@ void cmd_m3select()
 
 	MultiSequence *MS = new MultiSequence;
 	MS->LoadMFA(FastaFN, true);
-	MS->SetSequentialGSIs();
 
 	opt_quiet = true;
 	optset_quiet = true;

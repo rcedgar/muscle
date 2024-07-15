@@ -5,7 +5,7 @@
 
 void MPCFlat::Clear()
 	{
-	m_InputSeqs = 0;
+	m_MyInputSeqs = 0;
 	if (m_MSA != 0)
 		delete m_MSA;
 	m_MSA = 0;
@@ -23,27 +23,36 @@ void MPCFlat::Clear()
 	FreeProgMSAs();
 	}
 
+uint MPCFlat::GetMyInputSeqIndex(const string &Label) const
+	{
+	unordered_map<string, uint>::const_iterator iter =
+	  m_LabelToIndex.find(Label);
+	asserta(iter != m_LabelToIndex.end());
+	uint Index = iter->second;
+	return Index;
+	}
+
 const char *MPCFlat::GetLabel(uint SeqIndex) const
 	{
-	const char *Label = m_InputSeqs->GetLabel(SeqIndex);
+	const char *Label = m_MyInputSeqs->GetLabel(SeqIndex);
 	return Label;
 	}
 
 uint MPCFlat::GetSeqLength(uint SeqIndex) const
 	{
-	uint L = m_InputSeqs->GetSeqLength(SeqIndex);
+	uint L = m_MyInputSeqs->GetSeqLength(SeqIndex);
 	return L;
 	}
 
 const Sequence *MPCFlat::GetSequence(uint SeqIndex) const
 	{
-	const Sequence *s = m_InputSeqs->GetSequence(SeqIndex);
+	const Sequence *s = m_MyInputSeqs->GetSequence(SeqIndex);
 	return s;
 	}
 
 const byte *MPCFlat::GetBytePtr(uint SeqIndex) const
 	{
-	const byte *Ptr = m_InputSeqs->GetBytePtr(SeqIndex);
+	const byte *Ptr = m_MyInputSeqs->GetBytePtr(SeqIndex);
 	return Ptr;
 	}
 
@@ -102,19 +111,19 @@ MySparseMx &MPCFlat::GetUpdatedSparsePost(uint PairIndex)
 
 uint MPCFlat::GetL(uint SeqIndex) const
 	{
-	return m_InputSeqs->GetSeqLength(SeqIndex);
+	return m_MyInputSeqs->GetSeqLength(SeqIndex);
 	}
 
 uint MPCFlat::GetSeqCount() const
 	{
-	asserta(m_InputSeqs != 0);
-	uint SeqCount = m_InputSeqs->GetSeqCount();
+	asserta(m_MyInputSeqs != 0);
+	uint SeqCount = m_MyInputSeqs->GetSeqCount();
 	return SeqCount;
 	}
 
 void MPCFlat::InitSeqs(MultiSequence *InputSeqs)
 	{
-	m_InputSeqs = InputSeqs;
+	m_MyInputSeqs = InputSeqs;
 	const uint SeqCount = GetSeqCount();
 
 	m_Labels.clear();
@@ -122,8 +131,6 @@ void MPCFlat::InitSeqs(MultiSequence *InputSeqs)
 	for (uint i = 0; i < SeqCount; ++i)
 		{
 		const Sequence *Seq = InputSeqs->GetSequence(i);
-		Sequence *HackSeq = (Sequence *) Seq;
-		HackSeq->m_SMI = i;
 
 		const string &Label = Seq->GetLabel();
 		m_Labels.push_back(Label);
@@ -311,7 +318,7 @@ void MPCFlat::Run(MultiSequence *OriginalInputSeqs)
 	CalcPosteriors();
 	CalcGuideTree();
 
-	m_CW.Run(*m_InputSeqs, m_GuideTree, m_Weights);
+	m_CW.Run(*m_MyInputSeqs, m_GuideTree, m_Weights);
 	asserta(SIZE(m_Weights) == SeqCount);
 	double Sum = 0;
 	for (uint i = 0; i < SeqCount; ++i)
@@ -403,7 +410,7 @@ void MPCFlat::SortMSA_ByInputOrder()
 	vector<const Sequence *> SortedSeqs;
 	for (uint i = 0; i < SeqCount; ++i)
 		{
-		const string &Label = m_InputSeqs->GetLabelStr(i);
+		const string &Label = m_MyInputSeqs->GetLabelStr(i);
 		unordered_map<string, uint>::const_iterator p =
 		  LabelToMSASeqIndex.find(Label);
 		if (p == LabelToMSASeqIndex.end())

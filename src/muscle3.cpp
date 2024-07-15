@@ -10,7 +10,6 @@ void Muscle3::Run(const M3AlnParams &AP, const MultiSequence &InputSeqs)
 	m_AP = &AP;
 	asserta(m_AP->m_Ready);
 
-	InputSeqs.AssertSequentialGSIs();
 	m_InputSeqs = &InputSeqs;
 	const uint SeqCount = InputSeqs.GetSeqCount();
 
@@ -50,7 +49,7 @@ void Muscle3::Run(const M3AlnParams &AP, const MultiSequence &InputSeqs)
 		for (uint k = 0; k < SeqCount; ++k)
 			{
 			const Sequence *Seq = m_PP3.m_MSA.GetSequence(k);
-			uint SeqIndex = Seq->GetGSI();
+			uint SeqIndex = GetGSIByLabel(Seq->m_Label);
 			asserta(SeqIndex < SeqCount);
 			MSA_InputOrder.m_Seqs[SeqIndex] = Seq;
 			}
@@ -85,7 +84,6 @@ void Muscle3::RunRO(const M3AlnParams &AP, const MultiSequence &InputSeqs)
 	{
 	asserta(m_AP != 0);
 	asserta(m_AP->m_Ready);
-	InputSeqs.AssertSequentialGSIs();
 	m_InputSeqs = &InputSeqs;
 	const uint SeqCount = InputSeqs.GetSeqCount();
 	vector<uint> Order;

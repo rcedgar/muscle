@@ -5,7 +5,7 @@
 #include "mpcflat_mega.h"
 
 // SMI = Sparse Matrix (posterior) Index
-//   same as index into m_InputSeqs
+//   same as index into m_InputSeqs << NOT WHEN PROFILE-PROFILE SUBSAMPLED
 const vector<vector<byte> > &MPCFlat_mega::GetProfile(uint SMI) const
 	{
 	asserta(SMI < SIZE(*m_ProfilePtrVec));

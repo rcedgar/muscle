@@ -63,10 +63,11 @@ void UClust::Run(MultiSequence &InputSeqs, float MinEA)
 	vector<uint> GSIToInputSeqIndex(GSICount, UINT_MAX);
 	for (uint SeqIndex = 0; SeqIndex < InputSeqCount; ++SeqIndex)
 		{
-		uint GSI = InputSeqs.GetGSI(SeqIndex);
+		const string Label = string(m_InputSeqs->GetLabel(SeqIndex));
+		uint GSI = GetGSIByLabel(Label);
 		asserta(GSI < GSICount);
 		asserta(GSIToInputSeqIndex[GSI] == UINT_MAX);
-		GSIToInputSeqIndex[GSI] = SeqIndex;;
+		GSIToInputSeqIndex[GSI] = SeqIndex;
 		}
 
 	uint CentroidCount = 0;
@@ -151,7 +152,7 @@ void UClust::GetGSIs(
 		{
 		uint CentroidSeqIndex = m_CentroidSeqIndexes[ClusterIndex];
 		const Sequence *Seq = m_InputSeqs->GetSequence(CentroidSeqIndex);
-		uint CentroidGSI = Seq->GetGSI();
+		uint CentroidGSI = GetGSIByLabel(Seq->m_Label);
 		CentroidGSIs.push_back(CentroidGSI);
 		}
 
@@ -166,8 +167,8 @@ void UClust::GetGSIs(
 		const Sequence *MemberSeq = m_InputSeqs->GetSequence(MemberSeqIndex);
 		const Sequence *CentroidSeq = m_InputSeqs->GetSequence(CentroidSeqIndex);
 
-		uint MemberGSI = MemberSeq->GetGSI();
-		uint MemberCentroidGSI = CentroidSeq->GetGSI();
+		uint MemberGSI = GetGSIByLabel(MemberSeq->m_Label);
+		uint MemberCentroidGSI = GetGSIByLabel(CentroidSeq->m_Label);
 
 		MemberGSIs.push_back(MemberGSI);
 		MemberCentroidGSIs.push_back(MemberCentroidGSI);

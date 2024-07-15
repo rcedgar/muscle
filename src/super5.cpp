@@ -115,7 +115,7 @@ void Super5::SetCentroidMSAVecs()
 	  ++CentroidMSASeqIndex)
 		{
 		const Sequence *Seq = m_CentroidMSA->GetSequence(CentroidMSASeqIndex);
-		uint GSI = Seq->GetGSI();
+		uint GSI = GetGSIByLabel(Seq->m_Label);
 		asserta(GSI < GlobalSeqCount);
 		if (m_GSIToCentroidMSASeqIndex[GSI] != UINT_MAX)
 			Die("Super5::SetCentroidMSAVecs() GSI=%u found twice (%u,%u)",
@@ -143,7 +143,7 @@ void Super5::SetCentroidSeqsVecs()
 	  ++CentroidSeqSeqIndex)
 		{
 		const Sequence *Seq = m_CentroidSeqs->GetSequence(CentroidSeqSeqIndex);
-		uint GSI = Seq->GetGSI();
+		uint GSI = GetGSIByLabel(Seq->m_Label);
 		asserta(GSI < GlobalSeqCount);
 		asserta(m_GSIToCentroidSeqsSeqIndex[GSI] == UINT_MAX);
 		m_GSIToCentroidSeqsSeqIndex[GSI] = CentroidSeqSeqIndex;
@@ -264,7 +264,8 @@ void Super5::LogClusters() const
 
 	for (uint GSI = 0; GSI < InputSeqCount; ++GSI)
 		{
-		const string &Label = GetGlobalInputSeqLabel(GSI);
+		string Label;
+		GetLabelByGSI(GSI, Label);
 		bool Dupe = m_IsDupe[GSI];
 		bool Centroid = m_IsCentroid[GSI];
 		bool Member = m_IsMember[GSI];
@@ -284,7 +285,7 @@ void Super5::LogClusters() const
 		uint CentroidGSI = m_GSIToCentroidGSI[GSI];
 		string CentroidLabel = "";
 		if (CentroidGSI != UINT_MAX)
-			CentroidLabel = GetGlobalInputSeqLabel(CentroidGSI);
+			GetLabelByGSI(CentroidGSI, CentroidLabel);
 
 		Log("%5u", GSI);
 		Log("  %3.3s", Cat);
@@ -367,7 +368,7 @@ void Super5::AlignMembers()
 	for (uint MemberIndex = 0; MemberIndex < MemberCount; ++MemberIndex)
 		{
 		uint MemberGSI = m_MemberGSIs[MemberIndex];
-		Sequence *MemberSeq = (Sequence *) &GetGlobalInputSeq(MemberGSI);
+		Sequence *MemberSeq = (Sequence *) &GetGlobalInputSeqByIndex(MemberGSI);
 		MemberSeqs->AddSequence(MemberSeq, false);
 
 		uint CentroidGSI = m_MemberCentroidGSIs[MemberIndex];
@@ -405,7 +406,7 @@ void Super5::AlignDupes()
 	  ++ExtendedSeqIndex)
 		{
 		const Sequence *Seq = m_ExtendedMSA->GetSequence(ExtendedSeqIndex);
-		uint GSI = Seq->GetGSI();
+		uint GSI = GetGSIByLabel(Seq->m_Label);
 		asserta(GSI < GSICount);
 		asserta(GSIToExtendedSeqIndex[GSI] == UINT_MAX);
 		GSIToExtendedSeqIndex[GSI] = ExtendedSeqIndex;
@@ -420,8 +421,8 @@ void Super5::AlignDupes()
 		asserta(RepExtendedSeqIndex < ExtendedSeqCount);
 		const Sequence *Rep = m_ExtendedMSA->GetSequence(RepExtendedSeqIndex);
 		Sequence *AlignedDupe = Rep->Clone();
-		AlignedDupe->OverwriteGSI(DupeGSI);
-		const string &Label = GetGlobalInputSeqLabel(DupeGSI);
+		string Label;
+		GetLabelByGSI(DupeGSI, Label);
 		AlignedDupe->OverwriteLabel(Label);
 		m_ExtendedMSA->AddSequence(AlignedDupe, true);
 		}

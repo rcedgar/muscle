@@ -661,8 +661,6 @@ Sequence *TransAln::ExtendFreshSeq(uint FreshIndex) const
 	uint MSACol = 0;
 	Sequence *FX = Sequence::NewSequence();
 	FX->InitData();
-	uint GSI = F.GetGSI();
-	FX->SetGSI(GSI);
 	FX->m_Label = F.m_Label;
 	uint FPos = 0;
 	for (uint Col = 0; Col < ColCount; ++Col)
@@ -704,8 +702,6 @@ Sequence *TransAln::ExtendMSASeq(uint MSAIndex) const
 	uint MSACol = 0;
 	Sequence *MX = Sequence::NewSequence();
 	MX->InitData();
-	uint GSI = M.GetGSI();
-	MX->SetGSI(GSI);
 	MX->m_Label = M.m_Label;
 	for (uint Col = 0; Col < ColCount; ++Col)
 		{

@@ -12,29 +12,28 @@
 class Sequence
 	{
 public:
-// Global input MulitSquence index
-	uint m_GSI = UINT_MAX;
-
-// Sparse matrix index
-	uint m_SMI = UINT_MAX;
+//// Global input MulitSquence index
+//	uint m_GSI = UINT_MAX;
+//
+//// Sparse matrix index
+//	uint m_SMI = UINT_MAX;
 
 	string m_Label;
 	vector<char> m_CharVec;
 
 private:
-	Sequence()
-		{
-		m_Label = "~";
-		m_GSI = UINT_MAX;
-		m_SMI = UINT_MAX;
-		}
+	Sequence() {}
+		//{
+		//m_Label = "~";
+		////m_GSI = UINT_MAX;
+		////m_SMI = UINT_MAX;
+		//}
 	~Sequence() {}
 
 public:
 	bool FromFileBuffer(FileBuffer& infile, bool stripGaps = false);
 
-	void Create(const vector<char> *m_CharVec, string m_Label,
-	  uint GSI, uint SMI);
+	void Create(const vector<char> *m_CharVec, string m_Label);
 
 	void FromString(const string &Label, const string &Seq);
 
@@ -78,31 +77,31 @@ public:
 		return m_CharVec[i];
 		}
 
-	void SetGSI(uint GSI)
-		{
-		asserta(m_GSI == UINT_MAX);
-		m_GSI = GSI;
-		}
+	//void SetGSI(uint GSI)
+	//	{
+	//	asserta(m_GSI == UINT_MAX);
+	//	m_GSI = GSI;
+	//	}
 
-	void OverwriteGSI(uint GSI)
-		{
-		m_GSI = GSI;
-		}
+	//void OverwriteGSI(uint GSI)
+	//	{
+	//	m_GSI = GSI;
+	//	}
 
 	void OverwriteLabel(const string &Label)
 		{
 		m_Label = Label;
 		}
 
-	uint GetSMI() const
-		{
-		return m_SMI;
-		}
+	//uint GetSMI() const
+	//	{
+	//	return m_SMI;
+	//	}
 
-	uint GetGSI() const
-		{
-		return m_GSI;
-		}
+	//uint GetGSI() const
+	//	{
+	//	return m_GSI;
+	//	}
 
 	uint GetLength() const
 		{

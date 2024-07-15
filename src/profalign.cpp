@@ -1,8 +1,6 @@
 #include "muscle.h"
 #include "locallock.h"
 
-//MultiSequence *MPCFlat::ProfAlign(const MultiSequence &MSA1,
-//  const MultiSequence &MSA2)
 static MultiSequence *ProfAlign(MPCFlat &M,
   const MultiSequence &MSA1,const MultiSequence &MSA2)
 	{
@@ -11,16 +9,12 @@ static MultiSequence *ProfAlign(MPCFlat &M,
 	uint SeqCount2 = MSA2.GetSeqCount();
 	uint ColCount2 = MSA2.GetColCount();
 
-	uint SMI = 0;
 	MultiSequence CombinedSeqs;
 	for (uint SeqIndex = 0; SeqIndex < SeqCount1; ++SeqIndex)
 		{
 		const Sequence *seq = MSA1.GetSequence(SeqIndex);
 		Sequence *seq2 = seq->CopyDeleteGaps();
 		CombinedSeqs.AddSequence(seq2, false);
-
-		Sequence *HackSeq = (Sequence *) seq;
-		HackSeq->m_SMI = SMI++;
 		}
 
 	for (uint SeqIndex = 0; SeqIndex < SeqCount2; ++SeqIndex)
@@ -28,9 +22,6 @@ static MultiSequence *ProfAlign(MPCFlat &M,
 		const Sequence *seq = MSA2.GetSequence(SeqIndex);
 		Sequence *seq2 = seq->CopyDeleteGaps();
 		CombinedSeqs.AddSequence(seq2, false);
-
-		Sequence *HackSeq = (Sequence *) seq;
-		HackSeq->m_SMI = SMI++;
 		}
 
 	M.InitSeqs(&CombinedSeqs);

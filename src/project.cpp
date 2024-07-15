@@ -24,8 +24,6 @@ MultiSequence* MultiSequence::Project(const set<int>& SeqIndexes)
 		int OldSeqIndex = *p;
 		const Sequence *OldSeq = GetSequence(OldSeqIndex);
 		const string &Label = OldSeq->m_Label;
-		uint GSI = OldSeq->GetGSI();
-		uint SMI = OldSeq->GetSMI();
 		uint L = OldSeq->GetLength();
 		if (OldColCount == UINT_MAX)
 			OldColCount = L;
@@ -34,8 +32,6 @@ MultiSequence* MultiSequence::Project(const set<int>& SeqIndexes)
 
 		Sequence *NewSeq = NewSequence(); 
 		NewSeq->m_Label = Label;
-		NewSeq->m_GSI = GSI;
-		NewSeq->m_SMI = SMI;
 		NewSeq->m_CharVec.reserve(L);
 		SubsetMSA->m_Seqs.push_back(NewSeq);
 		SubsetMSA->m_Owners.push_back(true);

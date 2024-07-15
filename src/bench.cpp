@@ -56,7 +56,6 @@ void Bench::LoadQ2(const string &FileName, const string &FaDir,
 		MultiSequence *MS = new MultiSequence;
 		const string &InputFileName = FaDir + RefName;
 		MS->LoadMFA(InputFileName, true);
-		MS->SetSequentialGSIs();
 		m_Inputs.push_back(MS);
 		}
 	}
@@ -87,7 +86,6 @@ void Bench::Load(const string &FileName, const string &RefDir)
 
 		MultiSequence *MS = new MultiSequence;
 		MS->LoadMFA(RefFileName, true);
-		MS->SetSequentialGSIs();
 		m_Inputs.push_back(MS);
 		}
 	}

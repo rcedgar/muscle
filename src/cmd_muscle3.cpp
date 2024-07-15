@@ -15,7 +15,6 @@ void cmd_muscle3()
 	AP.SetFromCmdLine(IsNucleo);
 	Muscle3 M3;
 	M3.m_AP = &AP;
-	InputSeqs.SetSequentialGSIs();
 	if (opt(muscle3_randomorder))
 		M3.RunRO(AP, InputSeqs);
 	else
