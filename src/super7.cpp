@@ -158,8 +158,19 @@ void cmd_super7()
 	Tree GuideTree;
 	if (optset_guidetreein)
 		GuideTree.FromFile(opt(guidetreein));
+	else if (optset_distmxin)
+		{
+		UPGMA5 U;
+		U.ReadDistMx2(opt(distmxin));
+		U.ScaleDistMx();
+		U.Run(LINKAGE_Avg, GuideTree);
+		}
 	else
+		{
+		if (Mega::m_Loaded)
+			Die("Must specify -guidetreein or -distmxin with mega");
 		CalcGuideTree_SW_BLOSUM62(InputSeqs, GuideTree);
+		}
 
 	SetAlpha(ALPHA_Amino);
 	InitProbcons();

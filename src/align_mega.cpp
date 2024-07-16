@@ -61,6 +61,7 @@ static void Align_Mega(MPCFlat_mega &M, MultiSequence &InputSeqs,
 
 void cmd_align_mega()
 	{
+	Die("_mega");
 	Mega::FromFile(g_Arg1);
 
 	MultiSequence InputSeqs;

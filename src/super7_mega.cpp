@@ -81,6 +81,7 @@ void Super7_mega::Run(MultiSequence &InputSeqs,
 
 void cmd_super7_mega()
 	{
+	Die("_mega");
 	uint ShrubSize = 32;
 	if (optset_shrub_size)
 		ShrubSize = opt(shrub_size);

@@ -85,11 +85,11 @@ C(squeeze_inserts)
 C(newbench_selectpfams)
 C(newbench_pfamgroups)
 C(mustang_core)
-C(align_mega)
+//C(align_mega)
 C(test_mega)
 C(shrub)
 C(super7)
-C(super7_mega)
+//C(super7_mega)
 C(swdistmx)
 
 #undef C
