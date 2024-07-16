@@ -39,8 +39,8 @@ void CalcEADistMx(FILE *f, MultiSequence* sequences,
 		const Sequence* seq1 = sequences->GetSequence(SeqIndex1);
 		const Sequence* seq2 = sequences->GetSequence(SeqIndex2);
 
-		const char *Label1 = seq1->m_Label.c_str();
-		const char *Label2 = seq2->m_Label.c_str();
+		const string &Label1 = seq1->m_Label;
+		const string &Label2 = seq2->m_Label;
 
 		Lock();
 		double MeanEA = (PairCounter == 0 ? 0 : SumEA/PairCounter);
@@ -51,11 +51,11 @@ void CalcEADistMx(FILE *f, MultiSequence* sequences,
 		string Path;
 		float EA;
 		if (SparsePostVec == 0)
-			EA = AlignPairFlat(seq1, seq2, Path);
+			EA = AlignPairFlat(Label1, Label2, Path);
 		else
 			{
 			MySparseMx *SparsePost = new MySparseMx;
-			EA = AlignPairFlat_SparsePost(seq1, seq2, Path, SparsePost);
+			EA = AlignPairFlat_SparsePost(Label1, Label2, Path, SparsePost);
 			SparsePostVec->push_back(SparsePost);
 			}
 
@@ -63,7 +63,7 @@ void CalcEADistMx(FILE *f, MultiSequence* sequences,
 		DistMx[SeqIndex1][SeqIndex2] = EA;
 		DistMx[SeqIndex2][SeqIndex1] = EA;
 		if (f != 0)
-			fprintf(f, "%s\t%s\t%.4g\n", Label1, Label2, EA);
+			fprintf(f, "%s\t%s\t%.4g\n", Label1.c_str(), Label2.c_str(), EA);
 		SumEA += EA;
 		Unlock();
 		}

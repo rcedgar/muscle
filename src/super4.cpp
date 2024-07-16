@@ -337,6 +337,9 @@ void Super4::Run(MultiSequence &InputSeqs, TREEPERM TreePerm)
 
 void cmd_super4()
 	{
+	if (optset_mega)
+		Die("-super4 does not support -mega, use -super7");
+
 	MultiSequence InputSeqs;
 	LoadInput(InputSeqs);
 

@@ -780,9 +780,11 @@ void cmd_transaln()
 
 		const Sequence *InputSeq = InputSeqs.GetSequence(InputSeqIndex);
 		const Sequence *RefSeq = UngappedRefSeqs.GetSequence(RefSeqIndex);
+		const string &InputLabel = InputSeq->m_Label;
+		const string &RefLabel = RefSeq->m_Label;
 
 		string PWPath;
-		AlignPairFlat(InputSeq, RefSeq, PWPath);
+		AlignPairFlat(InputLabel, RefLabel, PWPath);
 
 		PWPaths.push_back(PWPath);
 		}

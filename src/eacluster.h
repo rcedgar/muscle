@@ -19,7 +19,7 @@ public:
 	void Run(MultiSequence &InputSeqs, float MinEA);
 	void MakeClusterMFAs();
 	uint GetBestCentroid(uint SeqIndex, float MinEA, float &BestEA);
-	float AlignSeqPair(uint SeqIndex1, uint SeqIndex2);
+	float AlignSeqPair(const string &Label1, const string &Input2);
 	void WriteMFAs(const string &FileNamePattern) const;
 	void GetClusterMFAs(vector<MultiSequence *> &MFAs) const;
 	void Validate() const;

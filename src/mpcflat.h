@@ -69,7 +69,6 @@ public:
 	void AllocPairCount(uint SeqCount);
 	void FreeProgMSAs();
 	void FreeSparsePosts();
-	uint GetL(uint SeqIndex) const;
 	void InitSeqs(MultiSequence *InputSeqs);
 	void InitPairs();
 	void InitDistMx();

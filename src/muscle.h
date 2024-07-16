@@ -125,10 +125,10 @@ void CalcPosteriorFlat3(const MultiSequence &MSA1,
   const vector<uint> &SeqIndexes2,
   const vector<MySparseMx *> &SparseMxs,
   float *Flat);
-float AlignPairFlat(const Sequence *Seq1, const Sequence *Seq2, string &Path);
-float AlignPairFlat_SparsePost(const Sequence *Seq1, const Sequence *Seq2, string &Path,MySparseMx *SparsePost);
-float AlignPairFlat_mega(const Mega * M, string &Path, uint index_X, uint index_Y);
-float AlignPairFlat_mega_SparsePost(const Mega * M,string &Path, MySparseMx *SparsePost, uint index_X, uint index_Y);
+float AlignPairFlat(const string &Label1, const string &Label2, string &Path);
+float AlignPairFlat_SparsePost(const string &Label1, const string &Label2, string &Path, MySparseMx *SparsePost);
+//float AlignPairFlat_mega(const Mega * M, string &Path, uint index_X, uint index_Y);
+//float AlignPairFlat_mega_SparsePost(const Mega * M,string &Path, MySparseMx *SparsePost, uint index_X, uint index_Y);
 
 void GetAllPairs(uint SeqCount,
   vector<uint> &SeqIndexes1, vector<uint> &SeqIndexes2);
@@ -169,6 +169,10 @@ void CheckMegaOpts(bool Nucleo);
 uint GetGSIByLabel(const string &Label);
 void GetLabelByGSI(uint GSI, string &Label);
 uint GetSeqLengthByGSI(uint GSI);
+uint GetSeqLengthByGlobalLabel(const string &Label);
+const Sequence *GetSequenceByGlobalLabel(const string &Label);
 const Sequence *GetSequenceByGSI(uint GSI);
 const byte *GetByteSeqByGSI(uint GSI);
 void LoadInput(MultiSequence &InputSeqs);
+float *CalcPost(uint GSIX, uint GSIY);
+float *CalcPost(const string &Label1, const string &Label2);

@@ -26,14 +26,14 @@ public:
 	vector<uint> m_JoinMSAIndexes1;
 	vector<uint> m_JoinMSAIndexes2;
 
-// Members which know about HMM are virtual to
-//  allow subclass override in PProg_mega.
-public:
-	virtual void CalcFwdFlat_PProg(uint GSI1, uint L1, 
-	  uint GSI2, uint L2, float *Flat);
-
-	virtual void CalcBwdFlat_PProg(uint GSI1, uint L1, 
-	  uint GSI2, uint L2, float *Flat);
+//// Members which know about HMM are virtual to
+////  allow subclass override in PProg_mega.
+//public:
+//	virtual void CalcFwdFlat_PProg(uint GSI1, uint L1, 
+//	  uint GSI2, uint L2, float *Flat);
+//
+//	virtual void CalcBwdFlat_PProg(uint GSI1, uint L1, 
+//	  uint GSI2, uint L2, float *Flat);
 
 public:
 	float GetPostPairsAlignedFlat(const string &aProgressStr,

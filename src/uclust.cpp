@@ -7,9 +7,11 @@ float UClust::AlignSeqPair(uint SeqIndex1, uint SeqIndex2, string &Path)
 	Path.clear();
 	const Sequence *Seq1 = m_InputSeqs->GetSequence(SeqIndex1);
 	const Sequence *Seq2 = m_InputSeqs->GetSequence(SeqIndex2);
+	const string &Label1 = Seq1->m_Label;
+	const string &Label2 = Seq2->m_Label;
 	asserta(Seq1 != 0);
 	asserta(Seq2 != 0);
-	float EA = AlignPairFlat(Seq1, Seq2, Path);
+	float EA = AlignPairFlat(Label1, Label2, Path);
 	return EA;
 	}
 

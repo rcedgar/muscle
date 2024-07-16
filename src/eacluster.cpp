@@ -117,7 +117,9 @@ uint EACluster::GetBestCentroid(uint SeqIndex, float MinEA, float &BestEA)
 		if (Done)
 			continue;
 		uint TopSeqIndex = TopSeqIndexes[TopIndex];
-		float EA = AlignSeqPair(SeqIndex, TopSeqIndex);
+		const string &Label = m_InputSeqs->GetLabel(SeqIndex);
+		const string &TopLabel = m_InputSeqs->GetLabel(TopSeqIndex);
+		float EA = AlignSeqPair(Label, TopLabel);
 		Lock();
 		if (EA > MinEA && EA > BestEA)
 			{
@@ -196,13 +198,15 @@ void EACluster::MakeClusterMFAs()
 	AssertSameSeqsVec(*m_InputSeqs, m_ClusterMFAs);
 	}
 
-float EACluster::AlignSeqPair(uint SeqIndex1, uint SeqIndex2)
+float EACluster::AlignSeqPair(const string &Label1, const string &Label2)
 	{
-	const Sequence *Seq1 = m_InputSeqs->GetSequence(SeqIndex1);
-	const Sequence *Seq2 = m_InputSeqs->GetSequence(SeqIndex2);
+	//const Sequence *Seq1 = m_InputSeqs->GetSequence(SeqIndex1);
+	//const Sequence *Seq2 = m_InputSeqs->GetSequence(SeqIndex2);
+	const Sequence *Seq1 = GetSequenceByGlobalLabel(Label1);
+	const Sequence *Seq2 = GetSequenceByGlobalLabel(Label2);
 
 	string Path;
-	float EA = AlignPairFlat(Seq1, Seq2, Path);
+	float EA = AlignPairFlat(Label1, Label2, Path);
 	return EA;
 	}
 

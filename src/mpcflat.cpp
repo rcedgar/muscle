@@ -109,11 +109,6 @@ MySparseMx &MPCFlat::GetUpdatedSparsePost(uint PairIndex)
 	return *Mx;
 	}
 
-uint MPCFlat::GetL(uint SeqIndex) const
-	{
-	return m_MyInputSeqs->GetSeqLength(SeqIndex);
-	}
-
 uint MPCFlat::GetSeqCount() const
 	{
 	asserta(m_MyInputSeqs != 0);

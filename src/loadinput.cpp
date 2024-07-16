@@ -2,7 +2,7 @@
 
 void LoadInput(MultiSequence &InputSeqs)
 	{
-	if (opt(mega))
+	if (opt(mega) || EndsWith(g_Arg1, ".mega"))
 		{
 		Mega::FromFile(g_Arg1);
 		InputSeqs.FromStrings(Mega::m_Labels, Mega::m_Seqs);

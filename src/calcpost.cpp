@@ -34,3 +34,11 @@ float *CalcPost(uint GSIX, uint GSIY)
 	myfree(Bwd);
 	return Post;
 	}
+
+float *CalcPost(const string &Label1, const string &Label2)
+	{
+	uint GSI1 = GetGSIByLabel(Label1);
+	uint GSI2 = GetGSIByLabel(Label2);
+	float *Post = CalcPost(GSI1, GSI2);
+	return Post;
+	}

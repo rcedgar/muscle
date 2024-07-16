@@ -40,36 +40,39 @@ float PProg::GetPostPairsAlignedFlat(const string &aProgressStr,
 		asserta(SeqIndex2 < SeqCount2);
 		const string &Label1 = MSA1.GetLabelStr(SeqIndex1);
 		const string &Label2 = MSA2.GetLabelStr(SeqIndex2);
-		const uint GSI1 = GetGSIByLabel(Label1);
-		const uint GSI2 = GetGSIByLabel(Label2);
-		const uint L1 = GetSeqLengthByGSI(GSI1);
-		const uint L2 = GetSeqLengthByGSI(GSI2);
+		const uint L1 = GetSeqLengthByGlobalLabel(Label1);
+		const uint L2 = GetSeqLengthByGlobalLabel(Label2);
 
-		//const Sequence *gapped_seq1 = MSA1.GetSequence(SeqIndex1);
-		//const Sequence *gapped_seq2 = MSA2.GetSequence(SeqIndex2);
-		//Sequence *seq1 = gapped_seq1->CopyDeleteGaps();
-		//Sequence *seq2 = gapped_seq2->CopyDeleteGaps();
-		//const byte *ByteSeq1 = seq1->GetBytePtr();
-		//const byte *ByteSeq2 = seq2->GetBytePtr();
-		//const uint L1 = seq1->GetLength();
-		//const uint L2 = seq2->GetLength();
+		//const uint GSI1 = GetGSIByLabel(Label1);
+		//const uint GSI2 = GetGSIByLabel(Label2);
+		//const uint L1 = GetSeqLengthByGSI(GSI1);
+		//const uint L2 = GetSeqLengthByGSI(GSI2);
 
-		float *Fwd = AllocFB(L1, L2);
-		float *Bwd = AllocFB(L1, L2);
-		float *Post = AllocPost(L1, L2);
+		////const Sequence *gapped_seq1 = MSA1.GetSequence(SeqIndex1);
+		////const Sequence *gapped_seq2 = MSA2.GetSequence(SeqIndex2);
+		////Sequence *seq1 = gapped_seq1->CopyDeleteGaps();
+		////Sequence *seq2 = gapped_seq2->CopyDeleteGaps();
+		////const byte *ByteSeq1 = seq1->GetBytePtr();
+		////const byte *ByteSeq2 = seq2->GetBytePtr();
+		////const uint L1 = seq1->GetLength();
+		////const uint L2 = seq2->GetLength();
 
-		CalcFwdFlat_PProg(GSI1, L1, GSI2, L2, Fwd);
-		CalcBwdFlat_PProg(GSI1, L1, GSI2, L2, Bwd);
+		//float *Fwd = AllocFB(L1, L2);
+		//float *Bwd = AllocFB(L1, L2);
+		float *Post = CalcPost(Label1, Label2);
 
-		//CalcFwdFlat(ByteSeq1, L1, ByteSeq2, L2, Fwd);
-		//CalcBwdFlat(ByteSeq1, L1, ByteSeq2, L2, Bwd);
+		//CalcFwdFlat_PProg(GSI1, L1, GSI2, L2, Fwd);
+		//CalcBwdFlat_PProg(GSI1, L1, GSI2, L2, Bwd);
 
-		//DeleteSequence(seq1);
-		//DeleteSequence(seq2);
+		////CalcFwdFlat(ByteSeq1, L1, ByteSeq2, L2, Fwd);
+		////CalcBwdFlat(ByteSeq1, L1, ByteSeq2, L2, Bwd);
 
-		CalcPostFlat(Fwd, Bwd, L1, L2, Post);
-		delete Fwd;
-		delete Bwd;
+		////DeleteSequence(seq1);
+		////DeleteSequence(seq2);
+
+		//CalcPostFlat(Fwd, Bwd, L1, L2, Post);
+		//delete Fwd;
+		//delete Bwd;
 
 		float *DPRows = AllocDPRows(L1, L2);
 		char *TB = AllocTB(L1, L2);

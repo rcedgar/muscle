@@ -27,6 +27,20 @@ uint GetSeqLengthByGSI(uint GSI)
 	return L;
 	}
 
+uint GetSeqLengthByGlobalLabel(const string &Label)
+	{
+	uint GSI = GetGSIByLabel(Label);
+	uint L = GetSeqLengthByGSI(GSI);
+	return L;
+	}
+
+const Sequence *GetSequenceByGlobalLabel(const string &Label)
+	{
+	uint GSI = GetGSIByLabel(Label);
+	const Sequence *seq = GetSequenceByGSI(GSI);
+	return seq;
+	}
+
 const Sequence *GetSequenceByGSI(uint GSI)
 	{
 	return g_GlobalMS->GetSequence(GSI);

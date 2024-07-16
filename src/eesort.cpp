@@ -43,13 +43,15 @@ void cmd_eesort()
 		uint DBSeqIndex = uint(iDBSeqIndex);
 
 		const Sequence *DBSeq = DB.GetSequence(DBSeqIndex);
+		const string &DBLabel = DBSeq->m_Label;
 
 		for (uint QuerySeqIndex = 0; QuerySeqIndex < QuerySeqCount; ++QuerySeqIndex)
 			{
 			const Sequence *QSeq = Query.GetSequence(QuerySeqIndex);
+			const string &QLabel = QSeq->m_Label;
 
 			string Path;
-			double EA = AlignPairFlat(QSeq, DBSeq, Path);
+			double EA = AlignPairFlat(QLabel, DBLabel, Path);
 			if (QuerySeqIndex == 0)
 				{
 				Lock();
