@@ -5,6 +5,7 @@
 
 float ViterbiFastMem(XDPMem &Mem, const byte *A, uint LA,
   const byte *B, uint LB, PathInfo &PI);
+void WriteAlnPretty(FILE *f, const byte *A, const byte *B, const char *Path);
 
 void cmd_transalnref()
 	{
@@ -52,4 +53,6 @@ void cmd_transalnref()
 	string PathStr;
 	PI->GetPathStr(PathStr);
 	Log("Path=%s\n", PathStr.c_str());
+	WriteAlnPretty(g_fLog, (const byte *) R.c_str(), (const byte *) A.c_str(),
+	  PathStr.c_str());
 	}

@@ -1,5 +1,6 @@
 #include "muscle.h"
 #include "m3alnparams.h"
+#include "alpha.h"
 
 // src/blosum/matrices/blosumNN.sij 
 // Converted to C syntax by blosum_qij_reformat.py
@@ -150,4 +151,13 @@ void GetGapParams_Blosum(uint PctId, uint n, float *ptrGapOpen, float *ptrCenter
 
 #undef X
 	Die("GetGapParams_Blosum(%u, %u)", PctId, n);
+	}
+
+float GetBlosumScoreChars(byte a, byte b)
+	{
+	uint ia = g_CharToLetterAmino[a];
+	uint ib = g_CharToLetterAmino[b];
+	if (ia >= 20 || ib >= 20)
+		return 0;
+	return Blosum62_sij[ia][ib];
 	}

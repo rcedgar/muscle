@@ -223,3 +223,96 @@ void PathToColVecs(const string &PathXY,
 		}
 	}
 	}
+
+static void WriteAnnotRow(FILE *f, const byte *A, const byte *B, const char *Path,
+  unsigned i, unsigned j, unsigned ColLo, unsigned ColHi)
+	{
+	fprintf(f, "%5.5s ", "");
+	for (unsigned k = ColLo; k <= ColHi; ++k)
+		{
+		char c = Path[k];
+		if (c == 'M')
+			{
+			byte a = A[i++];
+			byte b = B[j++];
+			if (toupper(a) == toupper(b))
+				fprintf(f, "|");
+			else
+				fprintf(f, " ");
+			}
+		else
+			{
+			if (c == 'D')
+				++i;
+			else if (c == 'I')
+				++j;
+			else
+				asserta(false);
+			fprintf(f, " ");
+			}
+		}
+	fprintf(f, "\n");
+	}
+
+static void WriteBRow(FILE *f, const byte *B, const char *Path,
+  unsigned &j, unsigned ColLo, unsigned ColHi)
+	{
+	fprintf(f, "%5u ", j+1);
+	for (unsigned k = ColLo; k <= ColHi; ++k)
+		{
+		char c = Path[k];
+		if (c == 'M' || c == 'I')
+			fprintf(f, "%c", B[j++]);
+		else
+			fprintf(f, "-");
+		}
+	fprintf(f, " %u\n", j);
+	}
+
+static void WriteARow(FILE *f, const byte *A, const char *Path,
+  unsigned &i, unsigned ColLo, unsigned ColHi)
+	{
+	fprintf(f, "%5u ", i+1);
+	for (unsigned k = ColLo; k <= ColHi; ++k)
+		{
+		char c = Path[k];
+		if (c == 'M' || c == 'D')
+			fprintf(f, "%c", A[i++]);
+		else
+			fprintf(f, "-");
+		}
+	fprintf(f, " %u\n", i);
+	}
+
+void WriteAlnPretty(FILE *f, const byte *A, const byte *B, const char *Path)
+	{
+	const unsigned BLOCK_SIZE = 80;
+	unsigned ALo, BLo, ColLo, ColHi;
+	ALo = 0;
+	BLo = 0;
+	ColLo = 0;
+	ColHi = (unsigned) strlen(Path) - 1;
+
+	asserta(ColHi >= ColLo);
+
+	unsigned i = ALo;
+	unsigned j = BLo;
+	unsigned ColFrom = ColLo;
+	for (;;)
+		{
+		if (ColFrom > ColHi)
+			break;
+		unsigned ColTo = ColFrom + BLOCK_SIZE - 1;
+		if (ColTo > ColHi)
+			ColTo = ColHi;
+
+		unsigned i0 = i;
+		unsigned j0 = j;
+		WriteARow(f, A, Path, i, ColFrom, ColTo);
+		WriteAnnotRow(f, A, B, Path, i0, j0, ColFrom, ColTo);
+		WriteBRow(f, B, Path, j, ColFrom, ColTo);
+		fprintf(f, "\n");
+
+		ColFrom += BLOCK_SIZE;
+		}
+	}

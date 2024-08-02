@@ -7,63 +7,24 @@
 #include "alpha.h"
 #include <mutex>
 
-float g_Viterbi_GapOpen = FLT_MAX;
-float g_Viterbi_GapExt = FLT_MAX;
-float g_Viterbi_TermGapOpen = FLT_MAX;
-float g_Viterbi_TermGapExt = FLT_MAX;
-float **g_Viterbi_SubstMx_Char = 0;
-static float Blosum62[20][20];
+float g_Viterbi_GapOpen = -3;
+float g_Viterbi_GapExt = -0.5;
+
+float GetBlosumScoreChars(byte a, byte b);
 
 void GetSubstMx_Letter_Blosum(uint PctId, float Mx[20][20]);
 
-static bool g_InitParamsDone = false;
-static void SetParams()
-	{
-	static mutex mut;
-	mut.lock();
-	if (!g_InitParamsDone)
-		{
-		g_Viterbi_GapOpen = -6;
-		g_Viterbi_GapExt = -1;
-		g_Viterbi_TermGapExt = -1;
-		g_Viterbi_TermGapOpen = -6;
-		g_InitParamsDone = true;
-		GetSubstMx_Letter_Blosum(62, Blosum62);
-		g_Viterbi_SubstMx_Char = myalloc(float *, 256);
-		for (uint i = 0; i < 256; ++i)
-			{
-			g_Viterbi_SubstMx_Char[i] = myalloc(float, 256);
-			for (uint j = 0; j < 256; ++j)
-				g_Viterbi_SubstMx_Char[i][j] = 0;
-			}
-
-		for (uint i = 0; i < 20; ++i)
-			{
-			char ci = g_LetterToCharAmino[i];
-			for (uint j = 0; j < 20; ++j)
-				{
-				char cj = g_LetterToCharAmino[i];
-				float Score = Blosum62[i][j];
-				g_Viterbi_SubstMx_Char[ci][cj] = Score;
-				}
-			}
-		g_InitParamsDone = true;
-		}
-	mut.unlock();
-	}
-
-float ViterbiFastMem(XDPMem &Mem, const byte *A, uint LA,
-  const byte *B, uint LB, PathInfo &PI)
+float ViterbiFastMem(XDPMem &Mem, const byte *A, unsigned LA,
+  const byte *B, unsigned LB, PathInfo &PI)
 	{
 	if (LA*LB > 100*1000*1000)
 		Die("ViterbiFastMem, seqs too long LA=%u, LB=%u", LA, LB);
-	SetParams();
 
 	Mem.Alloc(LA, LB);
 	PI.Alloc2(LA, LB);
 	
-	float OpenA = g_Viterbi_TermGapOpen;
-	float ExtA = g_Viterbi_TermGapExt;
+	float OpenA = g_Viterbi_GapOpen;
+	float ExtA = g_Viterbi_GapExt;
 
 	float *Mrow = Mem.GetDPRow1();
 	float *Drow = Mem.GetDPRow2();
@@ -78,13 +39,12 @@ float ViterbiFastMem(XDPMem &Mem, const byte *A, uint LA,
 		}
 	
 // Main loop
-	float M0 = float (0);
+	float M0 = float(0);
 	for (unsigned i = 0; i < LA; ++i)
 		{
 		byte a = A[i];
-		const float *MxRow = g_Viterbi_SubstMx_Char[a];
-		float OpenB = g_Viterbi_TermGapOpen;
-		float ExtB = g_Viterbi_TermGapExt;
+		float OpenB = g_Viterbi_GapOpen;
+		float ExtB = g_Viterbi_GapExt;
 		float I0 = MINUS_INFINITY;
 
 		byte *TBrow = TB[i];
@@ -96,6 +56,10 @@ float ViterbiFastMem(XDPMem &Mem, const byte *A, uint LA,
 
 		// MATCH
 			{
+		// M0 = DPM[i][j]
+		// I0 = DPI[i][j]
+		// Drow[j] = DPD[i][j]
+
 			float xM = M0;
 			if (Drow[j] > xM)
 				{
@@ -109,12 +73,14 @@ float ViterbiFastMem(XDPMem &Mem, const byte *A, uint LA,
 				}
 			M0 = Mrow[j];
 
-		// Mrow[j] = xM + (toupper(a) == toupper(b) ? MATCH_SCORE : MISMATCH_SCORE);
-			Mrow[j] = xM + MxRow[b];
+			Mrow[j] = xM + GetBlosumScoreChars(a, b); // MxRow[b];
+		// Mrow[j] = DPM[i+1][j+1])
 			}
 			
 		// DELETE
 			{
+		// SavedM0 = DPM[i][j]
+		// Drow[j] = DPD[i][j]
 			float md = SavedM0 + OpenB;
 			Drow[j] += ExtB;
 			if (md >= Drow[j])
@@ -122,10 +88,13 @@ float ViterbiFastMem(XDPMem &Mem, const byte *A, uint LA,
 				Drow[j] = md;
 				TraceBits |= TRACEBITS_MD;
 				}
+		// Drow[j] = DPD[i+1][j]
 			}
 			
 		// INSERT
 			{
+		// SavedM0 = DPM[i][j]
+		// I0 = DPI[i][j]
 			float mi = SavedM0 + OpenA;
 			I0 += ExtA;
 			if (mi >= I0)
@@ -144,20 +113,24 @@ float ViterbiFastMem(XDPMem &Mem, const byte *A, uint LA,
 		
 	// Special case for end of Drow[]
 		{
+	// M0 = DPM[i][LB]
+	// Drow[LB] = DPD[i][LB]
+		
 		TBrow[LB] = 0;
-		float md = M0 + g_Viterbi_TermGapOpen;
-		Drow[LB] += g_Viterbi_TermGapExt;
+		float md = M0 + g_Viterbi_GapOpen; // g_VAP.ROpenB;
+		Drow[LB] += g_Viterbi_GapExt; // AP.RExtB;
 		if (md >= Drow[LB])
 			{
 			Drow[LB] = md;
 			TBrow[LB] = TRACEBITS_MD;
 			}
+	// Drow[LB] = DPD[i+1][LB]
 		}
 		
 		M0 = MINUS_INFINITY;
 
-		OpenA = g_Viterbi_GapOpen;
-		ExtA = g_Viterbi_GapExt;
+		OpenA = g_Viterbi_GapOpen; // AP.OpenA;
+		ExtA = g_Viterbi_GapExt; // AP.ExtA;
 		}
 	
 // Special case for last row of DPI
@@ -169,8 +142,8 @@ float ViterbiFastMem(XDPMem &Mem, const byte *A, uint LA,
 	// I1 = DPI[LA][j]
 		
 		TBrow[j] = 0;
-		float mi = Mrow[int(j)-1] + g_Viterbi_TermGapOpen;
-		I1 += g_Viterbi_TermGapExt;
+		float mi = Mrow[int(j)-1] + g_Viterbi_GapOpen; // AP.ROpenA;
+		I1 += g_Viterbi_GapExt; // AP.RExtA;
 		if (mi > I1)
 			{
 			I1 = mi;
