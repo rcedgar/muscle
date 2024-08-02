@@ -371,6 +371,7 @@
     <ClCompile Include="test_malloc.cpp" />
     <ClCompile Include="test_mega.cpp" />
     <ClCompile Include="tracebackbitmem.cpp" />
+    <ClCompile Include="transalnref.cpp" />
     <ClCompile Include="tree.cpp" />
     <ClCompile Include="tree2.cpp" />
     <ClCompile Include="tree4.cpp" />

@@ -4,19 +4,60 @@
 #include "pathinfo.h"
 #include "m3alnparams.h"
 #include "viterbiparams.h"
+#include "alpha.h"
+#include <mutex>
 
 float g_Viterbi_GapOpen = FLT_MAX;
 float g_Viterbi_GapExt = FLT_MAX;
 float g_Viterbi_TermGapOpen = FLT_MAX;
 float g_Viterbi_TermGapExt = FLT_MAX;
 float **g_Viterbi_SubstMx_Char = 0;
+static float Blosum62[20][20];
+
+void GetSubstMx_Letter_Blosum(uint PctId, float Mx[20][20]);
+
+static bool g_InitParamsDone = false;
+static void SetParams()
+	{
+	static mutex mut;
+	mut.lock();
+	if (!g_InitParamsDone)
+		{
+		g_Viterbi_GapOpen = -6;
+		g_Viterbi_GapExt = -1;
+		g_Viterbi_TermGapExt = -1;
+		g_Viterbi_TermGapOpen = -6;
+		g_InitParamsDone = true;
+		GetSubstMx_Letter_Blosum(62, Blosum62);
+		g_Viterbi_SubstMx_Char = myalloc(float *, 256);
+		for (uint i = 0; i < 256; ++i)
+			{
+			g_Viterbi_SubstMx_Char[i] = myalloc(float, 256);
+			for (uint j = 0; j < 256; ++j)
+				g_Viterbi_SubstMx_Char[i][j] = 0;
+			}
+
+		for (uint i = 0; i < 20; ++i)
+			{
+			char ci = g_LetterToCharAmino[i];
+			for (uint j = 0; j < 20; ++j)
+				{
+				char cj = g_LetterToCharAmino[i];
+				float Score = Blosum62[i][j];
+				g_Viterbi_SubstMx_Char[ci][cj] = Score;
+				}
+			}
+		g_InitParamsDone = true;
+		}
+	mut.unlock();
+	}
 
 float ViterbiFastMem(XDPMem &Mem, const byte *A, uint LA,
   const byte *B, uint LB, PathInfo &PI)
 	{
-	Die("TODO -- params");
 	if (LA*LB > 100*1000*1000)
 		Die("ViterbiFastMem, seqs too long LA=%u, LB=%u", LA, LB);
+	SetParams();
 
 	Mem.Alloc(LA, LB);
 	PI.Alloc2(LA, LB);

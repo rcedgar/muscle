@@ -614,6 +614,9 @@
     <ClCompile Include="loadinput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="transalnref.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">
