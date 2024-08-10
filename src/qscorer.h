@@ -53,7 +53,7 @@ public:
 
 public:
 	void Clear();
-	void Run(const string &Name, const MSA &Test, const MSA &Ref);
+	bool Run(const string &Name, const MSA &Test, const MSA &Ref);
 	void Run(const string &Name, const MultiSequence &Test, const MultiSequence &Ref);
 	void CmpRefMSAs(const string &Name, const MSA &Test, const MSA &Ref);
 

@@ -69,6 +69,7 @@ HDRS = \
   pathinfo.h \
   pprog.h \
   pprog3.h \
+  pprog_mega.h \
   profile3.h \
   profpos3.h \
   pwpath.h \
@@ -85,7 +86,9 @@ HDRS = \
   super4.h \
   super5.h \
   super6.h \
+  super7.h \
   sweeper.h \
+  swtrace.h \
   textfile.h \
   timing.h \
   tracebit.h \
@@ -105,17 +108,23 @@ HDRS = \
 OBJS = \
   $(OBJDIR)/addconfseq.o \
   $(OBJDIR)/align.o \
-  $(OBJDIR)/alignpairflat_mega.o \
+  $(OBJDIR)/alignmsasbycols.o \
   $(OBJDIR)/align_mega.o \
+  $(OBJDIR)/alnmsasflat_mega.o \
+  $(OBJDIR)/blosumsmx.o \
   $(OBJDIR)/bwdflat_mega.o \
+  $(OBJDIR)/calcpost.o \
   $(OBJDIR)/cmd_cmp_msa.o \
   $(OBJDIR)/cmd_m3ensemble.o \
   $(OBJDIR)/cmd_mustang_core.o \
   $(OBJDIR)/cmd_newbench_pfamgroups.o \
   $(OBJDIR)/cmd_newbench_selectpfams.o \
   $(OBJDIR)/cmd_squeeze_inserts.o \
+  $(OBJDIR)/cmp_ref_msas.o \
   $(OBJDIR)/fwdflat_mega.o \
+  $(OBJDIR)/getpostpairsalignedflat_mega.o \
   $(OBJDIR)/hscore.o \
+  $(OBJDIR)/loadinput.o \
   $(OBJDIR)/m3alnparams.o \
   $(OBJDIR)/alignpairflat.o \
   $(OBJDIR)/allocflat.o \
@@ -209,6 +218,7 @@ OBJS = \
   $(OBJDIR)/pprog2.o \
   $(OBJDIR)/pprog3.o \
   $(OBJDIR)/pprogt.o \
+  $(OBJDIR)/pprog_mega.o \
   $(OBJDIR)/pprog_tree.o \
   $(OBJDIR)/probcons.o \
   $(OBJDIR)/msa.o \
@@ -232,9 +242,12 @@ OBJS = \
   $(OBJDIR)/relabel.o \
   $(OBJDIR)/repredict.o \
   $(OBJDIR)/resample.o \
+  $(OBJDIR)/runthreads.o \
   $(OBJDIR)/scoretest.o \
   $(OBJDIR)/searchpd.o \
   $(OBJDIR)/seqinfo.o \
+  $(OBJDIR)/showseqstats.o \
+  $(OBJDIR)/shrub.o \
   $(OBJDIR)/simplecluster.o \
   $(OBJDIR)/spatter.o \
   $(OBJDIR)/stripgappy.o \
@@ -242,12 +255,17 @@ OBJS = \
   $(OBJDIR)/strip_anchors.o \
   $(OBJDIR)/substmxfromfile.o \
   $(OBJDIR)/super6.o \
+  $(OBJDIR)/super7.o \
+  $(OBJDIR)/super7_mega.o \
+  $(OBJDIR)/sw.o \
+  $(OBJDIR)/swdistmx.o \
   $(OBJDIR)/sweep.o \
   $(OBJDIR)/sweeper.o \
   $(OBJDIR)/test.o \
   $(OBJDIR)/test_malloc.o \
   $(OBJDIR)/test_mega.o \
   $(OBJDIR)/tracebackbitmem.o \
+  $(OBJDIR)/transalnref.o \
   $(OBJDIR)/tree.o \
   $(OBJDIR)/tree2.o \
   $(OBJDIR)/tree4.o \
@@ -290,7 +308,6 @@ OBJS = \
   $(OBJDIR)/usage.o \
   $(OBJDIR)/usorter.o \
   $(OBJDIR)/viterbifastmem.o \
-  $(OBJDIR)/vtml2.o \
 
 .PHONY: clean
 

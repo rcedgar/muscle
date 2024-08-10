@@ -191,7 +191,7 @@ void QScorer::InitColPosVecs()
 	{
 	const uint N = SIZE(m_RefSeqIndexes);
 	if (N == 0)
-		Die("No ref labels found in test MSA %s", m_Name.c_str());
+		Die("No matches to ref found in test MSA %s", m_Name.c_str());
 
 	m_PosToTestColVec.clear();
 	m_PosToRefColVec.clear();
@@ -343,7 +343,7 @@ void QScorer::Run(const string &Name, const MultiSequence &Test, const MultiSequ
 	Run(Name, *msaTest, *msaRef);
 	}
 
-void QScorer::Run(const string &Name, const MSA &Test, const MSA &Ref)
+bool QScorer::Run(const string &Name, const MSA &Test, const MSA &Ref)
 	{
 	Clear();
 
@@ -367,6 +367,11 @@ void QScorer::Run(const string &Name, const MSA &Test, const MSA &Ref)
 		InitRefLabels();
 		InitRefToTest();
 		}
+	if (m_RefSeqIndexes.empty())
+		{
+		Warning("No ref matches to %s", Name.c_str());
+		return false;
+		}
 	InitColPosVecs();
 	InitRefCols();
 	InitRefUngappedCounts();
@@ -375,6 +380,7 @@ void QScorer::Run(const string &Name, const MSA &Test, const MSA &Ref)
 
 	m_Q = float(m_CorrectPairs)/float(m_TotalPairs);
 	m_TC = float(m_CorrectCols)/float(m_RefAlignedColCount);
+	return true;
 	}
 
 void QScorer::UpdateRefLetterCountsCol(uint k,

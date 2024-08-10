@@ -48,6 +48,7 @@ void cmd_qscoredir()
 
 	const uint NameCount = SIZE(Names);
 	uint N = 0;
+	uint M = 0;
 	for (uint i = 0; i < NameCount; ++i)
 		{
 		ProgressStep(i, NameCount, "%s  Q %.2f TC %.2f",
@@ -75,8 +76,14 @@ void cmd_qscoredir()
 
 		QScorer QS;
 		QS.m_MaxGapFract = MaxGapFract;
-		QS.Run(Name, Test, Ref);
-		Pf(fOut, "set=%s	q=%.4f	tc=%.4f\n", Name.c_str(), QS.m_Q, QS.m_TC); 
+		bool Ok = QS.Run(Name, Test, Ref);
+		if (Ok)
+			{
+			++M;
+			Pf(fOut, "set=%s\tq=%.4f\ttc=%.4f\n", Name.c_str(), QS.m_Q, QS.m_TC);
+			}
+		else
+			Pf(fOut, "set=%s\tNOMATCH\n", Name.c_str()); 
 
 		SumQ += QS.m_Q;
 		SumTC += QS.m_TC;
@@ -85,7 +92,14 @@ void cmd_qscoredir()
 		AvgTC = SumTC/N;
 		}
 
-	Pf(fOut, "testdir=%s n=%u	N=%u	avgq=%.4f	avgtc=%.4f\n", 
-	  TestDir.c_str(), NameCount, N, AvgQ, AvgTC);
+	AvgQ = 0;
+	AvgTC = 0;
+	if (M > 0)
+		{
+		AvgQ = SumQ/M;
+		AvgTC = SumTC/M;
+		}
+	Pf(fOut, "testdir=%\tn=%u\tN=%u\t%u\tavgq=%.4f\tavgtc=%.4f\n", 
+	  TestDir.c_str(), NameCount, N, M, AvgQ, AvgTC);
 	CloseStdioFile(fOut);
 	}
