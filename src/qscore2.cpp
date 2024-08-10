@@ -99,7 +99,7 @@ void cmd_qscoredir()
 		AvgQ = SumQ/M;
 		AvgTC = SumTC/M;
 		}
-	Pf(fOut, "testdir=%\tn=%u\tN=%u\t%u\tavgq=%.4f\tavgtc=%.4f\n", 
+	Pf(fOut, "testdir=%s\tn=%u\tN=%u\tM=%u\tavgq=%.4f\tavgtc=%.4f\n", 
 	  TestDir.c_str(), NameCount, N, M, AvgQ, AvgTC);
 	CloseStdioFile(fOut);
 	}
