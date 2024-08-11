@@ -55,14 +55,6 @@ void cmd_align()
 	{
 	MultiSequence InputSeqs;
 	LoadInput(InputSeqs);
-	//if (opt(mega))
-	//	{
-	//	Mega::FromFile(g_Arg1);
-	//	InputSeqs.FromStrings(Mega::m_Labels, Mega::m_Seqs);
-	//	}
-	//else
-	//	InputSeqs.LoadMFA(opt(align), true);
-	//SetGlobalInputMS(InputSeqs);
 	const uint InputSeqCount = InputSeqs.GetSeqCount();
 	if (optset_minsuper && InputSeqCount >= opt(minsuper))
 		{
@@ -82,7 +74,7 @@ void cmd_align()
 	if (OutputPattern.empty())
 		Die("Must set -output");
 
-	ShowSeqStats(InputSeqs);
+	//ShowSeqStats(InputSeqs);
 
 	bool OutputWildcard = OutputPattern.find('@') != string::npos;
 	FILE *fOut = 0;

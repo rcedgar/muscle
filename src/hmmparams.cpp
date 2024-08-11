@@ -281,7 +281,8 @@ void HMMParams::FromDefaults(bool Nucleo)
 
 void HMMParams::CmdLineUpdate()
 	{
-	if (!optset_m_is && !optset_m_il && !optset_is_is && !optset_il_il)
+	if (!optset_m_is && !optset_m_il && !optset_is_is && !optset_il_il
+	  && !optset_s_is && !optset_s_il)
 		return;
 	asserta(!m_Logs);
 	if (optset_s_is)	m_Trans[HMMTRANS_START_IS] = (float) opt(s_is);
