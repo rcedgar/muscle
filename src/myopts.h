@@ -104,6 +104,8 @@ FLT_OPT(gapopen)
 FLT_OPT(gapext)
 FLT_OPT(center)
 
+FLT_OPT(s_is)
+FLT_OPT(s_il)
 FLT_OPT(m_is)
 FLT_OPT(m_il)
 FLT_OPT(is_is)

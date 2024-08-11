@@ -284,6 +284,8 @@ void HMMParams::CmdLineUpdate()
 	if (!optset_m_is && !optset_m_il && !optset_is_is && !optset_il_il)
 		return;
 	asserta(!m_Logs);
+	if (optset_s_is)	m_Trans[HMMTRANS_START_IS] = (float) opt(s_is);
+	if (optset_s_il)	m_Trans[HMMTRANS_START_IL] = (float) opt(s_il);
 	if (optset_m_is)	m_Trans[HMMTRANS_M_IS] = (float) opt(m_is);
 	if (optset_m_il)	m_Trans[HMMTRANS_M_IL] = (float) opt(m_il);
 	if (optset_is_is)	m_Trans[HMMTRANS_IS_IS] = (float) opt(is_is);
