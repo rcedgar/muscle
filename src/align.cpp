@@ -40,7 +40,6 @@ static void Align(MPCFlat &M, MultiSequence &InputSeqs,
 
 	M.m_TreePerm = TP;
 	M.Run(&InputSeqs);
-	DeleteTermPad(*M.m_MSA);
 
 	asserta(M.m_MSA != 0);
 

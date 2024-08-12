@@ -177,30 +177,6 @@ void Sequence::GetColToPos(vector<uint> &ColToPos) const
 		}
 	}
 
-Sequence *Sequence::TermPad() const
-	{
-	Sequence* ret = NewSequence();
-	asserta(ret);
-
-	ret->m_Label = m_Label;
-	ret->m_CharVec.clear();
-	uint L = GetLength();
-
-	for (uint i = 0; i < TERM_PAD_LENGTH; ++i)
-		ret->m_CharVec.push_back(LEFT_TERM_PAD_CHAR);
-
-	for (uint i = 0; i < L; ++i)
-		{
-		char c = m_CharVec[i];
-		ret->m_CharVec.push_back(c);
-		}
-
-	for (uint i = 0; i < TERM_PAD_LENGTH; ++i)
-		ret->m_CharVec.push_back(RIGHT_TERM_PAD_CHAR);
-
-	return ret;
-	}
-
 Sequence *Sequence::CopyDeleteGaps() const
 	{
 	Sequence* ret = NewSequence();

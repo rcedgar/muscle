@@ -366,7 +366,6 @@
     <ClCompile Include="swdistmx.cpp" />
     <ClCompile Include="sweep.cpp" />
     <ClCompile Include="sweeper.cpp" />
-    <ClCompile Include="termpad.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="test_malloc.cpp" />
     <ClCompile Include="test_mega.cpp" />

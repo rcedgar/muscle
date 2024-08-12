@@ -9,9 +9,9 @@
 #include <cstdlib>
 #include "filebuffer.h"
 
-static const char LEFT_TERM_PAD_CHAR = '<';
-static const char RIGHT_TERM_PAD_CHAR = '>';
-static const uint TERM_PAD_LENGTH = 3;
+//static const char LEFT_TERM_PAD_CHAR = '<';
+//static const char RIGHT_TERM_PAD_CHAR = '>';
+//static const uint TERM_PAD_LENGTH = 3;
 
 class Sequence
 	{
@@ -80,7 +80,6 @@ public:
 	Sequence *Clone() const;
 	Sequence *AddGapsPath(const string &Path, char id) const;
 	Sequence *CopyDeleteGaps() const;
-	Sequence *TermPad() const;
 	void GetPosToCol(vector<uint> &PosToCol) const;
 	void GetColToPos(vector<uint> &ColToPos) const;
 	void LogMe() const;

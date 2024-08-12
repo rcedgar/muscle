@@ -614,9 +614,6 @@
     <ClCompile Include="transalnref.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="termpad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

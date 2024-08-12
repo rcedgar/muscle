@@ -126,7 +126,7 @@ void Mega::CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
 	AssertSymmetrical(LogProbMx);
 	}
 
-void Mega::FromFile(const string &FileName, bool TermPad)
+void Mega::FromFile(const string &FileName)
 	{
 	m_Loaded = true;
 
@@ -208,23 +208,7 @@ void Mega::FromFile(const string &FileName, bool TermPad)
 		m_LabelToIdx[Label] = ProfileIdx;
         m_Labels.push_back(Label);
         const uint L = StrToUint(flds[3]);
-		uint ProfileBase = 0;
-		if (TermPad)
-			{
-	        Profile.resize(L + 2*TERM_PAD_LENGTH);
-			ProfileBase = TERM_PAD_LENGTH;
-			}
-		else
-	        Profile.resize(L);
-		if (TermPad)
-			{
-			for (uint i = 0; i < TERM_PAD_LENGTH; ++i)
-				{
-				S += LEFT_TERM_PAD_CHAR;
-	            for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
-					Profile[i].push_back(0);
-				}
-			}
+        Profile.resize(L);
         for (uint Pos = 0; Pos < L; ++Pos)
 		    {
             GetNextFields(flds, 3);
@@ -238,24 +222,15 @@ void Mega::FromFile(const string &FileName, bool TermPad)
                 if (FeatureIdx == 0)
 				    {
                     uint Letter = g_CharToLetterAmino[Sym];
-                    Profile[ProfileBase + Pos].push_back(Letter);
+                    Profile[Pos].push_back(Letter);
                     S += Sym;
 					}
                 else
 					{
                     uint Letter = uint(Sym - 'A');
                     asserta(Letter < 16);
-                    Profile[ProfileBase + Pos].push_back(Letter);
+                    Profile[Pos].push_back(Letter);
 					}
-				}
-			}
-		if (TermPad)
-			{
-			for (uint i = 0; i < TERM_PAD_LENGTH; ++i)
-				{
-				S += RIGHT_TERM_PAD_CHAR;
-	            for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
-					Profile[ProfileBase+L+i].push_back(0);
 				}
 			}
 		}
