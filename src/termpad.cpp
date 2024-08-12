@@ -43,6 +43,7 @@ static void GetColRange(const Sequence &seq, uint ColCount,
 
 void DeleteTermPad(MultiSequence &Seqs)
 	{
+	return;
 	const uint SeqCount = Seqs.GetSeqCount();
 	if (SeqCount == 0)
 		Die("DeleteTermPad(): empty input");

@@ -26,7 +26,7 @@ public:
 	static bool m_Loaded;
 
 public:
-	static void FromFile(const string &FileName);
+	static void FromFile(const string &FileName, bool TermPad);
 	static uint GetFeatureCount() { return m_FeatureCount; }
 	static const string &GetNextLine();
 	static void GetNextFields(vector<string> &Fields,

@@ -11,7 +11,7 @@
 
 static const char LEFT_TERM_PAD_CHAR = '<';
 static const char RIGHT_TERM_PAD_CHAR = '>';
-static const uint TERM_PAD_LENGTH = 3;
+static const uint TERM_PAD_LENGTH = 10;
 
 class Sequence
 	{

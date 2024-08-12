@@ -130,7 +130,6 @@ void cmd_align()
 		fOut = CreateStdioFile(OutputFileName);
 		Align(M, InputSeqs, PerturbSeed, TP, false, fOut);
 		CloseStdioFile(fOut);
-		exit(0);
 		return;
 		}
 

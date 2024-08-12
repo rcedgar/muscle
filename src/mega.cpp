@@ -126,7 +126,7 @@ void Mega::CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
 	AssertSymmetrical(LogProbMx);
 	}
 
-void Mega::FromFile(const string &FileName)
+void Mega::FromFile(const string &FileName, bool TermPad)
 	{
 	m_Loaded = true;
 
@@ -208,7 +208,23 @@ void Mega::FromFile(const string &FileName)
 		m_LabelToIdx[Label] = ProfileIdx;
         m_Labels.push_back(Label);
         const uint L = StrToUint(flds[3]);
-        Profile.resize(L);
+		uint ProfileBase = 0;
+		if (TermPad)
+			{
+	        Profile.resize(L + 2*TERM_PAD_LENGTH);
+			ProfileBase = TERM_PAD_LENGTH;
+			}
+		else
+	        Profile.resize(L);
+		if (TermPad)
+			{
+			for (uint i = 0; i < TERM_PAD_LENGTH; ++i)
+				{
+				S += LEFT_TERM_PAD_CHAR;
+	            for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
+					Profile[i].push_back(0);
+				}
+			}
         for (uint Pos = 0; Pos < L; ++Pos)
 		    {
             GetNextFields(flds, 3);
@@ -222,15 +238,24 @@ void Mega::FromFile(const string &FileName)
                 if (FeatureIdx == 0)
 				    {
                     uint Letter = g_CharToLetterAmino[Sym];
-                    Profile[Pos].push_back(Letter);
+                    Profile[ProfileBase + Pos].push_back(Letter);
                     S += Sym;
 					}
                 else
 					{
                     uint Letter = uint(Sym - 'A');
                     asserta(Letter < 16);
-                    Profile[Pos].push_back(Letter);
+                    Profile[ProfileBase + Pos].push_back(Letter);
 					}
+				}
+			}
+		if (TermPad)
+			{
+			for (uint i = 0; i < TERM_PAD_LENGTH; ++i)
+				{
+				S += RIGHT_TERM_PAD_CHAR;
+	            for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
+					Profile[ProfileBase+L+i].push_back(0);
 				}
 			}
 		}
@@ -255,8 +280,10 @@ float Mega::GetMatchScore(
   const vector<vector<byte> > &ProfileX, uint PosX,
   const vector<vector<byte> > &ProfileY, uint PosY)
 	{
-	asserta(PosX < SIZE(ProfileX));
-	asserta(PosY < SIZE(ProfileY));
+	const uint LX = SIZE(ProfileX);
+	const uint LY = SIZE(ProfileY);
+	asserta(PosX < LX);
+	asserta(PosY < LY);
 	const vector<byte> &ProfColX = ProfileX[PosX];
 	const vector<byte> &ProfColY = ProfileY[PosY];
 	float Score = 0;
@@ -265,7 +292,8 @@ float Mega::GetMatchScore(
 		const vector<vector<float> > &SubstMx = m_LogProbMxVec[i];
 		byte LetterX = ProfColX[i];
 		byte LetterY = ProfColY[i];
-		Score += SubstMx[LetterX][LetterY]*m_Weights[i];
+		float LetterPairScore = SubstMx[LetterX][LetterY];
+		Score += LetterPairScore*m_Weights[i];
 		}
 	return Score;
 	}

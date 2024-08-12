@@ -109,7 +109,6 @@ OBJS = \
   $(OBJDIR)/addconfseq.o \
   $(OBJDIR)/align.o \
   $(OBJDIR)/alignmsasbycols.o \
-  $(OBJDIR)/align_mega.o \
   $(OBJDIR)/alnmsasflat_mega.o \
   $(OBJDIR)/blosumsmx.o \
   $(OBJDIR)/bwdflat_mega.o \
@@ -261,6 +260,7 @@ OBJS = \
   $(OBJDIR)/swdistmx.o \
   $(OBJDIR)/sweep.o \
   $(OBJDIR)/sweeper.o \
+  $(OBJDIR)/termpad.o \
   $(OBJDIR)/test.o \
   $(OBJDIR)/test_malloc.o \
   $(OBJDIR)/test_mega.o \
