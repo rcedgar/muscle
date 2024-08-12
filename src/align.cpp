@@ -40,6 +40,7 @@ static void Align(MPCFlat &M, MultiSequence &InputSeqs,
 
 	M.m_TreePerm = TP;
 	M.Run(&InputSeqs);
+	DeleteTermPad(*M.m_MSA);
 
 	asserta(M.m_MSA != 0);
 
@@ -129,6 +130,7 @@ void cmd_align()
 		fOut = CreateStdioFile(OutputFileName);
 		Align(M, InputSeqs, PerturbSeed, TP, false, fOut);
 		CloseStdioFile(fOut);
+		exit(0);
 		return;
 		}
 

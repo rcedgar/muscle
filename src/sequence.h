@@ -9,38 +9,27 @@
 #include <cstdlib>
 #include "filebuffer.h"
 
+static const char LEFT_TERM_PAD_CHAR = '<';
+static const char RIGHT_TERM_PAD_CHAR = '>';
+static const uint TERM_PAD_LENGTH = 3;
+
 class Sequence
 	{
 public:
-//// Global input MulitSquence index
-//	uint m_GSI = UINT_MAX;
-//
-//// Sparse matrix index
-//	uint m_SMI = UINT_MAX;
-
 	string m_Label;
 	vector<char> m_CharVec;
 
 private:
 	Sequence() {}
-		//{
-		//m_Label = "~";
-		////m_GSI = UINT_MAX;
-		////m_SMI = UINT_MAX;
-		//}
 	~Sequence() {}
 
 public:
 	bool FromFileBuffer(FileBuffer& infile, bool stripGaps = false);
-
-	void Create(const vector<char> *m_CharVec, string m_Label);
-
 	void FromString(const string &Label, const string &Seq);
 
 	void InitData()
 		{
 		m_CharVec.clear();
-		//m_CharVec.push_back('@');
 		}
 
 	void AppendChar(char c)
@@ -77,31 +66,10 @@ public:
 		return m_CharVec[i];
 		}
 
-	//void SetGSI(uint GSI)
-	//	{
-	//	asserta(m_GSI == UINT_MAX);
-	//	m_GSI = GSI;
-	//	}
-
-	//void OverwriteGSI(uint GSI)
-	//	{
-	//	m_GSI = GSI;
-	//	}
-
 	void OverwriteLabel(const string &Label)
 		{
 		m_Label = Label;
 		}
-
-	//uint GetSMI() const
-	//	{
-	//	return m_SMI;
-	//	}
-
-	//uint GetGSI() const
-	//	{
-	//	return m_GSI;
-	//	}
 
 	uint GetLength() const
 		{
@@ -109,9 +77,10 @@ public:
 		}
 
 	void WriteMFA(FILE *f) const;
-	Sequence* Clone() const;
-	Sequence* AddGapsPath(const string &Path, char id) const;
-	Sequence* CopyDeleteGaps() const;
+	Sequence *Clone() const;
+	Sequence *AddGapsPath(const string &Path, char id) const;
+	Sequence *CopyDeleteGaps() const;
+	Sequence *TermPad() const;
 	void GetPosToCol(vector<uint> &PosToCol) const;
 	void GetColToPos(vector<uint> &ColToPos) const;
 	void LogMe() const;

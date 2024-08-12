@@ -560,9 +560,6 @@
     <ClCompile Include="bwdflat_mega.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="align_mega.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="mpcflat_mega.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -615,6 +612,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="transalnref.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="termpad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

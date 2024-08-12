@@ -151,8 +151,6 @@ void cmd_super7()
 	LoadInput(InputSeqs);
 
 	bool Nucleo = InputSeqs.GuessIsNucleo();
-	CheckMegaOpts(Nucleo);
-
 	const uint InputSeqCount = GetGlobalMSSeqCount();
 
 	Tree GuideTree;

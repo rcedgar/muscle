@@ -8,6 +8,9 @@ void LoadInput(MultiSequence &InputSeqs)
 		InputSeqs.FromStrings(Mega::m_Labels, Mega::m_Seqs);
 		}
 	else
+		{
 		InputSeqs.LoadMFA(g_Arg1, true);
+		TermPad(InputSeqs);
+		}
 	SetGlobalInputMS(InputSeqs);
 	}
