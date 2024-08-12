@@ -9,7 +9,6 @@ void cmd_muscle3()
 	{
 	MultiSequence InputSeqs;
 	InputSeqs.FromFASTA(g_Arg1);
-	SetGlobalInputMS(InputSeqs);
 	bool IsNucleo = InputSeqs.GuessIsNucleo();
 
 	M3AlnParams AP;
