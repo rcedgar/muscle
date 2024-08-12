@@ -176,3 +176,5 @@ const byte *GetByteSeqByGSI(uint GSI);
 void LoadInput(MultiSequence &InputSeqs);
 float *CalcPost(uint GSIX, uint GSIY);
 float *CalcPost(const string &Label1, const string &Label2);
+void TermPad(MultiSequence &Seqs);
+void DeleteTermPad(MultiSequence &Seqs);

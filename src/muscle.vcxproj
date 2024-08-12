@@ -215,7 +215,6 @@
     <ClCompile Include="addconfseq.cpp" />
     <ClCompile Include="align.cpp" />
     <ClCompile Include="alignmsasbycols.cpp" />
-    <ClCompile Include="align_mega.cpp" />
     <ClCompile Include="alnmsasflat_mega.cpp" />
     <ClCompile Include="blosumsmx.cpp" />
     <ClCompile Include="bwdflat_mega.cpp" />
@@ -367,6 +366,7 @@
     <ClCompile Include="swdistmx.cpp" />
     <ClCompile Include="sweep.cpp" />
     <ClCompile Include="sweeper.cpp" />
+    <ClCompile Include="termpad.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="test_malloc.cpp" />
     <ClCompile Include="test_mega.cpp" />

@@ -266,6 +266,7 @@ void HMMParams::FromStrings(const vector<string> &Lines)
 			}
 		}
 
+	Normalize();
 	AssertProbsValid();
 	}
 

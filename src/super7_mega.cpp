@@ -88,16 +88,10 @@ void cmd_super7_mega()
 	if (ShrubSize < 3)
 		Die("-shrub_size must be >= 3");
 
-	//Mega MM;
-	//MM.FromFile(g_Arg1);
-
 	MultiSequence InputSeqs;
-	//InputSeqs.FromStrings(MM.m_Labels, MM.m_Seqs);
-	//SetGlobalInputMS(InputSeqs);
 	LoadInput(InputSeqs);
 
 	bool Nucleo = InputSeqs.GuessIsNucleo();
-	CheckMegaOpts(Nucleo);
 
 	Tree GuideTree;
 	if (optset_guidetreein)

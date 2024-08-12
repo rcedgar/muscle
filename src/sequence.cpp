@@ -1,5 +1,6 @@
 #include "myutils.h"
 #include "sequence.h"
+#include "alpha.h"
 
 static uint g_NewCount;
 static uint g_DeleteCount;
@@ -27,11 +28,11 @@ void Sequence::_DeleteSequence(const Sequence *Seq)
 	delete Seq;
 	}
 
-void Sequence::Create(const vector<char> *a_data, string a_label)
-	{
-	m_CharVec = *a_data;
-	m_Label = a_label;
-	}
+//void Sequence::Create(const vector<char> *a_data, string a_label)
+//	{
+//	m_CharVec = *a_data;
+//	m_Label = a_label;
+//	}
 
 bool Sequence::FromFileBuffer(FileBuffer& infile, bool stripGaps)
 	{
@@ -176,14 +177,36 @@ void Sequence::GetColToPos(vector<uint> &ColToPos) const
 		}
 	}
 
+Sequence *Sequence::TermPad() const
+	{
+	Sequence* ret = NewSequence();
+	asserta(ret);
+
+	ret->m_Label = m_Label;
+	ret->m_CharVec.clear();
+	uint L = GetLength();
+
+	for (uint i = 0; i < TERM_PAD_LENGTH; ++i)
+		ret->m_CharVec.push_back(LEFT_TERM_PAD_CHAR);
+
+	for (uint i = 0; i < L; ++i)
+		{
+		char c = m_CharVec[i];
+		ret->m_CharVec.push_back(c);
+		}
+
+	for (uint i = 0; i < TERM_PAD_LENGTH; ++i)
+		ret->m_CharVec.push_back(RIGHT_TERM_PAD_CHAR);
+
+	return ret;
+	}
+
 Sequence *Sequence::CopyDeleteGaps() const
 	{
 	Sequence* ret = NewSequence();
 	asserta(ret);
 
 	ret->m_Label = m_Label;
-	//ret->m_GSI = m_GSI;
-	//ret->m_SMI = m_SMI;
 	ret->m_CharVec.clear();
 	int L = GetLength();
 	for (int i = 0; i < L; ++i)
@@ -197,9 +220,6 @@ Sequence *Sequence::CopyDeleteGaps() const
 
 void Sequence::FromString(const string &Label, const string &Seq)
 	{
-	//m_GSI = UINT_MAX;
-	//m_SMI = UINT_MAX;
-
 	m_Label = Label;
 	m_CharVec.clear();
 	int L = (int) SIZE(Seq);
