@@ -3,7 +3,8 @@
 cd ../src
 rm -rf o/ ../bin/muscle*
 chmod +x ./build_linux.py
-python3 ./build_linux.py
+chmod +x ./build_linux.bash
+./build_linux.bash
 cd ../test_scripts
 
 rm -rf ../test_output ../test_logs
