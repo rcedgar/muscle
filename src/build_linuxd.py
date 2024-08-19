@@ -12,12 +12,16 @@ if rc != 0:
     sys.stderr.write("\n\nERROR -- failed to generate gitver.txt\n\n")
     sys.exit(1)
 
+rc = os.system(r'rm -rf o/ ../bin/muscle*')
+if rc != 0:
+    sys.stderr.write("\n\nERROR -- failed to clean\n\n")
+    sys.exit(1)
+
 OBJDIR = "o"
 BINDIR = "../bin"
 
 LRT = False
 ## DEBUG = True
-SVNVER = False
 
 ProjFileName = None
 HdrNames = []
@@ -84,16 +88,16 @@ with open("Makefile", "w") as f:
     if CNames:
         Out("")
         Out("CC = ccache gcc")
-        Out("CFLAGS := $(CFLAGS) -ggdb -ffast-math -march=native")
+        Out("CFLAGS := $(CFLAGS) -g -ffast-math -march=native")
 
     if CXXNames:
         Out("")
         Out("CXX = ccache g++")
-        Out("CXXFLAGS := $(CFLAGS) -DDEBUG -ggdb -pthread -fopenmp -ffast-math -march=native --std=c++11")
+        Out("CXXFLAGS := $(CFLAGS) -DDEBUG -g -pthread -fopenmp -ffast-math -march=native --std=c++11")
 
     Out("")
     Out("UNAME_S := $(shell uname -s)")
-    Out("LDFLAGS := $(LDFLAGS) -ggdb -pthread  -fopenmp -lpthread")
+    Out("LDFLAGS := $(LDFLAGS) -g -pthread  -fopenmp -lpthread")
     Out("ifeq ($(UNAME_S),Linux)")
     Out("    LDFLAGS += -static")
     Out("endif")

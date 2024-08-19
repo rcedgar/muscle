@@ -92,5 +92,6 @@ C(super7)
 //C(super7_mega)
 C(swdistmx)
 C(transalnref)
+C(mega_msas)
 
 #undef C

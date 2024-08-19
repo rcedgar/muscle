@@ -1,4 +1,5 @@
 #include "muscle.h"
+#include "omplock.h"
 
 static MultiSequence *g_GlobalMS;
 static uint g_GlobalMSSeqCount = 0;
@@ -58,8 +59,10 @@ const byte *GetByteSeqByGSI(uint GSI)
 
 void AddGlobalTmpSeq(Sequence *seq)
 	{
+	Lock();
 	string Label = string(seq->m_Label);
 	m_LabelToSeq[Label] = seq;
+	Unlock();
 	}
 
 void SetGlobalInputMS(MultiSequence &MS)

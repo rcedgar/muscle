@@ -9,5 +9,5 @@ do
 	../bin/muscle \
 	  -align ../test_data/mega/$acc.mega \
 	  -output $outdir/$acc \
-	  -log $logdir/BB_structs.$acc
+	  -log $logdir/BB_structs.$acc.log
 done

@@ -293,6 +293,7 @@
     <ClCompile Include="make_a2m_refseq.cpp" />
     <ClCompile Include="make_substmx.cpp" />
     <ClCompile Include="maxcc.cpp" />
+    <ClCompile Include="mega_msas.cpp" />
     <ClCompile Include="mpcflat.cpp" />
     <ClCompile Include="eadistmx.cpp" />
     <ClCompile Include="eadistmxmsas.cpp" />

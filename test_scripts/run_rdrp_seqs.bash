@@ -6,4 +6,5 @@ mkdir -p $outdir $logdir
 
 ../bin/muscle \
   -super5 ../test_data/rdrp/rdrp.fa \
-  -output $outdir/rdrp_seqs.afa
+  -output $outdir/rdrp_seqs.afa \
+  -log ../test_logs/super5_rdrp.log

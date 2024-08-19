@@ -11,6 +11,13 @@ rc = os.system(r'echo \"$(git log --oneline | head -n1 | cut "-d " -f1)\" | tee 
 if rc != 0:
     sys.stderr.write("\n\nERROR -- failed to generate gitver.txt\n\n")
     sys.exit(1)
+sys.stderr.write("gitver.txt done.\n")
+
+rc = os.system(r'rm -rf o/ ../bin/muscle*')
+if rc != 0:
+    sys.stderr.write("\n\nERROR -- failed to clean\n\n")
+    sys.exit(1)
+sys.stderr.write("clean done.\n")
 
 OBJDIR = "o"
 BINDIR = "../bin"
@@ -150,10 +157,12 @@ with open("Makefile", "w") as f:
     Out("clean:")
     Out("	rm -rf $(OBJDIR)/ $(BINPATH)")
 
-rc = os.system("rm -f o/myutils.o ../bin/muscle")
+sys.stderr.write("Makefile done.\n")
 
 rc = os.system("make > make.stdout 2> make.stderr")
 if rc != 0:
     os.system("tail make.stderr")
     sys.stderr.write("\n\nERROR -- make failed, see make.stderr\n\n")
     sys.exit(1)
+sys.stderr.write("make done.\n")
+sys.stderr.write("ls -lh ../bin/muscle\n")
