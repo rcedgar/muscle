@@ -6,7 +6,7 @@ mkdir -p $outdir $logdir
 
 for acc in `cat ../test_data/info/BB.accs`
 do
-	muscle \
+	../bin/muscle \
 	  -qscore ../test_output/BB_structs/$acc \
 	  -ref ../test_data/ref_alns/$acc \
 	  -bysequence \

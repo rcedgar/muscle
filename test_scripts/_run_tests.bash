@@ -24,7 +24,12 @@ echo STARTED `date` >> $log
 ./run_rdrp_seqs.bash
 ./run_rdrp_structs.bash
 
+./qscore_BB_seqs.bash
+./qscore_BB_structs.bash
+./qscore_rdrp.bash
+
 python3 ./check_logs.py
+python3 ./check_results.py
 python3 ./update_success_list.py $ver $date
 
 echo COMPLETED $date >> $log
