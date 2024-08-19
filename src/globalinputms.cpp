@@ -5,6 +5,7 @@ static uint g_GlobalMSSeqCount = 0;
 static double g_GlobalMSMeanSeqLength = 0;
 static uint g_GlobalMSMaxSeqLength = 0;
 static unordered_map<string, uint> m_LabelToIdx;
+static unordered_map<string, const Sequence *> m_LabelToSeq;
 
 uint GetGSIByLabel(const string &Label)
 	{
@@ -29,8 +30,10 @@ uint GetSeqLengthByGSI(uint GSI)
 
 uint GetSeqLengthByGlobalLabel(const string &Label)
 	{
-	uint GSI = GetGSIByLabel(Label);
-	uint L = GetSeqLengthByGSI(GSI);
+	//uint GSI = GetGSIByLabel(Label);
+	//uint L = GetSeqLengthByGSI(GSI);
+	const Sequence &seq = GetGlobalInputSeqByLabel(Label);
+	uint L = seq.GetLength();
 	return L;
 	}
 
@@ -53,6 +56,12 @@ const byte *GetByteSeqByGSI(uint GSI)
 	return ByteSeq;
 	}
 
+void AddGlobalTmpSeq(Sequence *seq)
+	{
+	string Label = string(seq->m_Label);
+	m_LabelToSeq[Label] = seq;
+	}
+
 void SetGlobalInputMS(MultiSequence &MS)
 	{
 	asserta(g_GlobalMS == 0);
@@ -70,6 +79,7 @@ void SetGlobalInputMS(MultiSequence &MS)
 		if (iter != m_LabelToIdx.end())
 			Die("Error duplicate label in input >%s", Label.c_str());
 		m_LabelToIdx[Label] = GSI;
+		m_LabelToSeq[Label] = Seq;
 		uint L = Seq->GetLength();
 		g_GlobalMSMaxSeqLength = max(L, g_GlobalMSMaxSeqLength);
 		SumSeqLength += L;
@@ -78,15 +88,6 @@ void SetGlobalInputMS(MultiSequence &MS)
 		g_GlobalMSMeanSeqLength = SumSeqLength/g_GlobalMSSeqCount;
 	ShowSeqStats(*g_GlobalMS);
 	}
-
-//MultiSequence &LoadGlobalInputMS(const string &FileName)
-//	{
-//	asserta(g_GlobalMS == 0);
-//	MultiSequence *MS = new MultiSequence;
-//	MS->FromFASTA(FileName, true);
-//	SetGlobalInputMS(*MS);
-//	return *g_GlobalMS;
-//	}
 
 MultiSequence &GetGlobalInputMS()
 	{
@@ -120,9 +121,20 @@ const Sequence &GetGlobalInputSeqByIndex(uint GSI)
 
 const Sequence &GetGlobalInputSeqByLabel(const string &Label)
 	{
-	uint GSI = GetGSIByLabel(Label);
-	const Sequence &Seq = GetGlobalInputSeqByIndex(GSI);
-	const string &Label2 = Seq.GetLabel();
+	//uint GSI = GetGSIByLabel(Label);
+	//const Sequence &Seq = GetGlobalInputSeqByIndex(GSI);
+	unordered_map<string, const Sequence *>::const_iterator iter = m_LabelToSeq.find(Label);
+	if (iter == m_LabelToSeq.end())
+		Die("GetGlobalInputSeqByLabel()", Label.c_str());
+	const Sequence *seq = iter->second;
+	const string &Label2 = seq->GetLabel();
 	asserta(Label2 == Label);
-	return Seq;
+	return *seq;
+	}
+
+const byte *GetGlobalByteSeqByLabel(const string &Label)
+	{
+	const Sequence &seq = GetGlobalInputSeqByLabel(Label);
+	const byte *ByteSeq = seq.GetBytePtr();
+	return ByteSeq;
 	}

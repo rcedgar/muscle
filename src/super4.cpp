@@ -215,7 +215,8 @@ void Super4::GetConsensusSeqs()
 
 		Sequence *seq = NewSequence();
 		seq->FromString(Label, ConsSeq);
-
+		
+		AddGlobalTmpSeq(seq);
 		m_ConsensusSeqs.AddSequence(seq, true);
 
 		asserta(ClusterIndex < SIZE(m_ClusterLabels));

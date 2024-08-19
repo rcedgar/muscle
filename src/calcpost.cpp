@@ -1,10 +1,10 @@
 #include "muscle.h"
 #include "mega.h"
 
-float *CalcPost(uint GSIX, uint GSIY)
+float *CalcPost(const string &LabelX, const string &LabelY)
 	{
-	uint LX = GetSeqLengthByGSI(GSIX);
-	uint LY = GetSeqLengthByGSI(GSIY);
+	uint LX = GetSeqLengthByGlobalLabel(LabelX);
+	uint LY = GetSeqLengthByGlobalLabel(LabelY);
 	if (double(LX)*double(LY)*5 + 100 > double(INT_MAX))
 		Die("HMM overflow, sequence lengths %u, %u (max ~21k)", LX, LY);
 
@@ -13,8 +13,8 @@ float *CalcPost(uint GSIX, uint GSIY)
 
 	if (Mega::m_Loaded)
 		{
-		const vector<vector<byte> > &ProfileX = *Mega::GetProfileByGSI(GSIX);
-		const vector<vector<byte> > &ProfileY = *Mega::GetProfileByGSI(GSIY);
+		const vector<vector<byte> > &ProfileX = *Mega::GetProfileByLabel(LabelX);
+		const vector<vector<byte> > &ProfileY = *Mega::GetProfileByLabel(LabelY);
 		asserta(SIZE(ProfileX) == LX);
 		asserta(SIZE(ProfileY) == LY);
 		Mega::CalcFwdFlat_mega(ProfileX, ProfileY, Fwd);
@@ -22,8 +22,8 @@ float *CalcPost(uint GSIX, uint GSIY)
 		}
 	else
 		{
-		const byte *X = GetByteSeqByGSI(GSIX);
-		const byte *Y = GetByteSeqByGSI(GSIY);
+		const byte *X = GetGlobalByteSeqByLabel(LabelX);
+		const byte *Y = GetGlobalByteSeqByLabel(LabelY);
 		CalcFwdFlat(X, LX, Y, LY, Fwd);
 		CalcBwdFlat(X, LX, Y, LY, Bwd);
 		}
@@ -35,10 +35,10 @@ float *CalcPost(uint GSIX, uint GSIY)
 	return Post;
 	}
 
-float *CalcPost(const string &Label1, const string &Label2)
-	{
-	uint GSI1 = GetGSIByLabel(Label1);
-	uint GSI2 = GetGSIByLabel(Label2);
-	float *Post = CalcPost(GSI1, GSI2);
-	return Post;
-	}
+//float *CalcPost(const string &Label1, const string &Label2)
+//	{
+//	uint GSI1 = GetGSIByLabel(Label1);
+//	uint GSI2 = GetGSIByLabel(Label2);
+//	float *Post = CalcPost(GSI1, GSI2);
+//	return Post;
+//	}
