@@ -13,7 +13,7 @@ mkdir -p ../test_output ../test_logs ../test_results
 log=../test_output/TEST_LOG.txt
 
 date=`date "+%Y-%m-%d/%H:%M:%S"`
-ver=`muscle --version | tr -d ' \n\r' | sed "-es/Built.*//"`
+ver=`../bin/muscle --version | tr -d ' \n\r' | sed "-es/Built.*//"`
 echo $date $ver STARTED >> $log
 git status >> $log
 
