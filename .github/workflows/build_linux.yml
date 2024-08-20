@@ -1,13 +1,6 @@
 name: build_linux
 
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
-  # Enable manual run from the Actions tab
   workflow_dispatch:
 
 permissions:
@@ -71,10 +64,13 @@ jobs:
           uname -a
           lscpu
           cd src/
-          pwd
           chmod u+x ./build_linux.bash
           chmod u+x ./build_linux.py
           ./build_linux.bash
+          echo path
+          pwd
+          ls /muscle/*
+          ls /muscle/bin/muscle
           #make -j LDFLAGS2=-static 
           #file Linux/muscle | grep aarch64
 
@@ -82,4 +78,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: muscle-linux-aarch64-binary
-        path: /muscle/bin/muscle
+        path: /home/runner/work/muscle/muscle/bin/muscle
