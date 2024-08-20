@@ -1,23 +1,43 @@
 name: build_windows
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: ./src
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+
+permissions:
+  contents: read
 
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: windows-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
-      - name: Build
-        run: |
-          cd src
-          $msbuild = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Msbuild\Current\Bin\MSBuild.exe"
-          $a = @("muscle.sln", "/p:Platform=x64", "/p:Configuration=Release")
-          & $msbuild $a
-          
-      - name: Upload binary artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: muscle-windows-exe
-          path: src/x64/Release/muscle.exe
+    - uses: actions/checkout@v4
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      # Add additional options to the MSBuild command line here (like platform or verbosity level).
+      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
+      run: |
+           cd D:\a\muscle\muscle\src
+           bash build_win.bash
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: muscle-windows-binary.exe
+          path: D:\a\muscle\muscle\src\x64\Release\muscle.exe
