@@ -8,10 +8,10 @@ OBJDIR := o
 BINPATH := $(BINDIR)/muscle
 
 CXX = g++
-CXXFLAGS := $(CFLAGS) --std=c++11 -ffast-math -march=native -O3 -DNDEBUG -g3 -fopenmp
+CXXFLAGS := $(CFLAGS) --std=c++11 -ffast-math -march=native -O3 -DNDEBUG -fopenmp
 
 UNAME_S := $(shell uname -s)
-LDFLAGS := $(LDFLAGS) -ffast-math -march=native -O3 -g3 -fopenmp
+LDFLAGS := $(LDFLAGS) -ffast-math -march=native -O3 -fopenmp
 ifeq ($(UNAME_S),Linux)
     LDFLAGS += -static
 endif
@@ -313,6 +313,7 @@ OBJS = \
 
 $(BINPATH) : $(BINDIR)/ $(OBJDIR)/ $(OBJS)
 	$(CXX) $(LDFLAGS) $(OBJS) -o $(BINPATH)
+	strip $(BINPATH)
 
 $(OBJDIR)/ :
 	mkdir -p $(OBJDIR)/

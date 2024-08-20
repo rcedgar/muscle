@@ -36,6 +36,9 @@ void GetInsertLoHis(const vector<bool> &Als,
 bool GetMSAColIsAligned(const MSA &Aln, uint Col)
 	{
 	const uint SeqCount = Aln.GetSeqCount();
+	if (SeqCount == 0)
+		return false;
+
 	uint GapCount = 0;
 	uint UpperCount = 0;
 	uint LowerCount = 0;
@@ -54,9 +57,17 @@ bool GetMSAColIsAligned(const MSA &Aln, uint Col)
 			Die("Unexpected sequence char '%c'", c);
 			}
 		}
-	if (UpperCount > 0 && LowerCount > 0)
-		Die("Mixed-case col");
-	return UpperCount > 0;
+	if (optset_max_gap_fract)
+		{
+		double GapFract = double(GapCount)/SeqCount;
+		return GapFract <= opt(max_gap_fract);
+		}
+	else
+		{
+		if (UpperCount > 0 && LowerCount > 0)
+			Die("Mixed-case col");
+		return UpperCount > 0;
+		}
 	}
 
 void GetMSAColAlignedVec(const MSA &Aln,
@@ -114,7 +125,14 @@ MSA *SqueezeInserts(const MSA &Aln, ptr_GetMSAColIsAligned pFn)
 		uint From = (PrevHi == UINT_MAX ? 0 : PrevHi + 1);
 		for (uint Col = From; Col < Lo; ++Col)
 			for (uint SeqIndex = 0; SeqIndex < SeqCount; ++SeqIndex)
-				NewRows[SeqIndex] += Aln.GetChar(SeqIndex, Col);
+				{
+				char c =  Aln.GetChar(SeqIndex, Col);
+				if (Als[Col])
+					c = toupper(c);
+				else
+					c = tolower(c);
+				NewRows[SeqIndex] += c;
+				}
 
 		uint MaxInsL = 0;
 		vector<string> Inserts;
@@ -125,7 +143,7 @@ MSA *SqueezeInserts(const MSA &Aln, ptr_GetMSAColIsAligned pFn)
 				{
 				char c = Aln.GetChar(SeqIndex, Col);
 				if (!isgap(c))
-					Insert += c;
+					Insert += tolower(c);
 				}
 			uint L = SIZE(Insert);
 			if (L > MaxInsL)

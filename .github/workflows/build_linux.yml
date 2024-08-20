@@ -34,15 +34,18 @@ jobs:
           echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
           uname -a
           cd $GITHUB_WORKSPACE
-          ls -lh
+          pwd
           cd src
-          make -j LDFLAGS2=-static
-          file Linux/muscle | grep x86-64
+          chmod u+x ./build_linux.bash
+          chmod u+x ./build_linux.py
+          ./build_linux.bash
+          #make -j LDFLAGS2=-static
+          #file Linux/muscle | grep x86-64
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: muscle-linux-binary
-          path: src/Linux/muscle
+          path: /home/runner/work/muscle/muscle/bin/muscle
 
   build-aarch64:
     name: Linux aarch64
@@ -61,19 +64,22 @@ jobs:
           --volume "${PWD}:/muscle"
         install: |
           apt-get update -q -y
-          apt-get install -q -y make g++ file git
+          apt-get install -q -y make g++ file git python3
         run: |
           git config --global --add safe.directory /muscle
           cd /muscle  
           uname -a
           lscpu
           cd src/
-          make -j LDFLAGS2=-static 
-          file Linux/muscle | grep aarch64
+          pwd
+          chmod u+x ./build_linux.bash
+          chmod u+x ./build_linux.py
+          ./build_linux.bash
+          #make -j LDFLAGS2=-static 
+          #file Linux/muscle | grep aarch64
 
     - name: Upload binary artifact
       uses: actions/upload-artifact@v4
       with:
         name: muscle-linux-aarch64-binary
-        path: src/Linux/muscle
-    
+        path: /muscle/bin/muscle

@@ -1,7 +1,9 @@
 #include "muscle.h"
 
-static char GetFeatureChar(uint Letter)
+static char GetFeatureChar(bool IsAA, uint Letter)
 	{
+	if (IsAA)
+		return g_CharToLetterAmino[Letter];
 	if (Letter < 26)
 		return 'A' + Letter;
 	else if (Letter < 26*2)
@@ -30,6 +32,7 @@ void cmd_mega_msas()
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
 		{
 		const string &FeatureName = Mega::m_FeatureNames[FeatureIdx];
+		bool IsAA = (FeatureName == "AA");
 		string OutputFN = OutputPrefix + FeatureName;
 
 		FILE *f = CreateStdioFile(OutputFN);
@@ -51,7 +54,8 @@ void cmd_mega_msas()
 					{
 					asserta(SIZE(Profile[Pos]) == FeatureCount);
 					byte FeatureLetter = Profile[Pos][FeatureIdx];
-					FeatureRow += GetFeatureChar(FeatureLetter);
+					FeatureRow += GetFeatureChar(IsAA, FeatureLetter);
+					++Pos;
 					}
 				}
 			SeqToFasta(f, FeatureRow, Label);
