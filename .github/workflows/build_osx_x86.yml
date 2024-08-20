@@ -1,0 +1,51 @@
+name: build-osx-x86
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: macos-13
+ 
+    steps:
+      # Checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v4
+
+      # Install MacPorts (new step)
+      - uses: melusina-org/setup-macports@v1
+
+      # Install ccache using port (optional, adjust as needed)
+      - name: Install ccache
+        run: |
+          sudo port install ccache
+          sudo port install python311
+
+      # Runs a set of commands using the runner's shell
+      - name: Build-commands
+        run: |
+          echo Starting Build-commands
+          echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
+          uname -a
+          cd $GITHUB_WORKSPACE
+          ls -lh
+          cd src
+          chmod u+x ./build_linux.bash
+          chmod u+x ./build_linux.py
+          ./build_linux.bash
+          pwd
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: muscle-osx-binary
+          path: /Users/runner/work/muscle/muscle/bin/muscle
+      - name: Upload make.stderr artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: make.stderr-osx
+          path: /Users/runner/work/muscle/muscle/bin/muscle.stderr
+      - name: Upload make.stdout artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: make.stdout-osx
+          path: /Users/runner/work/muscle/muscle/bin/muscle.stdout
+
