@@ -11,11 +11,10 @@ jobs:
       # Checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
 
-      # Install MacPorts (new step)
+      # Install MacPorts
       - uses: melusina-org/setup-macports@v1
 
-      # Install ccache using port (optional, adjust as needed)
-      - name: Install ccache
+      - name: Install dependencies
         run: |
           sudo port install python311
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"  
@@ -25,29 +24,12 @@ jobs:
       # Runs a set of commands using the runner's shell
       - name: Build-commands
         run: |
-          echo Starting Build-commands
-          echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
-          uname -a
-          cd $GITHUB_WORKSPACE
-          ls -lh
-          cd src
+          cd $GITHUB_WORKSPACE/src
           curl -fsSL https://raw.githubusercontent.com/rcedgar/vcxproj_make/806d016/vcxproj_make.py >./vcxproj_make.py
           chmod u+x ./vcxproj_make.py
           ./vcxproj_make.py --openmp --cppcompiler g++-11 
-          pwd
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: muscle-osx-binary-m
+          name: muscle-osx-m
           path: /Users/runner/work/muscle/muscle/bin/muscle
-      - name: Upload make.stderr artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: make.stderr-osx-m
-          path: /Users/runner/work/muscle/muscle/src/make.stderr
-      - name: Upload make.stdout artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: make.stdout-osx-m
-          path: /Users/runner/work/muscle/muscle/src/make.stdout
-
