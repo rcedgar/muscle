@@ -23,21 +23,13 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Build-commands
         run: |
-          echo Starting Build-commands
-          echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
-          uname -a
-          cd $GITHUB_WORKSPACE
-          pwd
-          cd src
+          cd $GITHUB_WORKSPACE/src
           chmod u+x ./build_linux.bash
-          chmod u+x ./build_linux.py
           ./build_linux.bash
-          #make -j LDFLAGS2=-static
-          #file Linux/muscle | grep x86-64
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: muscle-linux-binary
+          name: muscle-linux-x64
           path: /home/runner/work/muscle/muscle/bin/muscle
 
   build-aarch64:
@@ -52,30 +44,20 @@ jobs:
       with:
         arch: aarch64
         distro: ubuntu20.04
-        githubToken: ${{ github.token }}
-        dockerRunArgs: |
-          --volume "${PWD}:/muscle"
+        # githubToken: ${{ github.token }}
+        # dockerRunArgs: |
+        #   --volume "${PWD}:/muscle"
         install: |
           apt-get update -q -y
           apt-get install -q -y make g++ file git python3
         run: |
           git config --global --add safe.directory /muscle
-          cd /muscle  
-          uname -a
-          lscpu
-          cd src/
+          cd /muscle/src
           chmod u+x ./build_linux.bash
-          chmod u+x ./build_linux.py
           ./build_linux.bash
-          echo path
-          pwd
-          ls /muscle/*
-          ls /muscle/bin/muscle
-          #make -j LDFLAGS2=-static 
-          #file Linux/muscle | grep aarch64
 
     - name: Upload binary artifact
       uses: actions/upload-artifact@v4
       with:
-        name: muscle-linux-aarch64-binary
+        name: muscle-linux-aarch64
         path: /home/runner/work/muscle/muscle/bin/muscle
