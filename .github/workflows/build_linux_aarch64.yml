@@ -28,7 +28,7 @@ jobs:
           --volume "${PWD}:/muscle"
         install: |
           apt-get update -q -y
-          apt-get install -q -y make g++ file git python3
+          apt-get install -q -y make g++ file git python3 curl
         run: |
           git config --global --add safe.directory /muscle
           cd /muscle/src
