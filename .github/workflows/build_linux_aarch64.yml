@@ -32,12 +32,9 @@ jobs:
         run: |
           git config --global --add safe.directory /muscle
           cd /muscle/src
-          rm -f vcxproj_make.py
           curl -fsSL https://raw.githubusercontent.com/rcedgar/vcxproj_make/806d016/vcxproj_make.py > vcxproj_make.py
-          chmod u+x ./vcxproj_make.py
+          chmod x vcxproj_make.py
           ./vcxproj_make.py --openmp
-          chmod u+x ./build_linux.bash
-          ./build_linux.bash
 
     - name: Upload binary artifact
       uses: actions/upload-artifact@v4

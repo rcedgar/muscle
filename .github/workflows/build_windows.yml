@@ -39,5 +39,5 @@ jobs:
     - name: Upload binary artifact
       uses: actions/upload-artifact@v4
       with:
-          name: muscle-windows-binary.exe
+          name: muscle-windows.exe
           path: D:\a\muscle\muscle\src\x64\Release\muscle.exe
