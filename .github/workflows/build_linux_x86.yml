@@ -1,4 +1,4 @@
-name: build_linux
+name: build_linux_x86
 
 on:
   workflow_dispatch:

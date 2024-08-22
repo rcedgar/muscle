@@ -1,4 +1,4 @@
-name: build-osx-M
+name: build_osx_M
 
 on:
   workflow_dispatch:

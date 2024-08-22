@@ -1,4 +1,4 @@
-name: build-osx-x86
+name: build_osx_x86
 
 on:
   workflow_dispatch:
