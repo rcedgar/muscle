@@ -32,7 +32,8 @@ jobs:
         run: |
           git config --global --add safe.directory /muscle
           cd /muscle/src
-          curl -fsSL https://raw.githubusercontent.com/rcedgar/vcxproj_make/806d016/vcxproj_make.py >./vcxproj_make.py
+          rm -f vcxproj_make.py
+          wget https://raw.githubusercontent.com/rcedgar/vcxproj_make/806d016/vcxproj_make.py
           chmod u+x ./vcxproj_make.py
           ./vcxproj_make.py --openmp
           chmod u+x ./build_linux.bash
