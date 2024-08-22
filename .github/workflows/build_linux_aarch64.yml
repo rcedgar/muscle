@@ -9,29 +9,8 @@ permissions:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-    
 
 jobs:
-  build:
-    name: Linux x86_64
-    runs-on: ubuntu-20.04
-
-    steps:
-      # Checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v4
-
-      # Runs a set of commands using the runners shell
-      - name: Build-commands
-        run: |
-          cd $GITHUB_WORKSPACE/src
-          chmod u+x ./build_linux.bash
-          ./build_linux.bash
-      - name: Upload binary artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: muscle-linux-x64
-          path: /home/runner/work/muscle/muscle/bin/muscle
-
   build-aarch64:
     name: Linux aarch64
     runs-on: ubuntu-latest
