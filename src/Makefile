@@ -8,10 +8,10 @@ OBJDIR := o
 BINPATH := $(BINDIR)/muscle
 
 CXX = g++
-CXXFLAGS := $(CFLAGS)  -ffast-math -march=native -O3 -DNDEBUG -fopenmp
+CXXFLAGS := $(CFLAGS)  -ffast-math -march=native -O3 -DNDEBUG
 
 UNAME_S := $(shell uname -s)
-LDFLAGS := $(LDFLAGS)  -ffast-math -march=native -O3 -fopenmp
+LDFLAGS := $(LDFLAGS)  -ffast-math -march=native -O3
 ifeq ($(UNAME_S),Linux)
     LDFLAGS += -static
 endif

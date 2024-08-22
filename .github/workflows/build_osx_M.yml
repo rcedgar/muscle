@@ -1,11 +1,11 @@
-name: build-osx-x86
+name: build-osx-M
 
 on:
   workflow_dispatch:
   
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-14
  
     steps:
       # Checks-out the repository under $GITHUB_WORKSPACE
@@ -38,16 +38,16 @@ jobs:
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: muscle-osx-binary_x86
+          name: muscle-osx-binary-m
           path: /Users/runner/work/muscle/muscle/bin/muscle
       - name: Upload make.stderr artifact
         uses: actions/upload-artifact@v4
         with:
-          name: make.stderr-osx_x86
+          name: make.stderr-osx-m
           path: /Users/runner/work/muscle/muscle/src/make.stderr
       - name: Upload make.stdout artifact
         uses: actions/upload-artifact@v4
         with:
-          name: make.stdout-osx_x86
+          name: make.stdout-osx-m
           path: /Users/runner/work/muscle/muscle/src/make.stdout
 
