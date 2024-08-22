@@ -23,9 +23,9 @@ jobs:
       with:
         arch: aarch64
         distro: ubuntu20.04
-        # githubToken: ${{ github.token }}
-        # dockerRunArgs: |
-        #   --volume "${PWD}:/muscle"
+        githubToken: ${{ github.token }}
+        dockerRunArgs: |
+          --volume "${PWD}:/muscle"
         install: |
           apt-get update -q -y
           apt-get install -q -y make g++ file git python3
