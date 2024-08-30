@@ -15,11 +15,13 @@ vector<vector<vector<byte> > > Mega::m_Profiles;
 vector<string> Mega::m_Seqs;
 vector<vector<float> > Mega::m_LogProbsVec;
 vector<vector<vector<float> > > Mega::m_LogProbMxVec;
+vector<vector<vector<float> > > Mega::m_LogOddsMxVec;
 vector<string> m_Labels;
 uint Mega::m_NextLineNr;
 uint Mega::m_FeatureCount;
 bool Mega::m_Loaded = false;
 unordered_map<string, uint> Mega::m_LabelToIdx;
+unordered_map<string, uint> Mega::m_SeqToIdx;
 
 uint Mega::GetGSIByLabel(const string &Label)
 	{
@@ -47,6 +49,21 @@ const vector<vector<byte> > *Mega::GetProfileByLabel(const string &Label)
 	unordered_map<string, uint>::const_iterator iter = m_LabelToIdx.find(Label);
 	if (iter == m_LabelToIdx.end())
 		Die("Mega::GetProfileByLabel(%s)", Label.c_str());
+	uint Idx = iter->second;
+	asserta(Idx < SIZE(m_Profiles));
+	return &m_Profiles[Idx];
+	}
+
+const vector<vector<byte> > *Mega::GetProfileBySeq(const string &Seq,
+  bool FailOnError)
+	{
+	unordered_map<string, uint>::const_iterator iter = m_SeqToIdx.find(Seq);
+	if (iter == m_SeqToIdx.end())
+		{
+		if (FailOnError)
+			Die("Mega::GetProfileBySeq(%16.16s...)", Seq.c_str());
+		return 0;
+		}
 	uint Idx = iter->second;
 	asserta(Idx < SIZE(m_Profiles));
 	return &m_Profiles[Idx];
@@ -99,33 +116,6 @@ void Mega::CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
 	asserta(feq(SumMarginalFreqs, 1));
 	}
 
-void Mega::CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
-  vector<vector<float > > &LogProbMx)
-	{
-	AssertSymmetrical(FreqsMx);
-	const uint N = SIZE(FreqsMx);
-	LogProbMx.clear();
-	LogProbMx.resize(N);
-	for (uint i = 0; i < N; ++i)
-		LogProbMx[i].resize(N);
-
-	const float VERY_SMALL_FREQ = 1e-6f;
-	for (uint i = 0; i < N; ++i)
-		{
-		const vector<float> &FreqsRow = FreqsMx[i];
-		vector<float> &LogProbsRow = LogProbMx[i];
-		for (uint j = 0; j < N; ++j)
-			{
-			float Freq = FreqsRow[j];
-			asserta(Freq <= 1);
-			if (Freq < VERY_SMALL_FREQ)
-				Freq = VERY_SMALL_FREQ;
-			LogProbsRow[j] = logf(Freq);
-			}
-		}
-	AssertSymmetrical(LogProbMx);
-	}
-
 void Mega::FromFile(const string &FileName)
 	{
 	m_Loaded = true;
@@ -147,6 +137,7 @@ void Mega::FromFile(const string &FileName)
     uint ProfileCount = StrToUint(flds[2]);
     m_LogProbsVec.resize(m_FeatureCount);
     m_LogProbMxVec.resize(m_FeatureCount);
+    m_LogOddsMxVec.resize(m_FeatureCount);
     for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
 		{
         GetNextFields(flds, 4);
@@ -191,6 +182,28 @@ void Mega::FromFile(const string &FileName)
                 LogProbMx[Letter2][Letter1] = LogProb;
 				}
 			}
+
+		vector<string> flds;
+		GetNextFields(flds, 1);
+		asserta(flds[0] == "logoddsmx");
+
+		vector<vector<float> > &LogOddsMx = m_LogOddsMxVec[FeatureIdx];
+        LogOddsMx.resize(AlphaSize);
+        for (uint Letter1 = 0; Letter1 < AlphaSize; ++Letter1)
+            LogOddsMx[Letter1].resize(AlphaSize);
+        for (uint Letter1 = 0; Letter1 < AlphaSize; ++Letter1)
+			{
+            GetNextFields(flds, Letter1 + 3);
+            asserta(StrToUint(flds[0]) == Letter1);
+			const string &LetterStr = flds[1];
+			asserta(SIZE(LetterStr) == 1 && isalpha(LetterStr[0]));
+            for (uint Letter2 = 0; Letter2 <= Letter1; ++Letter2)
+				{
+                float Score = (float) StrToFloat(flds[Letter2+2]);
+                LogOddsMx[Letter1][Letter2] = Score;
+                LogOddsMx[Letter2][Letter1] = Score;
+				}
+			}
 		}
     m_Profiles.resize(ProfileCount);
     m_Seqs.resize(ProfileCount);
@@ -233,6 +246,16 @@ void Mega::FromFile(const string &FileName)
 					}
 				}
 			}
+		if (m_SeqToIdx.find(S) != m_SeqToIdx.end())
+			{
+			static bool WarningDone = false;
+			if (!WarningDone)
+				{
+				Warning("Duplicate sequences found\n");
+				WarningDone = true;
+				}
+			}
+		m_SeqToIdx[S] = ProfileIdx;
 		}
     m_Lines.clear();
 	}
@@ -249,6 +272,18 @@ float Mega::GetInsScore(const vector<vector<byte> > &Profile, uint Pos)
 		Score += LogProbs[Letter]*m_Weights[i];
 		}
 	return Score;
+	}
+
+const string &Mega::GetFeatureName(uint FeatureIndex)
+	{
+	asserta(FeatureIndex < SIZE(m_FeatureNames));
+	return m_FeatureNames[FeatureIndex];
+	}
+
+uint Mega::GetAlphaSize(uint FeatureIndex)
+	{
+	asserta(FeatureIndex < SIZE(m_AlphaSizes));
+	return m_AlphaSizes[FeatureIndex];
 	}
 
 float Mega::GetMatchScore(

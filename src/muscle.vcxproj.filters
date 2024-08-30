@@ -617,6 +617,15 @@
     <ClCompile Include="mega_msas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="masmcol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="masm_train.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="masm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">
@@ -932,6 +941,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pprog_mega.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="psm_mega.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="psmcol_mega.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="masmcol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="masm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

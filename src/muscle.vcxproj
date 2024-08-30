@@ -292,6 +292,8 @@
     <ClCompile Include="make_a2m.cpp" />
     <ClCompile Include="make_a2m_refseq.cpp" />
     <ClCompile Include="make_substmx.cpp" />
+    <ClCompile Include="masm.cpp" />
+    <ClCompile Include="masm_train.cpp" />
     <ClCompile Include="maxcc.cpp" />
     <ClCompile Include="mega_msas.cpp" />
     <ClCompile Include="mpcflat.cpp" />
@@ -333,6 +335,8 @@
     <ClCompile Include="colscoreefa.cpp" />
     <ClCompile Include="profalign.cpp" />
     <ClCompile Include="profile3.cpp" />
+    <ClCompile Include="masmcol.cpp" />
+    <ClCompile Include="mega.cpp" />
     <ClCompile Include="profpos3.cpp" />
     <ClCompile Include="profprof3.cpp" />
     <ClCompile Include="profseq.cpp" />
@@ -344,7 +348,6 @@
     <ClCompile Include="qscorer2.cpp" />
     <ClCompile Include="randomchaintree.cpp" />
     <ClCompile Include="randomdistmx.cpp" />
-    <ClCompile Include="mega.cpp" />
     <ClCompile Include="relabel.cpp" />
     <ClCompile Include="repredict.cpp" />
     <ClCompile Include="resample.cpp" />
@@ -455,6 +458,8 @@
     <ClInclude Include="kmerdist66.h" />
     <ClInclude Include="kmerscan.h" />
     <ClInclude Include="locallock.h" />
+    <ClInclude Include="masm.h" />
+    <ClInclude Include="masmcol.h" />
     <ClInclude Include="mega.h" />
     <ClInclude Include="mpc.h" />
     <ClInclude Include="mpcflat.h" />
@@ -481,7 +486,9 @@
     <ClInclude Include="pprog3.h" />
     <ClInclude Include="pprog_mega.h" />
     <ClInclude Include="probcons.h" />
+    <ClInclude Include="psmcol_mega.h" />
     <ClInclude Include="profile3.h" />
+    <ClInclude Include="psm_mega.h" />
     <ClInclude Include="profpos3.h" />
     <ClInclude Include="pwpath.h" />
     <ClInclude Include="qscorer.h" />

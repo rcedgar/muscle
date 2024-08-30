@@ -11,12 +11,16 @@ public:
 	static vector<float> m_Weights;
 	static vector<uint> m_AlphaSizes;
 	static unordered_map<string, uint> m_LabelToIdx;
+	static unordered_map<string, uint> m_SeqToIdx;
 
 // log(P_i) for each letter (for HMM Insert states)
 	static vector<vector<float> > m_LogProbsVec;
 
 // log(P_ij) for each letter pair (for HMM Match state)
 	static vector<vector<vector<float> > > m_LogProbMxVec;
+
+// log-odds score matrix for S-W / N-W
+	static vector<vector<vector<float> > > m_LogOddsMxVec;
 
 	static vector<string> m_Labels;
 	static vector<vector<vector<byte> > > m_Profiles;
@@ -28,6 +32,8 @@ public:
 public:
 	static void FromFile(const string &FileName);
 	static uint GetFeatureCount() { return m_FeatureCount; }
+	static uint GetAlphaSize(uint FeatureIndex);
+	static const string &GetFeatureName(uint FeatureIndex);
 	static const string &GetNextLine();
 	static void GetNextFields(vector<string> &Fields,
 	  uint ExpectedNrFields = UINT_MAX);
@@ -35,8 +41,6 @@ public:
 	static float GetMatchScore(
 	  const vector<vector<byte> > &ProfileX, uint PosX,
 	  const vector<vector<byte> > &ProfileY, uint PosY);
-	static void CalcLogProbsMx(const vector<vector<float > > &FreqsMx,
-	  vector<vector<float > > &LogProbMx);
 	static void CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
 	  vector<float> &Freqs);
 	static void LogFeatureParams(uint Idx);
@@ -55,4 +59,6 @@ public:
 	static const string &GetLabelByGSI(uint GSI);
 	static const vector<vector<byte> > *GetProfileByGSI(uint GSI);
 	static const vector<vector<byte> > *GetProfileByLabel(const string &Label);
+	static const vector<vector<byte> > *GetProfileBySeq(const string &Seq,
+	  bool FailOnError);
 	};
