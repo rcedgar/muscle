@@ -4,7 +4,9 @@
 #include "xdpmem.h"
 #include "swtrace.h"
 
-void MakeBlosumSMx(const Sequence &A, const Sequence &B, Mx<float> &MxS);
+void MakeBlosum62SMx(const Sequence &A, const Sequence &B, Mx<float> &MxS);
+void WriteLocalAln(FILE *f, const byte *A, const byte *B,
+  uint Loi, uint Loj, const char *Path);
 
 void TraceBackBitSW(XDPMem &Mem,
   uint LA, uint LB, uint Besti, uint Bestj,
@@ -213,12 +215,87 @@ float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
 	return BestScore;
 	}
 
-float SWFast_Seqs(XDPMem &Mem, const Sequence &A, const Sequence &B,
-  float Open, float Ext, uint &Loi, uint &Loj, uint &Leni, uint &Lenj,
-  string &Path)
+float SWFast_Seqs_BLOSUM62(XDPMem &Mem,
+  const Sequence &A, const Sequence &B, float Open, float Ext,
+  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path)
 	{
 	Mx<float> SMx;
-	MakeBlosumSMx(A, B, SMx);
+	MakeBlosum62SMx(A, B, SMx);
 	float Score = SWFast_SMx(Mem, SMx, Open, Ext, Loi, Loj, Leni, Lenj, Path);
 	return Score;
+	}
+
+static void MakeLogOddsSMx(const Sequence &A, const Sequence &B, 
+  const vector<vector<float> > &LogOddsMx, Mx<float> &MxS)
+	{
+	uint LA = A.GetLength();
+	uint LB = B.GetLength();
+	const char *ptrA = A.GetCharPtr();
+	const char *ptrB = B.GetCharPtr();
+	MxS.Alloc("LOS", LA, LB);
+	float **S = MxS.GetData();
+	for (uint i = 0; i < LA; ++i)
+		{
+		char a = ptrA[i];
+		byte ai = g_CharToLetterAmino[a];
+		for (uint j = 0; j < LB; ++j)
+			{
+			char b = ptrB[j];
+			byte bi = g_CharToLetterAmino[b];
+			if (ai < 20 && bi < 20)
+				S[i][j] = LogOddsMx[ai][bi];
+			else
+				S[i][j] = 0;
+			}
+		}
+	}
+
+float SWFast_Seqs_LO(XDPMem &Mem, const vector<vector<float> > &LogOddsMx,
+  const Sequence &A, const Sequence &B, float Open, float Ext,
+  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path)
+	{
+	Mx<float> SMx;
+	MakeLogOddsSMx(A, B, LogOddsMx, SMx);
+	float Score = SWFast_SMx(Mem, SMx, Open, Ext, Loi, Loj, Leni, Lenj, Path);
+	return Score;
+	}
+
+void cmd_sw()
+	{
+	const string &FaFN = g_Arg1;
+
+	MultiSequence Input;
+	LoadInput(Input);
+
+	const uint SeqCount = Input.GetSeqCount();
+	if (SeqCount < 2)
+		Die("%u seqs", SeqCount);
+
+	float Open = -5;
+	float Ext = -1;
+
+	XDPMem Mem;
+	uint PairCount = (SeqCount*(SeqCount - 1))/2;
+	uint PairIdx = 0;
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		const Sequence &seq_i = *Input.GetSequence(i);
+		for (uint j = i+1; j < SeqCount; ++j)
+			{
+			ProgressStep(PairIdx++, PairCount, "Aligning");
+			const Sequence &seq_j = *Input.GetSequence(j);
+			uint Loi, Loj, Leni, Lenj;
+			string Path;
+			float Score = SWFast_Seqs_BLOSUM62(Mem, seq_i, seq_j, Open, Ext,
+			  Loi, Loj, Leni, Lenj, Path);
+
+			Log("\n");
+			WriteLocalAln(g_fLog, seq_i.GetBytePtr(), seq_j.GetBytePtr(),
+			  Loi, Loj, Path.c_str());
+			Log("%s %s %.3g\n",
+			  seq_i.GetLabel().c_str(),
+			  seq_j.GetLabel().c_str(),
+			  Score);
+			}
+		}
 	}

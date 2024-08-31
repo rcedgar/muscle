@@ -26,7 +26,7 @@ float B62Mf[20][20] = {
   {  -1.76f, -2.41f, -3.06f, -2.02f,  2.94f, -3.04f,  1.69f, -1.33f, -1.82f, -1.06f, -0.99f, -2.08f, -2.92f, -1.42f, -1.69f, -1.69f, -1.61f, -1.21f,  2.15f,  6.59f,  }, // Y 
 };
 
-void MakeBlosumSMx(const Sequence &A, const Sequence &B, Mx<float> &MxS)
+void MakeBlosum62SMx(const Sequence &A, const Sequence &B, Mx<float> &MxS)
 	{
 	uint LA = A.GetLength();
 	uint LB = B.GetLength();

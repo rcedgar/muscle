@@ -6,7 +6,7 @@
 #include "upgma5.h"
 #include <mutex>
 
-float SWFast_Seqs(XDPMem &Mem, const Sequence &A, const Sequence &B,
+float SWFast_Seqs_BLOSUM62(XDPMem &Mem, const Sequence &A, const Sequence &B,
   float Open, float Ext, uint &Loi, uint &Loj, uint &Leni, uint &Lenj,
   string &Path);
 
@@ -70,7 +70,7 @@ static void ThreadBody(uint ThreadIndex, void *ptrData)
 		string Path;
 		uint Loi, Loj, Leni, Lenj;
 		uint ThreadIndex = GetThreadIndex();
-		float SWScore = SWFast_Seqs(Mem, Seqi, Seqj, Open, Ext,
+		float SWScore = SWFast_Seqs_BLOSUM62(Mem, Seqi, Seqj, Open, Ext,
 			Loi, Loj, Leni, Lenj, Path);
 		float MeanLength = (Li + Lj)/2.0f;
 		float NormScore = SWScore/MeanLength;

@@ -224,7 +224,7 @@ void PathToColVecs(const string &PathXY,
 	}
 	}
 
-static void WriteAnnotRow(FILE *f, const byte *A, const byte *B, const char *Path,
+void WriteAnnotRow(FILE *f, const byte *A, const byte *B, const char *Path,
   unsigned i, unsigned j, unsigned ColLo, unsigned ColHi)
 	{
 	fprintf(f, "%5.5s ", "");
@@ -254,7 +254,7 @@ static void WriteAnnotRow(FILE *f, const byte *A, const byte *B, const char *Pat
 	fprintf(f, "\n");
 	}
 
-static void WriteBRow(FILE *f, const byte *B, const char *Path,
+void WriteBRow(FILE *f, const byte *B, const char *Path,
   unsigned &j, unsigned ColLo, unsigned ColHi)
 	{
 	fprintf(f, "%5u ", j+1);
@@ -269,7 +269,7 @@ static void WriteBRow(FILE *f, const byte *B, const char *Path,
 	fprintf(f, " %u\n", j);
 	}
 
-static void WriteARow(FILE *f, const byte *A, const char *Path,
+void WriteARow(FILE *f, const byte *A, const char *Path,
   unsigned &i, unsigned ColLo, unsigned ColHi)
 	{
 	fprintf(f, "%5u ", i+1);

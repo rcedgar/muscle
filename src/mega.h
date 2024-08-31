@@ -53,6 +53,7 @@ public:
 	static void CalcBwdFlat_mega(
 	  const vector<vector<byte> > &ProfileX,
 	  const vector<vector<byte> > &ProfileY, float *Flat);
+	static uint GetAAFeatureIdx();
 
 public:
 	static uint GetGSIByLabel(const string &Label);

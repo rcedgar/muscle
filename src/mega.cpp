@@ -356,3 +356,12 @@ void Mega::LogFeatureParams(uint Idx)
 	LogVec(Name, m_LogProbsVec[Idx]);
 	LogMx(Name, m_LogProbMxVec[Idx]);
 	}
+
+uint Mega::GetAAFeatureIdx()
+	{
+	for (uint FeatureIdx = 0; FeatureIdx < SIZE(m_FeatureNames); ++FeatureIdx)
+		if (m_FeatureNames[FeatureIdx] == "AA")
+			return FeatureIdx;
+	Die("Mega::GetAAFeatureIdx(), not found");
+	return UINT_MAX;
+	}

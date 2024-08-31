@@ -12,6 +12,7 @@ public:
 	vector<MASMCol *> m_Cols;
 	vector<string> m_UngappedSeqs;
 	vector<vector<vector<byte> > > m_FeatureAlnVec;
+	uint m_AAFeatureIdx = UINT_MAX;
 
 public:
 	void Clear()
@@ -41,4 +42,5 @@ public:
 	void GetFreqs(uint ColIndex, uint FeatureIdx, vector<float> &Freqs);
 	void ToFile(const string &FileName) const;
 	void ToFile(FILE *f) const;
+	void MakeSMx_Sequence(const Sequence &Q, Mx<float> &SMx) const;
 	};

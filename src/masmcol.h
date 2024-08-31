@@ -24,11 +24,12 @@ public:
 // Score = m_ScoresVec[FeatureIdx][Letter]
 	vector<vector<float> > m_ScoresVec;
 
-// Letter = m_SortOrderVec[FeatureIdx][k]
-	vector<vector<byte> > m_SortOrderVec;
+//// Letter = m_SortOrderVec[FeatureIdx][k]
+//	vector<vector<byte> > m_SortOrderVec;
 
 public:
 	void SetScoreVec();
-	void SetSortOrderVec();
+	//void SetSortOrderVec();
 	void ToFile(FILE *f, uint ColIndex) const;
+	const vector<float> &GetAAScores() const;
 	};

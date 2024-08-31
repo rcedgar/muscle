@@ -29,25 +29,25 @@ void MASMCol::SetScoreVec()
 		}
 	}
 
-void MASMCol::SetSortOrderVec()
-	{
-	const uint FeatureCount = SIZE(m_FreqsVec);
-	m_SortOrderVec.resize(FeatureCount);
-	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
-		{
-		uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
-		vector<byte> &SortOrder = m_SortOrderVec[FeatureIdx];
-		const vector<float> &Freqs = m_FreqsVec[FeatureIdx];
-		vector<uint> Order(AlphaSize);
-		QuickSortOrderDesc(Freqs.data(), AlphaSize, Order.data());
-		for (uint i = 0; i < AlphaSize; ++i)
-			{
-			uint Letter = Order[i];
-			asserta(Letter < AlphaSize);
-			SortOrder.push_back(byte(Letter));
-			}
-		}
-	}
+//void MASMCol::SetSortOrderVec()
+//	{
+//	const uint FeatureCount = SIZE(m_FreqsVec);
+//	m_SortOrderVec.resize(FeatureCount);
+//	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
+//		{
+//		uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
+//		vector<byte> &SortOrder = m_SortOrderVec[FeatureIdx];
+//		const vector<float> &Freqs = m_FreqsVec[FeatureIdx];
+//		vector<uint> Order(AlphaSize);
+//		QuickSortOrderDesc(Freqs.data(), AlphaSize, Order.data());
+//		for (uint i = 0; i < AlphaSize; ++i)
+//			{
+//			uint Letter = Order[i];
+//			asserta(Letter < AlphaSize);
+//			SortOrder.push_back(byte(Letter));
+//			}
+//		}
+//	}
 
 void MASMCol::ToFile(FILE *f, uint ColIndex) const
 	{
@@ -55,7 +55,7 @@ void MASMCol::ToFile(FILE *f, uint ColIndex) const
 		return;
 	const uint FeatureCount = SIZE(m_FreqsVec);
 	asserta(SIZE(m_ScoresVec) == FeatureCount);
-	asserta(SIZE(m_SortOrderVec) == FeatureCount);
+	//asserta(SIZE(m_SortOrderVec) == FeatureCount);
 	fprintf(f, "col\t%u\t%u\n", ColIndex, FeatureCount);
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
 		{
@@ -75,10 +75,18 @@ void MASMCol::ToFile(FILE *f, uint ColIndex) const
 			fprintf(f, "\t%.3g", Scores[Letter]);
 		fprintf(f, "\n");
 
-		const vector<byte> &SortOrder = m_SortOrderVec[FeatureIdx];
-		fprintf(f, "sort");
-		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-			fprintf(f, "\t%u", SortOrder[Letter]);
-		fprintf(f, "\n");
+		//const vector<byte> &SortOrder = m_SortOrderVec[FeatureIdx];
+		//fprintf(f, "sort");
+		//for (uint Letter = 0; Letter < AlphaSize; ++Letter)
+		//	fprintf(f, "\t%u", SortOrder[Letter]);
+		//fprintf(f, "\n");
 		}
+	}
+
+const vector<float> &MASMCol::GetAAScores() const
+	{
+	uint AAFeatureIdx = m_MASM->m_AAFeatureIdx;
+	asserta(AAFeatureIdx < SIZE(m_ScoresVec));
+	const vector<float> &Scores = m_ScoresVec[AAFeatureIdx];
+	return Scores;
 	}

@@ -107,6 +107,7 @@ void MASM::FromMSA(const MultiSequence &Aln, float GapOpen, float GapExt)
 	m_ColCount = Aln.GetColCount();
 	m_SeqCount = Aln.GetSeqCount();
 	m_FeatureCount = Mega::GetFeatureCount();
+	m_AAFeatureIdx = Mega::GetAAFeatureIdx();
 	SetUngappedSeqs();
 	SetFeatureAlnVec();
 	for (uint ColIndex = 0; ColIndex < m_ColCount; ++ColIndex)
@@ -133,7 +134,6 @@ void MASM::FromMSA(const MultiSequence &Aln, float GapOpen, float GapExt)
 
 		GetFreqsVec(ColIndex, Col.m_FreqsVec);
 		Col.SetScoreVec();
-		Col.SetSortOrderVec();
 
 		m_Cols.push_back(&Col);
 		}
@@ -214,6 +214,29 @@ void MASM::SetFeatureAln(uint FeatureIdx)
 				Row.push_back(Letter);
 				++Pos;
 				}
+			}
+		}
+	}
+
+void MASM::MakeSMx_Sequence(const Sequence &Q, Mx<float> &SMx) const
+	{
+	const uint LM = m_ColCount;
+	const uint LQ = Q.GetLength();
+	SMx.Alloc(LM, LQ);
+	const char *qs = Q.GetCharPtr();
+	const uint FeatureCount = Mega::GetFeatureCount();
+	for (uint Col = 0; Col < LM; ++Col)
+		{
+		const MASMCol &MC = *m_Cols[Col];
+		const vector<float> &Scores = MC.GetAAScores();
+		for (uint PosQ = 0; PosQ < LQ; ++PosQ)
+			{
+			char q = qs[PosQ];
+			byte Letter = g_CharToLetterAmino[q];
+			float Score = 0;
+			if (Letter < 20)
+				Score = Scores[Letter];
+			SMx.Put(Col, PosQ, Score);
 			}
 		}
 	}

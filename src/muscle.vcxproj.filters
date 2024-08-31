@@ -626,6 +626,12 @@
     <ClCompile Include="masm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="loglocalaln.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swmasm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

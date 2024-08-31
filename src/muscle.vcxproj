@@ -230,6 +230,7 @@
     <ClCompile Include="getpostpairsalignedflat_mega.cpp" />
     <ClCompile Include="hscore.cpp" />
     <ClCompile Include="loadinput.cpp" />
+    <ClCompile Include="loglocalaln.cpp" />
     <ClCompile Include="m3alnparams.cpp" />
     <ClCompile Include="alignpairflat.cpp" />
     <ClCompile Include="allocflat.cpp" />
@@ -370,6 +371,7 @@
     <ClCompile Include="swdistmx.cpp" />
     <ClCompile Include="sweep.cpp" />
     <ClCompile Include="sweeper.cpp" />
+    <ClCompile Include="swmasm.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="test_malloc.cpp" />
     <ClCompile Include="test_mega.cpp" />

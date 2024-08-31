@@ -94,5 +94,7 @@ C(swdistmx)
 C(transalnref)
 C(mega_msas)
 C(masm_train)
+C(sw)
+C(swmasm)
 
 #undef C
