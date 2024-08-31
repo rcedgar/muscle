@@ -49,6 +49,14 @@ void MASMCol::SetScoreVec()
 //		}
 //	}
 
+const vector<float> &MASMCol::GetAAScores() const
+	{
+	uint AAFeatureIdx = m_MASM->m_AAFeatureIdx;
+	asserta(AAFeatureIdx < SIZE(m_ScoresVec));
+	const vector<float> &Scores = m_ScoresVec[AAFeatureIdx];
+	return Scores;
+	}
+
 void MASMCol::ToFile(FILE *f, uint ColIndex) const
 	{
 	if (f == 0)
@@ -56,12 +64,12 @@ void MASMCol::ToFile(FILE *f, uint ColIndex) const
 	const uint FeatureCount = SIZE(m_FreqsVec);
 	asserta(SIZE(m_ScoresVec) == FeatureCount);
 	//asserta(SIZE(m_SortOrderVec) == FeatureCount);
-	fprintf(f, "col\t%u\t%u\n", ColIndex, FeatureCount);
+	fprintf(f, "col\t%u\n", ColIndex);
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
 		{
 		uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
 		const string &Name = Mega::GetFeatureName(FeatureIdx);
-		fprintf(f, "feature\t%u\t%s\n", FeatureIdx, Name.c_str());
+		fprintf(f, "colfeature\t%u\n", FeatureIdx);
 
 		const vector<float> &Freqs = m_FreqsVec[FeatureIdx];
 		fprintf(f, "freqs");
@@ -83,10 +91,62 @@ void MASMCol::ToFile(FILE *f, uint ColIndex) const
 		}
 	}
 
-const vector<float> &MASMCol::GetAAScores() const
+void MASMCol::FromFile(FILE *f, uint ColIndex)
 	{
-	uint AAFeatureIdx = m_MASM->m_AAFeatureIdx;
-	asserta(AAFeatureIdx < SIZE(m_ScoresVec));
-	const vector<float> &Scores = m_ScoresVec[AAFeatureIdx];
-	return Scores;
+	asserta(f != 0);
+	asserta(m_MASM != 0);
+	const uint FeatureCount = m_MASM->m_FeatureCount;
+	//asserta(SIZE(m_SortOrderVec) == FeatureCount);
+	//fprintf(f, "col\t%u\t%u\n", ColIndex, FeatureCount);
+	vector<string> Fields;
+	ReadTabbedLine(f, Fields, 2);
+	asserta(Fields[0] == "col");
+	asserta(StrToUint(Fields[1]) == ColIndex);
+	m_FreqsVec.clear();
+	m_ScoresVec.clear();
+	m_FreqsVec.resize(FeatureCount);
+	m_ScoresVec.resize(FeatureCount);
+	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
+		{
+		//uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
+		//const string &Name = Mega::GetFeatureName(FeatureIdx);
+		//fprintf(f, "feature\t%u\t%s\n", FeatureIdx, Name.c_str());
+		ReadTabbedLine(f, Fields, 2);
+		asserta(Fields[0] == "colfeature");
+		asserta(StrToUint(Fields[1]) == FeatureIdx);
+		uint AlphaSize = m_MASM->m_AlphaSizes[FeatureIdx];
+
+		vector<float> &Freqs = m_FreqsVec[FeatureIdx];
+		vector<float> &Scores = m_ScoresVec[FeatureIdx];
+		//fprintf(f, "freqs");
+		//for (uint Letter = 0; Letter < AlphaSize; ++Letter)
+		//	fprintf(f, "\t%.3g", Freqs[Letter]);
+		//fprintf(f, "\n");
+		ReadTabbedLine(f, Fields, AlphaSize+1);
+		asserta(Fields[0] == "freqs");
+		float SumFreqs = 0;
+		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
+			{
+			float Freq = (float) StrToFloat(Fields[Letter+1]);
+			Freqs.push_back(Freq);
+			SumFreqs += Freq;
+			}
+		asserta(SumFreqs < 1.001);
+
+		//const vector<float> &Scores = m_ScoresVec[FeatureIdx];
+		//fprintf(f, "scores");
+		//for (uint Letter = 0; Letter < AlphaSize; ++Letter)
+		//	fprintf(f, "\t%.3g", Scores[Letter]);
+		//fprintf(f, "\n");
+		ReadTabbedLine(f, Fields, AlphaSize+1);
+		asserta(Fields[0] == "scores");
+		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
+			Scores.push_back((float) StrToFloat(Fields[Letter+1]));
+
+		//const vector<byte> &SortOrder = m_SortOrderVec[FeatureIdx];
+		//fprintf(f, "sort");
+		//for (uint Letter = 0; Letter < AlphaSize; ++Letter)
+		//	fprintf(f, "\t%u", SortOrder[Letter]);
+		//fprintf(f, "\n");
+		}
 	}

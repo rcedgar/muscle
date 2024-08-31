@@ -96,5 +96,7 @@ C(mega_msas)
 C(masm_train)
 C(sw)
 C(swmasm)
+C(swmasm_seq)
+C(masm_stats)
 
 #undef C

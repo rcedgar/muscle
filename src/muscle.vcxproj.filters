@@ -632,6 +632,9 @@
     <ClCompile Include="swmasm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="swmasm_seq.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

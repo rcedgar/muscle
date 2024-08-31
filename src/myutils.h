@@ -150,7 +150,7 @@ FILE *OpenStdioFile(const string &FileName);
 FILE *CreateStdioFile(const string &FileName);
 void CloseStdioFile(FILE *f);
 bool ReadLineStdioFile(FILE *f, string &Line);
-void ReadTabbedLineStdioFile(FILE *f, vector<string> &Fields, unsigned FieldCount);
+void ReadTabbedLine(FILE *f, vector<string> &Fields, unsigned FieldCount);
 void FlushStdioFile(FILE *f);
 bool StdioFileExists(const string &FileName);
 void LogStdioFileState(FILE *f);

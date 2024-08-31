@@ -22,7 +22,7 @@ void MASM::MakeSMx(const vector<vector<byte> > &ProfB, Mx<float> &SMx) const
 	{
 	const uint LA = m_ColCount;
 	const uint LB = SIZE(ProfB);
-	SMx.AllocData(LA, LB);
+	SMx.Alloc(LA, LB);
 	for (uint PosA = 0; PosA < LA; ++PosA)
 		{
 		const MASMCol &ColA = GetCol(PosA);
@@ -96,17 +96,20 @@ void MASM::GetFreqsVec(uint ColIndex, vector<vector<float> > &FreqsVec)
 		GetFreqs(ColIndex, FeatureIdx, FreqsVec[FeatureIdx]);
 	}
 
-void MASM::FromMSA(const MultiSequence &Aln, float GapOpen, float GapExt)
+void MASM::FromMSA(const MultiSequence &Aln, const string &Label,
+  float GapOpen, float GapExt)
 	{
 	asserta(GapOpen >= 0);
 	asserta(GapExt >= 0);
 
 	Clear();
-
+	m_Label = Label;
 	m_Aln = &Aln;
 	m_ColCount = Aln.GetColCount();
 	m_SeqCount = Aln.GetSeqCount();
 	m_FeatureCount = Mega::GetFeatureCount();
+	m_FeatureNames = Mega::m_FeatureNames;
+	m_AlphaSizes = Mega::m_AlphaSizes;
 	m_AAFeatureIdx = Mega::GetAAFeatureIdx();
 	SetUngappedSeqs();
 	SetFeatureAlnVec();
@@ -152,8 +155,11 @@ void MASM::ToFile(FILE *f) const
 	{
 	if (f == 0)
 		return;
-	fprintf(f, "MSAM\t%u\t%u\t%u\n",
-	  m_SeqCount, m_ColCount, Mega::GetFeatureCount());
+	fprintf(f, "MASM\t%u\t%u\t%u\t%s\n",
+	  m_SeqCount, m_ColCount, Mega::GetFeatureCount(), m_Label.c_str());
+	for (uint i = 0; i < m_FeatureCount; ++i)
+		fprintf(f, "feature\t%u\t%s\t%u\n",
+		  i, m_FeatureNames[i].c_str(), m_AlphaSizes[i]);
 	for (uint i = 0; i < m_ColCount; ++i)
 		m_Cols[i]->ToFile(f, i);
 	}
@@ -224,7 +230,6 @@ void MASM::MakeSMx_Sequence(const Sequence &Q, Mx<float> &SMx) const
 	const uint LQ = Q.GetLength();
 	SMx.Alloc(LM, LQ);
 	const char *qs = Q.GetCharPtr();
-	const uint FeatureCount = Mega::GetFeatureCount();
 	for (uint Col = 0; Col < LM; ++Col)
 		{
 		const MASMCol &MC = *m_Cols[Col];
@@ -239,4 +244,47 @@ void MASM::MakeSMx_Sequence(const Sequence &Q, Mx<float> &SMx) const
 			SMx.Put(Col, PosQ, Score);
 			}
 		}
+	}
+
+void MASM::FromFile(const string &FileName)
+	{
+	if (FileName == "")
+		Die("Missing MASM input file");
+
+	Clear();
+	FILE *f = OpenStdioFile(FileName);
+	string Line;
+	vector<string> Fields;
+	bool Ok = ReadLineStdioFile(f, Line);
+	asserta(Ok);
+	Split(Line, Fields, '\t');
+	asserta(SIZE(Fields) == 5);
+	asserta(Fields[0] == "MASM");
+	uint SeqCount = StrToUint(Fields[1]);
+	uint ColCount = StrToUint(Fields[2]);
+	uint FeatureCount = StrToUint(Fields[3]);
+	m_Label = Fields[4];
+	m_SeqCount = SeqCount;
+	m_ColCount = ColCount;
+	m_FeatureCount = FeatureCount;
+	for (uint i = 0; i < FeatureCount; ++i)
+		{
+		bool Ok = ReadLineStdioFile(f, Line);
+		asserta(Ok);
+		Split(Line, Fields, '\t');
+		asserta(SIZE(Fields) == 4);
+		asserta(Fields[0] == "feature");
+		asserta(StrToUint(Fields[1]) == i);
+		m_FeatureNames.push_back(Fields[2]);
+		m_AlphaSizes.push_back(StrToUint(Fields[3]));
+		}
+
+	for (uint i = 0; i < m_ColCount; ++i)
+		{
+		MASMCol *MC = new MASMCol;
+		MC->m_MASM = this;
+		MC->FromFile(f, i);
+		m_Cols.push_back(MC);
+		}
+	CloseStdioFile(f);
 	}

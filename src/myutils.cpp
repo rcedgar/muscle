@@ -630,7 +630,7 @@ bool ReadLineStdioFile(FILE *f, char *Line, uint32 Bytes)
 	return true;
 	}
 
-void ReadTabbedLineStdioFile(FILE *f, vector<string> &Fields, unsigned FieldCount)
+void ReadTabbedLine(FILE *f, vector<string> &Fields, unsigned FieldCount)
 	{
 	string Line;
 	bool Ok = ReadLineStdioFile(f, Line);

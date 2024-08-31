@@ -286,6 +286,18 @@ uint Mega::GetAlphaSize(uint FeatureIndex)
 	return m_AlphaSizes[FeatureIndex];
 	}
 
+const string &Mega::GetLabel(uint ProfileIdx)
+	{
+	asserta(ProfileIdx < SIZE(m_Profiles));
+	return m_Labels[ProfileIdx];
+	}
+
+const vector<vector<byte> > &Mega::GetProfile(uint ProfileIdx)
+	{
+	asserta(ProfileIdx < SIZE(m_Profiles));
+	return m_Profiles[ProfileIdx];
+	}
+
 float Mega::GetMatchScore(
   const vector<vector<byte> > &ProfileX, uint PosX,
   const vector<vector<byte> > &ProfileY, uint PosY)

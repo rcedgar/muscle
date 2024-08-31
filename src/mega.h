@@ -30,6 +30,9 @@ public:
 	static bool m_Loaded;
 
 public:
+	static uint GetProfileCount() { return SIZE(m_Profiles); }
+	static const vector<vector<byte> > &GetProfile(uint ProfileIdx);
+	static const string &GetLabel(uint ProfileIdx);
 	static void FromFile(const string &FileName);
 	static uint GetFeatureCount() { return m_FeatureCount; }
 	static uint GetAlphaSize(uint FeatureIndex);

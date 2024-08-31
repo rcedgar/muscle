@@ -372,6 +372,7 @@
     <ClCompile Include="sweep.cpp" />
     <ClCompile Include="sweeper.cpp" />
     <ClCompile Include="swmasm.cpp" />
+    <ClCompile Include="swmasm_seq.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="test_malloc.cpp" />
     <ClCompile Include="test_mega.cpp" />
