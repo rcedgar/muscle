@@ -230,6 +230,7 @@
     <ClCompile Include="getpostpairsalignedflat_mega.cpp" />
     <ClCompile Include="hscore.cpp" />
     <ClCompile Include="loadinput.cpp" />
+    <ClCompile Include="logaln_masm.cpp" />
     <ClCompile Include="loglocalaln.cpp" />
     <ClCompile Include="m3alnparams.cpp" />
     <ClCompile Include="alignpairflat.cpp" />

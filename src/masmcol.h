@@ -32,4 +32,5 @@ public:
 	void ToFile(FILE *f, uint ColIndex) const;
 	void FromFile(FILE *f, uint ColIndex);
 	const vector<float> &GetAAScores() const;
+	char GetConsensusAAChar() const;
 	};

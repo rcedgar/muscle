@@ -4,6 +4,33 @@
 #include "mega.h"
 #include "sort.h"
 
+char MASMCol::GetConsensusAAChar() const
+	{
+	uint FI = m_MASM->m_AAFeatureIdx;
+	asserta(FI < SIZE(m_FreqsVec));
+	const vector<float> &Freqs = m_FreqsVec[FI];
+	asserta(SIZE(Freqs) == 20);
+	float MaxFreq = 0;
+	float SumFreq = 0;
+	uint MaxLetter = 0;
+	for (uint Letter = 0; Letter < 20; ++Letter)
+		{
+		float Freq = Freqs[Letter];
+		if (Freq > MaxFreq)
+			{
+			MaxFreq = Freq;
+			MaxLetter = Letter;
+			}
+		SumFreq += Freq;
+		}
+	if (SumFreq < 0.5f)
+		return '-';
+	char c = g_LetterToCharAmino[MaxLetter];
+	if (MaxFreq < 0.5)
+		return tolower(c);
+	return c;
+	}
+
 void MASMCol::SetScoreVec()
 	{
 	const uint FeatureCount = SIZE(m_FreqsVec);

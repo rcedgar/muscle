@@ -53,4 +53,5 @@ public:
 	void ToFile(FILE *f) const;
 	void FromFile(const string &FileName);
 	void MakeSMx_Sequence(const Sequence &Q, Mx<float> &SMx) const;
+	void GetConsensusSeq(string &Seq) const;
 	};

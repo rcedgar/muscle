@@ -267,6 +267,7 @@ void MASM::FromFile(const string &FileName)
 	m_SeqCount = SeqCount;
 	m_ColCount = ColCount;
 	m_FeatureCount = FeatureCount;
+	m_AAFeatureIdx = UINT_MAX;
 	for (uint i = 0; i < FeatureCount; ++i)
 		{
 		bool Ok = ReadLineStdioFile(f, Line);
@@ -275,7 +276,10 @@ void MASM::FromFile(const string &FileName)
 		asserta(SIZE(Fields) == 4);
 		asserta(Fields[0] == "feature");
 		asserta(StrToUint(Fields[1]) == i);
-		m_FeatureNames.push_back(Fields[2]);
+		const string &FeatureName = Fields[2];
+		m_FeatureNames.push_back(FeatureName);
+		if (FeatureName == "AA")
+			m_AAFeatureIdx = i;
 		m_AlphaSizes.push_back(StrToUint(Fields[3]));
 		}
 
@@ -287,4 +291,11 @@ void MASM::FromFile(const string &FileName)
 		m_Cols.push_back(MC);
 		}
 	CloseStdioFile(f);
+	}
+
+void MASM::GetConsensusSeq(string &Seq) const
+	{
+	Seq.clear();
+	for (uint Col = 0; Col < m_ColCount; ++Col)
+		Seq += m_Cols[Col]->GetConsensusAAChar();
 	}
