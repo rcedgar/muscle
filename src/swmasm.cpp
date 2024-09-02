@@ -29,6 +29,8 @@ void cmd_swmasm()
 	const string &MasmFN = g_Arg1;
 	const string &MegaFN = opt(query);
 
+	FILE *fOut = CreateStdioFile(opt_output);
+
 	Mega::FromFile(MegaFN);
 
 	MASM M;
@@ -47,5 +49,15 @@ void cmd_swmasm()
 		WriteLocalAln_MASM(g_fLog, LabelM, M, LabelQ, Q, Loi, Loj, Path.c_str());
 		Log("Score = %.3g\n", Score);
 		Log("\n");
+
+		if (fOut != 0)
+			{
+			fprintf(fOut, "%s", LabelM.c_str());
+			fprintf(fOut, "\t%s", LabelQ.c_str());
+			fprintf(fOut, "\t%.3g", Score);
+			fprintf(fOut, "\n");
+			}
 		}
+
+	CloseStdioFile(fOut);
 	}
