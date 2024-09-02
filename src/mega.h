@@ -28,6 +28,8 @@ public:
 	static uint m_NextLineNr;
 	static uint m_FeatureCount;
 	static bool m_Loaded;
+	static float m_GapOpen;
+	static float m_GapExt;
 
 public:
 	static uint GetProfileCount() { return SIZE(m_Profiles); }

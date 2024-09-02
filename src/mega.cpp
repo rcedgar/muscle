@@ -20,6 +20,8 @@ vector<string> m_Labels;
 uint Mega::m_NextLineNr;
 uint Mega::m_FeatureCount;
 bool Mega::m_Loaded = false;
+float Mega::m_GapOpen = FLT_MAX;
+float Mega::m_GapExt = FLT_MAX;
 unordered_map<string, uint> Mega::m_LabelToIdx;
 unordered_map<string, uint> Mega::m_SeqToIdx;
 
@@ -131,10 +133,12 @@ void Mega::FromFile(const string &FileName)
     CloseStdioFile(f);
     
     vector<string> flds;
-    GetNextFields(flds, 3);
+    GetNextFields(flds, 5);
     asserta(flds[0] == "mega");
     m_FeatureCount = StrToUint(flds[1]);
     uint ProfileCount = StrToUint(flds[2]);
+	m_GapOpen = (float) StrToFloat(flds[3]);
+	m_GapExt = (float) StrToFloat(flds[4]);
     m_LogProbsVec.resize(m_FeatureCount);
     m_LogProbMxVec.resize(m_FeatureCount);
     m_LogOddsMxVec.resize(m_FeatureCount);

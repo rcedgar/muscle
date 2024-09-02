@@ -14,9 +14,10 @@ float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
   string &Path);
 
 float SWFast_MASM(XDPMem &Mem, const MASM &A, const vector<vector<byte> > &B,
-  float Open, float Ext,
   uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path)
 	{
+	float Open = A.m_GapOpen;
+	float Ext = A.m_GapExt;
 	Mx<float> SMx;
 	A.MakeSMx(B, SMx);
 	float Score = SWFast_SMx(Mem, SMx, -Open, -Ext, Loi, Loj, Leni, Lenj, Path);
@@ -34,9 +35,6 @@ void cmd_swmasm()
 	M.FromFile(MasmFN);
 	const string &LabelM = M.m_Label;
 
-	float GapOpen = 0.685533f;
-	float GapExt = 0.051881f;
-
 	XDPMem Mem;
 	const uint QueryProfileCount = Mega::GetProfileCount();
 	for (uint i = 0; i < QueryProfileCount; ++i)
@@ -45,8 +43,7 @@ void cmd_swmasm()
 		const string &LabelQ = Mega::GetLabel(i);
 		uint Loi, Loj, Leni, Lenj;
 		string Path;
-		float Score = SWFast_MASM(Mem, M, Q, GapOpen, GapExt,
-		  Loi, Loj, Leni, Lenj, Path);
+		float Score = SWFast_MASM(Mem, M, Q, Loi, Loj, Leni, Lenj, Path);
 		WriteLocalAln_MASM(g_fLog, LabelM, M, LabelQ, Q, Loi, Loj, Path.c_str());
 		Log("Score = %.3g\n", Score);
 		Log("\n");

@@ -1,30 +1,6 @@
 #include "muscle.h"
 #include "masm.h"
 
-void cmd_masm_train()
-	{
-	const string &AlnFN = g_Arg1;
-	const string &MegaFN = opt(input);
-
-	Mega::FromFile(MegaFN);
-
-	MultiSequence Aln;
-	Aln.FromFASTA(AlnFN);
-
-	float GapOpen = 4;
-	float GapExt = 0.5;
-
-	string Label;
-	if (optset_label)
-		Label = opt(label);
-	else
-		Label = string(BaseName(AlnFN.c_str()));
-
-	MASM M;
-	M.FromMSA(Aln, Label, GapOpen, GapExt);
-	M.ToFile(opt(output));
-	}
-
 void cmd_masm_stats()
 	{
 	MASM M;
@@ -37,4 +13,25 @@ void cmd_masm_stats()
 		  M.m_FeatureNames[FeatureIdx].c_str(), 
 		  M.m_AlphaSizes[FeatureIdx]); 
 	ProgressLog("\n");
+	}
+
+void cmd_masm_train()
+	{
+	const string &AlnFN = g_Arg1;
+	const string &MegaFN = opt(input);
+
+	Mega::FromFile(MegaFN);
+
+	MultiSequence Aln;
+	Aln.FromFASTA(AlnFN);
+
+	string Label;
+	if (optset_label)
+		Label = opt(label);
+	else
+		Label = string(BaseName(AlnFN.c_str()));
+
+	MASM M;
+	M.FromMSA(Aln, Label, Mega::m_GapOpen, Mega::m_GapExt);
+	M.ToFile(opt(output));
 	}

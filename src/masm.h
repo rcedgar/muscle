@@ -15,6 +15,8 @@ public:
 	vector<MASMCol *> m_Cols;
 	vector<string> m_UngappedSeqs;
 	vector<vector<vector<byte> > > m_FeatureAlnVec;
+	float m_GapOpen = FLT_MAX;
+	float m_GapExt = FLT_MAX;
 	uint m_AAFeatureIdx = UINT_MAX;
 
 public:
