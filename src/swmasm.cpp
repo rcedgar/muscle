@@ -29,7 +29,7 @@ void cmd_swmasm()
 	const string &MasmFN = g_Arg1;
 	const string &MegaFN = opt(query);
 
-	FILE *fOut = CreateStdioFile(opt_output);
+	FILE *fOut = CreateStdioFile(opt(output));
 
 	Mega::FromFile(MegaFN);
 
