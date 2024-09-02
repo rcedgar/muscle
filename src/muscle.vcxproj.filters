@@ -626,7 +626,7 @@
     <ClCompile Include="masm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="loglocalaln.cpp">
+    <ClCompile Include="writelocalaln.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="swmasm.cpp">

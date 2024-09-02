@@ -178,3 +178,14 @@ const byte *GetByteSeqByGSI(uint GSI);
 void LoadInput(MultiSequence &InputSeqs);
 //float *CalcPost(uint GSIX, uint GSIY);
 float *CalcPost(const string &Label1, const string &Label2);
+
+void WriteLocalAln(FILE *f, const string &LabelA, const byte *A,
+  const string &LabelB, const byte *B,
+  uint Loi, uint Loj, const char *Path);
+
+void WriteAnnotRow(FILE *f, const byte *A, const byte *B, const char *Path,
+  unsigned i, unsigned j, unsigned ColLo, unsigned ColHi);
+void WriteBRow(FILE *f, const byte *B, const char *Path,
+  unsigned &j, unsigned ColLo, unsigned ColHi, const string &LabelB);
+void WriteARow(FILE *f, const byte *A, const char *Path,
+  unsigned &i, unsigned ColLo, unsigned ColHi, const string &LabelA);

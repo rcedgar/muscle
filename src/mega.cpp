@@ -286,6 +286,12 @@ uint Mega::GetAlphaSize(uint FeatureIndex)
 	return m_AlphaSizes[FeatureIndex];
 	}
 
+float Mega::GetWeight(uint FeatureIndex)
+	{
+	asserta(FeatureIndex < SIZE(m_Weights));
+	return m_Weights[FeatureIndex];
+	}
+
 const string &Mega::GetLabel(uint ProfileIdx)
 	{
 	asserta(ProfileIdx < SIZE(m_Profiles));

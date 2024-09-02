@@ -1,13 +1,6 @@
 #include "muscle.h"
 #include "masm.h"
 
-void WriteAnnotRow(FILE *f, const byte *A, const byte *B, const char *Path,
-  unsigned i, unsigned j, unsigned ColLo, unsigned ColHi);
-void WriteBRow(FILE *f, const byte *B, const char *Path,
-  unsigned &j, unsigned ColLo, unsigned ColHi);
-void WriteARow(FILE *f, const byte *A, const char *Path,
-  unsigned &i, unsigned ColLo, unsigned ColHi);
-
 void GetMegaProfileAASeq(const vector<vector<byte> > &Profile, string &Seq)
 	{
 	Seq.clear();
@@ -26,7 +19,8 @@ void GetMegaProfileAASeq(const vector<vector<byte> > &Profile, string &Seq)
 		Seq += g_LetterToCharAmino[Profile[i][PI]];
 	}
 
-void WriteLocalAln_MASM(FILE *f, const MASM &MA, const vector<vector<byte> > &PB,
+void WriteLocalAln_MASM(FILE *f, const string &LabelA, const MASM &MA,
+  const string &LabelB, const vector<vector<byte> > &PB,
   uint Loi, uint Loj, const char *Path)
 	{
 	string strA;
@@ -52,12 +46,12 @@ void WriteLocalAln_MASM(FILE *f, const MASM &MA, const vector<vector<byte> > &PB
 		if (ColTo > ColHi)
 			ColTo = ColHi;
 
+		fprintf(f, "\n");
 		unsigned i0 = PosA;
 		unsigned j0 = PosB;
-		WriteARow(f, A, Path, PosA, ColFrom, ColTo);
+		WriteARow(f, A, Path, PosA, ColFrom, ColTo, LabelA);
 		WriteAnnotRow(f, A, B, Path, i0, j0, ColFrom, ColTo);
-		WriteBRow(f, B, Path, PosB, ColFrom, ColTo);
-		fprintf(f, "\n");
+		WriteBRow(f, B, Path, PosB, ColFrom, ColTo, LabelB);
 
 		ColFrom += BLOCK_SIZE;
 		}

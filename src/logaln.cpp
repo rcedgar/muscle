@@ -255,7 +255,7 @@ void WriteAnnotRow(FILE *f, const byte *A, const byte *B, const char *Path,
 	}
 
 void WriteBRow(FILE *f, const byte *B, const char *Path,
-  unsigned &j, unsigned ColLo, unsigned ColHi)
+  unsigned &j, unsigned ColLo, unsigned ColHi, const string &LabelB)
 	{
 	fprintf(f, "%5u ", j+1);
 	for (unsigned k = ColLo; k <= ColHi; ++k)
@@ -266,11 +266,11 @@ void WriteBRow(FILE *f, const byte *B, const char *Path,
 		else
 			fprintf(f, "-");
 		}
-	fprintf(f, " %u\n", j);
+	fprintf(f, " %u  %s\n", j, LabelB.c_str());
 	}
 
 void WriteARow(FILE *f, const byte *A, const char *Path,
-  unsigned &i, unsigned ColLo, unsigned ColHi)
+  unsigned &i, unsigned ColLo, unsigned ColHi, const string &LabelA)
 	{
 	fprintf(f, "%5u ", i+1);
 	for (unsigned k = ColLo; k <= ColHi; ++k)
@@ -281,7 +281,7 @@ void WriteARow(FILE *f, const byte *A, const char *Path,
 		else
 			fprintf(f, "-");
 		}
-	fprintf(f, " %u\n", i);
+	fprintf(f, " %u  %s\n", i, LabelA.c_str());
 	}
 
 void WriteAlnPretty(FILE *f, const byte *A, const byte *B, const char *Path)
@@ -308,9 +308,9 @@ void WriteAlnPretty(FILE *f, const byte *A, const byte *B, const char *Path)
 
 		unsigned i0 = i;
 		unsigned j0 = j;
-		WriteARow(f, A, Path, i, ColFrom, ColTo);
+		WriteARow(f, A, Path, i, ColFrom, ColTo, "");
 		WriteAnnotRow(f, A, B, Path, i0, j0, ColFrom, ColTo);
-		WriteBRow(f, B, Path, j, ColFrom, ColTo);
+		WriteBRow(f, B, Path, j, ColFrom, ColTo, "");
 		fprintf(f, "\n");
 
 		ColFrom += BLOCK_SIZE;

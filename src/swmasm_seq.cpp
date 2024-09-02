@@ -5,7 +5,8 @@
 #include "swtrace.h"
 #include "masm.h"
 
-void WriteLocalAln(FILE *f, const byte *A, const byte *B,
+void WriteLocalAln(FILE *f, const string &LabelA, const byte *A,
+  const string &LabelB, const byte *B,
   uint Loi, uint Loj, const char *Path);
 float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
   float Open, float Ext, uint &Loi, uint &Loj, uint &Leni, uint &Lenj,

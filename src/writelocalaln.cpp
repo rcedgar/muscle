@@ -1,13 +1,7 @@
 #include "muscle.h"
 
-void WriteAnnotRow(FILE *f, const byte *A, const byte *B, const char *Path,
-  unsigned i, unsigned j, unsigned ColLo, unsigned ColHi);
-void WriteBRow(FILE *f, const byte *B, const char *Path,
-  unsigned &j, unsigned ColLo, unsigned ColHi);
-void WriteARow(FILE *f, const byte *A, const char *Path,
-  unsigned &i, unsigned ColLo, unsigned ColHi);
-
-void WriteLocalAln(FILE *f, const byte *A, const byte *B,
+void WriteLocalAln(FILE *f, const string &LabelA, const byte *A,
+  const string &LabelB, const byte *B,
   uint Loi, uint Loj, const char *Path)
 	{
 	const unsigned BLOCK_SIZE = 80;
@@ -29,9 +23,9 @@ void WriteLocalAln(FILE *f, const byte *A, const byte *B,
 
 		unsigned i0 = PosA;
 		unsigned j0 = PosB;
-		WriteARow(f, A, Path, PosA, ColFrom, ColTo);
+		WriteARow(f, A, Path, PosA, ColFrom, ColTo, LabelA);
 		WriteAnnotRow(f, A, B, Path, i0, j0, ColFrom, ColTo);
-		WriteBRow(f, B, Path, PosB, ColFrom, ColTo);
+		WriteBRow(f, B, Path, PosB, ColFrom, ColTo, LabelB);
 		fprintf(f, "\n");
 
 		ColFrom += BLOCK_SIZE;

@@ -36,6 +36,7 @@ public:
 	static void FromFile(const string &FileName);
 	static uint GetFeatureCount() { return m_FeatureCount; }
 	static uint GetAlphaSize(uint FeatureIndex);
+	static float GetWeight(uint FeatureIndex);
 	static const string &GetFeatureName(uint FeatureIndex);
 	static const string &GetNextLine();
 	static void GetNextFields(vector<string> &Fields,

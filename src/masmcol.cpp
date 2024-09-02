@@ -38,6 +38,8 @@ void MASMCol::SetScoreVec()
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
 		{
 		uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
+
+	// Weights are already applied to ScoreMx
 		const vector<vector<float> > &ScoreMx = Mega::m_LogOddsMxVec[FeatureIdx];
 		asserta(SIZE(ScoreMx) == AlphaSize);
 		const vector<float> &Freqs = m_FreqsVec[FeatureIdx];
@@ -51,6 +53,8 @@ void MASMCol::SetScoreVec()
 				float Freq2 = Freqs[Letter2];
 				Total += Freq2*ScoreMx[Letter][Letter2];
 				}
+
+		// Weights are already applied to ScoreMx
 			Scores.push_back(Total);
 			}
 		}

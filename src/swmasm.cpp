@@ -5,7 +5,8 @@
 #include "swtrace.h"
 #include "masm.h"
 
-void WriteLocalAln_MASM(FILE *f, const MASM &MA, const vector<vector<byte> > &Q,
+void WriteLocalAln_MASM(FILE *f, const string &LabelA, const MASM &MA,
+  const string &LabelQ, const vector<vector<byte> > &Q,
   uint Loi, uint Loj, const char *Path);
 
 float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
@@ -31,9 +32,10 @@ void cmd_swmasm()
 
 	MASM M;
 	M.FromFile(MasmFN);
+	const string &LabelM = M.m_Label;
 
-	float GapOpen = 1.5;
-	float GapExt = 0.42;
+	float GapOpen = 0.685533f;
+	float GapExt = 0.051881f;
 
 	XDPMem Mem;
 	const uint QueryProfileCount = Mega::GetProfileCount();
@@ -45,9 +47,8 @@ void cmd_swmasm()
 		string Path;
 		float Score = SWFast_MASM(Mem, M, Q, GapOpen, GapExt,
 		  Loi, Loj, Leni, Lenj, Path);
-		WriteLocalAln_MASM(g_fLog, M, Q, Loi, Loj, Path.c_str());
-		Log("%10.3g  %16.16s  %7u  %7u  %s\n",
-		  Score, LabelQ.c_str(), Loi, Loj, Path.c_str());
+		WriteLocalAln_MASM(g_fLog, LabelM, M, LabelQ, Q, Loi, Loj, Path.c_str());
+		Log("Score = %.3g\n", Score);
 		Log("\n");
 		}
 	}

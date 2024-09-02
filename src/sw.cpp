@@ -5,8 +5,6 @@
 #include "swtrace.h"
 
 void MakeBlosum62SMx(const Sequence &A, const Sequence &B, Mx<float> &MxS);
-void WriteLocalAln(FILE *f, const byte *A, const byte *B,
-  uint Loi, uint Loj, const char *Path);
 
 void TraceBackBitSW(XDPMem &Mem,
   uint LA, uint LB, uint Besti, uint Bestj,
@@ -280,18 +278,21 @@ void cmd_sw()
 	for (uint i = 0; i < SeqCount; ++i)
 		{
 		const Sequence &seq_i = *Input.GetSequence(i);
+		const string &Label_i = seq_i.m_Label;
 		for (uint j = i+1; j < SeqCount; ++j)
 			{
 			ProgressStep(PairIdx++, PairCount, "Aligning");
 			const Sequence &seq_j = *Input.GetSequence(j);
+			const string &Label_j = seq_j.m_Label;
+
 			uint Loi, Loj, Leni, Lenj;
 			string Path;
 			float Score = SWFast_Seqs_BLOSUM62(Mem, seq_i, seq_j, Open, Ext,
 			  Loi, Loj, Leni, Lenj, Path);
 
 			Log("\n");
-			WriteLocalAln(g_fLog, seq_i.GetBytePtr(), seq_j.GetBytePtr(),
-			  Loi, Loj, Path.c_str());
+			WriteLocalAln(g_fLog, Label_i, seq_i.GetBytePtr(),
+			  Label_j, seq_j.GetBytePtr(), Loi, Loj, Path.c_str());
 			Log("%s %s %.3g\n",
 			  seq_i.GetLabel().c_str(),
 			  seq_j.GetLabel().c_str(),
