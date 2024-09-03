@@ -1,7 +1,7 @@
 #include "muscle.h"
 #include "mega.h"
 
-void cmd_test()
+void _cmd_test()
 	{
 #if 0
 	Mega M;

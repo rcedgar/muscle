@@ -226,6 +226,7 @@
     <ClCompile Include="cmd_newbench_selectpfams.cpp" />
     <ClCompile Include="cmd_squeeze_inserts.cpp" />
     <ClCompile Include="cmp_ref_msas.cpp" />
+    <ClCompile Include="enumpaths.cpp" />
     <ClCompile Include="fwdflat_mega.cpp" />
     <ClCompile Include="getpostpairsalignedflat_mega.cpp" />
     <ClCompile Include="hscore.cpp" />
@@ -424,6 +425,7 @@
     <ClCompile Include="viterbifastmem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="enumpaths.h" />
     <ClInclude Include="m3alnparams.h" />
     <ClInclude Include="alpha.h" />
     <ClInclude Include="alpha3.h" />
