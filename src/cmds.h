@@ -98,5 +98,6 @@ C(sw)
 C(swmasm)
 C(swmasm_seq)
 C(masm_stats)
+C(mega2)
 
 #undef C

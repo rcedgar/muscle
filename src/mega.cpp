@@ -310,6 +310,28 @@ const vector<vector<byte> > &Mega::GetProfile(uint ProfileIdx)
 	return m_Profiles[ProfileIdx];
 	}
 
+float Mega::GetMatchScore_LogOdds(
+  const vector<vector<byte> > &ProfileX, uint PosX,
+  const vector<vector<byte> > &ProfileY, uint PosY)
+	{
+	const uint LX = SIZE(ProfileX);
+	const uint LY = SIZE(ProfileY);
+	asserta(PosX < LX);
+	asserta(PosY < LY);
+	const vector<byte> &ProfColX = ProfileX[PosX];
+	const vector<byte> &ProfColY = ProfileY[PosY];
+	float Score = 0;
+	for (uint i = 0; i < m_FeatureCount; ++i)
+		{
+		const vector<vector<float> > &SubstMx = m_LogOddsMxVec[i];
+		byte LetterX = ProfColX[i];
+		byte LetterY = ProfColY[i];
+		float LetterPairScore = SubstMx[LetterX][LetterY];
+		Score += LetterPairScore*m_Weights[i];
+		}
+	return Score;
+	}
+
 float Mega::GetMatchScore(
   const vector<vector<byte> > &ProfileX, uint PosX,
   const vector<vector<byte> > &ProfileY, uint PosY)

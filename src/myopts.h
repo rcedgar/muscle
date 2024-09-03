@@ -103,6 +103,8 @@ FLT_OPT(shrink)
 
 FLT_OPT(gapopen)
 FLT_OPT(gapext)
+FLT_OPT(termgapopen)
+FLT_OPT(termgapext)
 FLT_OPT(center)
 
 FLT_OPT(s_is)

@@ -47,6 +47,9 @@ public:
 	static float GetMatchScore(
 	  const vector<vector<byte> > &ProfileX, uint PosX,
 	  const vector<vector<byte> > &ProfileY, uint PosY);
+	static float GetMatchScore_LogOdds(
+	  const vector<vector<byte> > &ProfileX, uint PosX,
+	  const vector<vector<byte> > &ProfileY, uint PosY);
 	static void CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
 	  vector<float> &Freqs);
 	static void LogFeatureParams(uint Idx);
