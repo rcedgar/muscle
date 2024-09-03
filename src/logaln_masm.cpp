@@ -23,6 +23,8 @@ void WriteLocalAln_MASM(FILE *f, const string &LabelA, const MASM &MA,
   const string &LabelB, const vector<vector<byte> > &PB,
   uint Loi, uint Loj, const char *Path)
 	{
+	if (f == 0)
+		return;
 	string strA;
 	string strB;
 	MA.GetConsensusSeq(strA);

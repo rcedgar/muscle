@@ -41,6 +41,7 @@ void cmd_swmasm()
 	const uint QueryProfileCount = Mega::GetProfileCount();
 	for (uint i = 0; i < QueryProfileCount; ++i)
 		{
+		ProgressStep(i, QueryProfileCount, "Aligning");
 		const vector<vector<byte> > &Q = Mega::GetProfile(i);
 		const string &LabelQ = Mega::GetLabel(i);
 		uint Loi, Loj, Leni, Lenj;

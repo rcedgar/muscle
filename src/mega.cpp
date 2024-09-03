@@ -120,6 +120,8 @@ void Mega::CalcMarginalFreqs(const vector<vector<float > > &FreqsMx,
 
 void Mega::FromFile(const string &FileName)
 	{
+	if (FileName == "")
+		Die("Missing mega filename");
 	m_Loaded = true;
 
 	asserta(m_FeatureNames.empty());

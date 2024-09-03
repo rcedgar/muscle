@@ -12,7 +12,8 @@ static float ScorePP(const MASMCol &PPA, const vector<byte> &ProfColB)
 		{
 		const vector<float> &ScoresA = PPA.m_ScoresVec[FeatureIdx];
 		byte LetterB = ProfColB[FeatureIdx];
-		TotalScore += ScoresA[LetterB];
+		if (LetterB != UINT8_MAX)
+			TotalScore += ScoresA[LetterB];
 		}
 	
 	return TotalScore;
@@ -104,6 +105,8 @@ void MASM::FromMSA(const MultiSequence &Aln, const string &Label,
 
 	Clear();
 	m_Label = Label;
+	m_GapOpen = GapOpen;
+	m_GapExt= GapExt;
 	m_Aln = &Aln;
 	m_ColCount = Aln.GetColCount();
 	m_SeqCount = Aln.GetSeqCount();
@@ -155,8 +158,9 @@ void MASM::ToFile(FILE *f) const
 	{
 	if (f == 0)
 		return;
-	fprintf(f, "MASM\t%u\t%u\t%u\t%s\n",
-	  m_SeqCount, m_ColCount, Mega::GetFeatureCount(), m_Label.c_str());
+	fprintf(f, "MASM\t%u\t%u\t%u\t%.4g\t%.4g\t%s\n",
+	  m_SeqCount, m_ColCount, Mega::GetFeatureCount(), 
+	  m_GapOpen, m_GapExt, m_Label.c_str());
 	for (uint i = 0; i < m_FeatureCount; ++i)
 		fprintf(f, "feature\t%u\t%s\t%u\n",
 		  i, m_FeatureNames[i].c_str(), m_AlphaSizes[i]);
@@ -258,12 +262,14 @@ void MASM::FromFile(const string &FileName)
 	bool Ok = ReadLineStdioFile(f, Line);
 	asserta(Ok);
 	Split(Line, Fields, '\t');
-	asserta(SIZE(Fields) == 5);
+	asserta(SIZE(Fields) == 7);
 	asserta(Fields[0] == "MASM");
 	uint SeqCount = StrToUint(Fields[1]);
 	uint ColCount = StrToUint(Fields[2]);
 	uint FeatureCount = StrToUint(Fields[3]);
-	m_Label = Fields[4];
+	m_GapOpen = (float) StrToFloat(Fields[4]);
+	m_GapExt = (float) StrToFloat(Fields[5]);
+	m_Label = Fields[6];
 	m_SeqCount = SeqCount;
 	m_ColCount = ColCount;
 	m_FeatureCount = FeatureCount;
