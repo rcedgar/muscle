@@ -49,3 +49,22 @@ void MakeBlosum62SMx(const Sequence &A, const Sequence &B, Mx<float> &MxS)
 			}
 		}
 	}
+
+void MakeBlosum62SMx(const string &A, const string &B, Mx<float> &MxS)
+	{
+	float GetBlosumScoreChars(byte a, byte b);
+
+	uint LA = SIZE(A);
+	uint LB = SIZE(B);
+	MxS.Alloc("BlosumS", LA, LB);
+	float **S = MxS.GetData();
+	for (uint i = 0; i < LA; ++i)
+		{
+		char a = A[i];
+		for (uint j = 0; j < LB; ++j)
+			{
+			char b = B[j];
+			S[i][j] = GetBlosumScoreChars(a, b);
+			}
+		}
+	}

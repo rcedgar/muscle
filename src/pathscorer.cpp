@@ -14,7 +14,11 @@ float PathScorer::GetLocalScore(uint PosA, uint PosB, uint LA, uint LB,
 	for (uint Col = 0; Col < ColCount; ++Col)
 		{
 		char State = Path[Col];
-		Total += GetScore(LastState, State, PosA, PosB);
+		float Score = GetScore(LastState, State, PosA, PosB);
+		Total += Score;
+		if (m_Trace)
+			Log("Col %3u  PosA %3u  PosB %3u  %c%c  %10.3g  %10.3g\n",
+			  Col, PosA, PosB, LastState, State, Score, Total);
 		switch (State)
 			{
 		case 'M':	++PosA; ++PosB; break;
@@ -118,4 +122,55 @@ float PathScorer_MASM_Mega::GetScoreII(uint PosA, uint PosB)
 	asserta(Score != FLT_MAX);
 	asserta(Score < 0);
 	return Score;
+	}
+
+float PathScorer_AA_BLOSUM62::GetMatchScore(uint PosA, uint PosB)
+	{
+	float GetBlosumScoreChars(byte a, byte b);
+	asserta(PosA < SIZE(m_SeqA));
+	asserta(PosB < SIZE(m_SeqB));
+	byte a = (byte) m_SeqA[PosA];
+	byte b = (byte) m_SeqB[PosB];
+	float Score = GetBlosumScoreChars(a, b);
+	if (m_Trace)
+		Log("\n    B62[%c,%c]=%.3g\n", a, b, Score);
+	return Score;
+	}
+
+float PathScorer_AA_BLOSUM62::GetScoreMM(uint PosA, uint PosB)
+	{
+	float m = GetMatchScore(PosA, PosB);
+	return m;
+	}
+
+float PathScorer_AA_BLOSUM62::GetScoreMD(uint PosA, uint PosB)
+	{
+	return m_GapOpen;
+	}
+
+float PathScorer_AA_BLOSUM62::GetScoreMI(uint PosA, uint PosB)
+	{
+	return m_GapOpen;
+	}
+
+float PathScorer_AA_BLOSUM62::GetScoreDM(uint PosA, uint PosB)
+	{
+	float m = GetMatchScore(PosA, PosB);
+	return m;
+	}
+
+float PathScorer_AA_BLOSUM62::GetScoreDD(uint PosA, uint PosB)
+	{
+	return m_GapExt;
+	}
+
+float PathScorer_AA_BLOSUM62::GetScoreIM(uint PosA, uint PosB)
+	{
+	float m = GetMatchScore(PosA, PosB);
+	return m;
+	}
+
+float PathScorer_AA_BLOSUM62::GetScoreII(uint PosA, uint PosB)
+	{
+	return m_GapExt;
 	}

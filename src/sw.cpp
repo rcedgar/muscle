@@ -5,6 +5,7 @@
 #include "swtrace.h"
 
 void MakeBlosum62SMx(const Sequence &A, const Sequence &B, Mx<float> &MxS);
+void MakeBlosum62SMx(const string &A, const string &B, Mx<float> &MxS);
 
 void TraceBackBitSW(XDPMem &Mem,
   uint LA, uint LB, uint Besti, uint Bestj,
@@ -211,6 +212,16 @@ float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
 	Loj = Bestj + 1 - Lenj;
 
 	return BestScore;
+	}
+
+float SWFast_Strings_BLOSUM62(XDPMem &Mem,
+  const string &A, const string &B, float Open, float Ext,
+  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path)
+	{
+	Mx<float> SMx;
+	MakeBlosum62SMx(A, B, SMx);
+	float Score = SWFast_SMx(Mem, SMx, Open, Ext, Loi, Loj, Leni, Lenj, Path);
+	return Score;
 	}
 
 float SWFast_Seqs_BLOSUM62(XDPMem &Mem,

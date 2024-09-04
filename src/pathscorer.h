@@ -6,10 +6,14 @@
 class PathScorer
 	{
 public:
+	bool m_Trace = false;
+
+public:
 	float GetLocalScore(uint PosA, uint PosB, uint LA, uint LB, 
 	  const string &Path);
 	float GetScore(char FromState, char ToState,
 	  uint PosA, uint PosB);
+	void Trace(bool On) { m_Trace = On; }
 
 public:
 	virtual float GetScoreMM(uint PosA, uint PosB) = 0;
@@ -23,11 +27,36 @@ public:
 	virtual float GetScoreII(uint PosA, uint PosB) = 0;
 	};
 
-class PathScorer_MASM_Mega
+class PathScorer_MASM_Mega : public PathScorer
 	{
 public:
 	MASM *m_MASM = 0;
 	const vector<vector<byte> > *m_MegaProfile = 0;
+
+public:
+	float GetMatchScore(uint PosA, uint PosB);
+
+public:
+	virtual float GetScoreMM(uint PosA, uint PosB);
+	virtual float GetScoreMD(uint PosA, uint PosB);
+	virtual float GetScoreMI(uint PosA, uint PosB);
+
+	virtual float GetScoreDM(uint PosA, uint PosB);
+	virtual float GetScoreDD(uint PosA, uint PosB);
+
+	virtual float GetScoreIM(uint PosA, uint PosB);
+	virtual float GetScoreII(uint PosA, uint PosB);
+	};
+
+class PathScorer_AA_BLOSUM62 : public PathScorer
+	{
+public:
+	float m_GapOpen = FLT_MAX;
+	float m_GapExt = FLT_MAX;
+	string m_SeqA;
+	string m_SeqB;
+
+public:
 	float GetMatchScore(uint PosA, uint PosB);
 
 public:

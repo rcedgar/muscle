@@ -30,6 +30,7 @@ void EnumPathsLocalRecurse(uint LoA, uint HiA, uint LoB, uint HiB,
 	{
 	const uint ColCount = SIZE(Path);
 	asserta(ColCount > 0);
+	asserta(Path[0] == 'M');
 	asserta(LoA <= HiA);
 	asserta(LoB <= HiB);
 	uint SubLA = HiA - LoA + 1;
@@ -37,7 +38,7 @@ void EnumPathsLocalRecurse(uint LoA, uint HiA, uint LoB, uint HiB,
 	uint NA = GetNA(Path);
 	uint NB = GetNB(Path);
 	asserta(NA <= SubLA && NB <= SubLB);
-	if (NA == SubLA && NB == SubLB)
+	if (NA == SubLA && NB == SubLB && Path[ColCount-1] == 'M')
 		{
 		OnPath(LoA, LoB, Path);
 		return;

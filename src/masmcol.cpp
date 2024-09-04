@@ -184,4 +184,6 @@ void MASMCol::FromFile(FILE *f, uint ColIndex)
 
 float MASMCol::GetMatchScore_MegaProfilePos(const vector<byte> &ProfPos) const
 	{
+	Die("TODO");
+	return 0;
 	}

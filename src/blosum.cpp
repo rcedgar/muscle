@@ -161,3 +161,10 @@ float GetBlosumScoreChars(byte a, byte b)
 		return 0;
 	return Blosum62_sij[ia][ib];
 	}
+
+float GetBlosumScoreLetters(byte ia, byte ib)
+	{
+	if (ia >= 20 || ib >= 20)
+		return 0;
+	return Blosum62_sij[ia][ib];
+	}
