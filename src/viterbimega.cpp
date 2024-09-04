@@ -5,6 +5,15 @@
 #include "pathinfo.h"
 #include "mega.h"
 
+/***
+https://drive5workspace.slack.com/archives/D076HKBFAM6/p1725457191133919
+gapopen=0.847836 gapext=0.105778 termgapopen=0.000000 termgapext=0.097557
+TC = [0.8877]
+
+-gapopen=0.85 -gapext=0.10 -termgapopen=0.0 -termgapext=0.10
+TC = [0.91]
+***/
+
 void TraceBackBitMem(XDPMem &Mem, unsigned LA, unsigned LB, char State, PathInfo &PI);
 
 static float g_AP_LOpenA;
@@ -207,19 +216,19 @@ static float ViterbiMega(XDPMem &Mem, const vector<vector<byte> > &ProfA,
 	return Score;
 	}
 
-void cmd_mega2()
+void AlignMega2()
 	{
-	Mega::FromFile(g_Arg1);
-
-	float IntOpen = float(-optd(gapopen, 1));
-	float IntExt = float(-optd(gapext, 0.5));
-	float TermOpen = float(-optd(termgapopen, 0.75));
-	float TermExt = float(-optd(termgapext, 0.25));
+// pymoo optimization
+// gapopen=0.847836 gapext=0.105778 termgapopen=0.000000 termgapext=0.097557
+	float IntOpen = float(-optd(gapopen, 0.85));
+	float IntExt = float(-optd(gapext, 0.10));
+	float TermOpen = float(-optd(termgapopen, 0.0));
+	float TermExt = float(-optd(termgapext, 0.10));
 	SetGaps(IntOpen, IntExt, TermOpen, TermExt);
 
 	const uint ProfileCount = Mega::GetProfileCount();
 	if (ProfileCount != 2)
-		Die("%u structures found, 2 required", ProfileCount);
+		Die("AlignMega2(): %u structures found, 2 required", ProfileCount);
 
 	XDPMem Mem;
 	PathInfo *PI = ObjMgr::GetPathInfo();
@@ -261,4 +270,10 @@ void cmd_mega2()
 	fprintf(fOut, "\n");
 
 	CloseStdioFile(fOut);
+	}
+
+void cmd_mega2()
+	{
+	Mega::FromFile(g_Arg1);
+	AlignMega2();
 	}

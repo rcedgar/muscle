@@ -644,6 +644,9 @@
     <ClCompile Include="enumpaths.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pathscorer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">
@@ -974,6 +977,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="enumpaths.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pathscorer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

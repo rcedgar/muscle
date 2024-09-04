@@ -232,6 +232,7 @@
     <ClCompile Include="hscore.cpp" />
     <ClCompile Include="loadinput.cpp" />
     <ClCompile Include="logaln_masm.cpp" />
+    <ClCompile Include="pathscorer.cpp" />
     <ClCompile Include="viterbimega.cpp" />
     <ClCompile Include="writelocalaln.cpp" />
     <ClCompile Include="m3alnparams.cpp" />
@@ -489,6 +490,7 @@
     <ClInclude Include="pairhmm.h" />
     <ClInclude Include="params.h" />
     <ClInclude Include="pathinfo.h" />
+    <ClInclude Include="pathscorer.h" />
     <ClInclude Include="pprog.h" />
     <ClInclude Include="pprog3.h" />
     <ClInclude Include="pprog_mega.h" />
