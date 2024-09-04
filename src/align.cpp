@@ -57,12 +57,6 @@ void cmd_align()
 	MultiSequence InputSeqs;
 	LoadInput(InputSeqs);
 	const uint InputSeqCount = InputSeqs.GetSeqCount();
-	if (InputSeqCount == 2 && Mega::m_Loaded)
-		{
-		void AlignMega2();
-		AlignMega2();
-		return;
-		}
 
 	if (optset_minsuper && InputSeqCount >= opt(minsuper))
 		{
