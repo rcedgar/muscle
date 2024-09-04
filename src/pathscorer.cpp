@@ -1,32 +1,6 @@
 #include "muscle.h"
 #include "pathscorer.h"
 
-float PathScorer::GetGlobalScore(uint LA, uint LB, const string &Path)
-	{
-	const uint ColCount = SIZE(Path);
-	asserta(ColCount > 0);
-	float Total = 0;
-	uint PosA = 0;
-	uint PosB = 0;
-	char LastState = 'S';
-	for (uint Col = 0; Col < ColCount; ++Col)
-		{
-		char State = Path[Col];
-		Total += GetScore(LastState, State, PosA, PosB);
-		switch (State)
-			{
-		case 'M':	++PosA; ++PosB; break;
-		case 'D':	++PosA; break;
-		case 'I':	++PosB; break;
-		default:	asserta(false);
-			}
-		LastState = State;
-		}
-	asserta(PosA == LA && PosB == LB);
-	Total += GetScore(LastState, 'E', PosA, PosB);
-	return Total;
-	}
-
 float PathScorer::GetLocalScore(uint PosA, uint PosB, uint LA, uint LB,
   const string &Path)
 	{
@@ -54,41 +28,6 @@ float PathScorer::GetLocalScore(uint PosA, uint PosB, uint LA, uint LB,
 	return Total;
 	}
 
-void PathScorer::TermizePath(string &Path)
-	{
-	const uint ColCount = SIZE(Path);
-	uint FirstM = UINT_MAX;
-	uint LastM = UINT_MAX;
-	for (uint i = 0; i < ColCount; ++i)
-		{
-		char c = Path[i];
-		if (c == 'M')
-			{
-			if (FirstM == UINT_MAX)
-				FirstM = i;
-			LastM = i;
-			}
-		}
-	if (FirstM == UINT_MAX)
-		return;
-	for (uint Col = 0; Col < FirstM; ++Col)
-		{
-		char c = Path[Col];
-		if (c == 'D')
-			Path[Col] = 'd';
-		else if (c == 'I')
-			Path[Col] = 'i';
-		}
-	for (uint Col = LastM+1; Col < ColCount; ++Col)
-		{
-		char c = Path[Col];
-		if (c == 'D')
-			Path[Col] = 'd';
-		else if (c == 'I')
-			Path[Col] = 'i';
-		}
-	}
-
 float PathScorer::GetScore(char FromState, char ToState,
   uint PosA, uint PosB)
 	{
@@ -96,29 +35,15 @@ float PathScorer::GetScore(char FromState, char ToState,
 		;
 
 #define c(x, y)	else if (FromState == #x[0] && ToState == #y[0]) return GetScore##x##y(PosA, PosB);
-	c(S, M)
-	c(S, d)
-	c(S, i)
-
 	c(M, M)
 	c(M, D)
-	c(M, d)
 	c(M, I)
-	c(M, i)
 
 	c(D, M)
-	c(d, M)
 	c(D, D)
-	c(d, d)
 
 	c(I, M)
-	c(i, M)
 	c(I, I)
-	c(i, i)
-
-	c(M, E)
-	c(d, E)
-	c(i, E)
 #undef c
 
 	else
@@ -133,20 +58,12 @@ float PathScorer::GetScore(char FromState, char ToState,
 
 float PathScorer_MASM_Mega::GetMatchScore(uint PosA, uint PosB)
 	{
-	}
-
-float PathScorer_MASM_Mega::GetScoreSM(uint PosA, uint PosB)
-	{
-	float m = GetMatchScore(PosA, PosB);
-	return m;
-	}
-
-float PathScorer_MASM_Mega::GetScoreSd(uint PosA, uint PosB)
-	{
-	}
-
-float PathScorer_MASM_Mega::GetScoreSi(uint PosA, uint PosB)
-	{
+	asserta(PosA < m_MASM->GetColCount());
+	asserta(PosB < SIZE(*m_MegaProfile));
+	const MASMCol &MCol = m_MASM->GetCol(PosA);
+	const vector<byte> &PPos = (*m_MegaProfile)[PosB];
+	float Score = MCol.GetMatchScore_MegaProfilePos(PPos);
+	return Score;
 	}
 
 float PathScorer_MASM_Mega::GetScoreMM(uint PosA, uint PosB)
@@ -157,67 +74,48 @@ float PathScorer_MASM_Mega::GetScoreMM(uint PosA, uint PosB)
 
 float PathScorer_MASM_Mega::GetScoreMD(uint PosA, uint PosB)
 	{
-	}
-
-float PathScorer_MASM_Mega::GetScoreMd(uint PosA, uint PosB)
-	{
+	asserta(PosA < m_MASM->GetColCount());
+	const MASMCol &MCol = m_MASM->GetCol(PosA);
+	return MCol.m_GapOpen;
 	}
 
 float PathScorer_MASM_Mega::GetScoreMI(uint PosA, uint PosB)
 	{
-	}
-
-float PathScorer_MASM_Mega::GetScoreMi(uint PosA, uint PosB)
-	{
+	float Score = m_MASM->m_GapOpen/2;
+	asserta(Score != FLT_MAX);
+	asserta(Score < 0);
+	return Score;
 	}
 
 float PathScorer_MASM_Mega::GetScoreDM(uint PosA, uint PosB)
 	{
 	float m = GetMatchScore(PosA, PosB);
-	}
-
-float PathScorer_MASM_Mega::GetScoredM(uint PosA, uint PosB)
-	{
-	float m = GetMatchScore(PosA, PosB);
+	asserta(PosA < m_MASM->GetColCount());
+	const MASMCol &MCol = m_MASM->GetCol(PosA);
+	float Score = m + MCol.m_GapClose;
+	return Score;
 	}
 
 float PathScorer_MASM_Mega::GetScoreDD(uint PosA, uint PosB)
 	{
-	}
-
-float PathScorer_MASM_Mega::GetScoredd(uint PosA, uint PosB)
-	{
+	asserta(PosA < m_MASM->GetColCount());
+	const MASMCol &MCol = m_MASM->GetCol(PosA);
+	return MCol.m_GapExt;
 	}
 
 float PathScorer_MASM_Mega::GetScoreIM(uint PosA, uint PosB)
 	{
 	float m = GetMatchScore(PosA, PosB);
-	}
-
-float PathScorer_MASM_Mega::GetScoreiM(uint PosA, uint PosB)
-	{
-	float m = GetMatchScore(PosA, PosB);
+	float Score = m_MASM->m_GapOpen/2;
+	asserta(Score != FLT_MAX);
+	asserta(Score < 0);
+	return m + Score;
 	}
 
 float PathScorer_MASM_Mega::GetScoreII(uint PosA, uint PosB)
 	{
-	}
-
-float PathScorer_MASM_Mega::GetScoreii(uint PosA, uint PosB)
-	{
-	}
-
-float PathScorer_MASM_Mega::GetScoreME(uint PosA, uint PosB)
-	{
-	return 0;
-	}
-
-float PathScorer_MASM_Mega::GetScoredE(uint PosA, uint PosB)
-	{
-	return 0;
-	}
-
-float PathScorer_MASM_Mega::GetScoreiE(uint PosA, uint PosB)
-	{
-	return 0;
+	float Score = m_MASM->m_GapExt;
+	asserta(Score != FLT_MAX);
+	asserta(Score < 0);
+	return Score;
 	}

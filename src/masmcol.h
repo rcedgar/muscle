@@ -33,4 +33,5 @@ public:
 	void FromFile(FILE *f, uint ColIndex);
 	const vector<float> &GetAAScores() const;
 	char GetConsensusAAChar() const;
+	float GetMatchScore_MegaProfilePos(const vector<byte> &ProfPos) const;
 	};
