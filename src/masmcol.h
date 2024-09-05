@@ -6,7 +6,7 @@ class MASMCol
 	{
 public:
 	const MASM *m_MASM = 0;
-
+	uint m_ColIndex = 0;
 	float m_GapOpen = FLT_MAX;
 	float m_GapExt = FLT_MAX;
 	float m_GapClose = FLT_MAX;
@@ -26,9 +26,10 @@ public:
 
 public:
 	void SetScoreVec();
-	void ToFile(FILE *f, uint ColIndex) const;
-	void FromFile(FILE *f, uint ColIndex);
+	void ToFile(FILE *f) const;
+	void FromFile(FILE *f);
 	const vector<float> &GetAAScores() const;
 	char GetConsensusAAChar() const;
 	float GetMatchScore_MegaProfilePos(const vector<byte> &ProfPos) const;
+	void LogMe() const;
 	};

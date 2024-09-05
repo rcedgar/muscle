@@ -55,6 +55,7 @@ public:
 	void GetFreqs(uint ColIndex, uint FeatureIdx, vector<float> &Freqs);
 	void ToFile(const string &FileName) const;
 	void ToFile(FILE *f) const;
+	void LogMe() const;
 	void FromFile(const string &FileName);
 	void MakeSMx_Sequence(const Sequence &Q, Mx<float> &SMx) const;
 	void GetConsensusSeq(string &Seq) const;

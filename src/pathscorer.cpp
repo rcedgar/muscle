@@ -80,7 +80,7 @@ float PathScorer_MASM_Mega::GetScoreMD(uint PosA, uint PosB)
 	{
 	asserta(PosA < m_MASM->GetColCount());
 	const MASMCol &MCol = m_MASM->GetCol(PosA);
-	return MCol.m_GapOpen;
+	return -MCol.m_GapOpen;
 	}
 
 float PathScorer_MASM_Mega::GetScoreMI(uint PosA, uint PosB)
@@ -96,7 +96,7 @@ float PathScorer_MASM_Mega::GetScoreDM(uint PosA, uint PosB)
 	float m = GetMatchScore(PosA, PosB);
 	asserta(PosA < m_MASM->GetColCount());
 	const MASMCol &MCol = m_MASM->GetCol(PosA);
-	float Score = m + MCol.m_GapClose;
+	float Score = m - MCol.m_GapClose;
 	return Score;
 	}
 

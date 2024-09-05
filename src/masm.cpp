@@ -125,6 +125,7 @@ void MASM::FromMSA(const MultiSequence &Aln, const string &Label,
 
 		MASMCol &Col = *new MASMCol;
 		Col.m_MASM = this;
+		Col.m_ColIndex = ColIndex;
 
 		Col.m_LetterFreq = float(LetterCount)/m_SeqCount;
 		Col.m_GapOpenFreq = float(GapOpenCount)/m_SeqCount;
@@ -166,7 +167,23 @@ void MASM::ToFile(FILE *f) const
 		fprintf(f, "feature\t%u\t%s\t%u\n",
 		  i, m_FeatureNames[i].c_str(), m_AlphaSizes[i]);
 	for (uint i = 0; i < m_ColCount; ++i)
-		m_Cols[i]->ToFile(f, i);
+		m_Cols[i]->ToFile(f);
+	}
+
+void MASM::LogMe() const
+	{
+	//if (f == 0)
+	//	return;
+	//fprintf(f, "MASM\t%u\t%u\t%u\t%.4g\t%.4g\t%s\n",
+	//  m_SeqCount, m_ColCount, m_FeatureCount,
+	//  m_GapOpen, m_GapExt, m_Label.c_str());
+	Log("MASM %u seqs, %u cols, %u features, open %.3g, ext %.3g, label %s\n",
+	  m_SeqCount, m_ColCount, m_FeatureCount,
+	  m_GapOpen, m_GapExt, m_Label.c_str());
+	for (uint i = 0; i < m_FeatureCount; ++i)
+		Log("Feature %u  AS %u  %s\n", i, m_AlphaSizes[i], m_FeatureNames[i].c_str());
+	for (uint i = 0; i < m_ColCount; ++i)
+		m_Cols[i]->LogMe();
 	}
 
 void MASM::SetFeatureAlnVec()
@@ -293,7 +310,7 @@ void MASM::FromFile(const string &FileName)
 		{
 		MASMCol *MC = new MASMCol;
 		MC->m_MASM = this;
-		MC->FromFile(f, i);
+		MC->FromFile(f);
 		m_Cols.push_back(MC);
 		}
 	CloseStdioFile(f);

@@ -110,7 +110,6 @@ static void Test(const string &sA, const string &B)
 	g_PS->m_MASM = &MA;
 	g_PS->m_MegaProfile = &PB;
 
-	g_LA = SIZE(RowsA[0]);
 	g_LB = SIZE(B);
 	EnumPathsLocal(g_LA, g_LB, OnPath);
 
@@ -126,6 +125,45 @@ static void Test(const string &sA, const string &B)
 	  MMScore, MMPath.c_str(), MMLoi, MMLoj);
 	}
 
+static void LogPath(const string &sA, const string &B,
+  uint PosA, uint PosB, const string &Path)
+	{
+	Log("___________________________________\n");
+	ClearBrute();
+
+	vector<string> RowsA;
+	Split(sA, RowsA, '|');
+
+	g_SeqCountA = SIZE(RowsA);
+	for (uint i = 0; i < g_SeqCountA; ++i)
+		{
+		if (i == 0)
+			g_LA = SIZE(RowsA[i]);
+		else
+			asserta(SIZE(RowsA[i]) == g_LA);
+		}
+
+	XDPMem Mem;
+	MASM &MA = *MakeMASM_AAs(RowsA);
+	MA.LogMe();
+
+	vector<vector<byte> > PB;
+	MakeMegaProfile_AA(B, PB);
+	g_LB = SIZE(B);
+
+	Log("\n");
+	for (uint i = 0; i < g_SeqCountA; ++i)
+		Log("%s  >A%u\n", RowsA[i].c_str(), i);
+	Log("%s  >B\n", B.c_str());
+	Log("Path %s\n", Path.c_str());
+
+	g_PS->m_MASM = &MA;
+	g_PS->m_MegaProfile = &PB;
+	g_PS->m_Trace = true;
+	g_PS->GetLocalScore(PosA, PosB, g_LA, g_LB, Path);
+	g_PS->m_Trace = false;
+	}
+
 void cmd_test_sw_mm()
 	{
 	PathScorer_MASM_Mega PS;
@@ -134,4 +172,6 @@ void cmd_test_sw_mm()
 	Test("SEQ|SEQ", "SEQ");
 	Test("SE-|-EQ", "SEQ");
 	Test("SEV-|V-EQ|DDD-", "WEQ");
+	//LogPath("SEV-|V-EQ|DDD-", "WEQ", 1, 1, "MDM");
+	//LogPath("SEV-|V-EQ|DDD-", "WEQ", 2, 1, "MM");
 	}

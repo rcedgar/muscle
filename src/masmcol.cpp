@@ -68,14 +68,44 @@ const vector<float> &MASMCol::GetAAScores() const
 	return Scores;
 	}
 
-void MASMCol::ToFile(FILE *f, uint ColIndex) const
+void MASMCol::LogMe() const
+	{
+	Log("  MSAMCol[%u]", m_ColIndex);
+	const uint FeatureCount = SIZE(m_FreqsVec);
+	if (FeatureCount == 1)
+		{
+		const uint FeatureIdx = 0;
+		uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
+		const string &Name = Mega::GetFeatureName(FeatureIdx);
+		const vector<float> &Scores = m_ScoresVec[FeatureIdx];
+		Log("  | %s |", Name.c_str());
+		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
+			Log(" %c=%.3g", g_LetterToCharAmino[Letter], Scores[Letter]);
+		Log("\n");
+		return;
+		}
+
+	Log("\n");
+	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
+		{
+		uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
+		const string &Name = Mega::GetFeatureName(FeatureIdx);
+		const vector<float> &Scores = m_ScoresVec[FeatureIdx];
+		Log("  | %8.8s |", Name.c_str());
+		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
+			Log(" %c=%.3g", g_LetterToCharAmino[Letter], Scores[Letter]);
+		Log("\n");
+		}
+	}
+
+void MASMCol::ToFile(FILE *f) const
 	{
 	if (f == 0)
 		return;
 	const uint FeatureCount = SIZE(m_FreqsVec);
 	asserta(SIZE(m_ScoresVec) == FeatureCount);
 	//asserta(SIZE(m_SortOrderVec) == FeatureCount);
-	fprintf(f, "col\t%u\n", ColIndex);
+	fprintf(f, "col\t%u\n", m_ColIndex);
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
 		{
 		uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
@@ -102,7 +132,7 @@ void MASMCol::ToFile(FILE *f, uint ColIndex) const
 		}
 	}
 
-void MASMCol::FromFile(FILE *f, uint ColIndex)
+void MASMCol::FromFile(FILE *f)
 	{
 	asserta(f != 0);
 	asserta(m_MASM != 0);
@@ -110,7 +140,7 @@ void MASMCol::FromFile(FILE *f, uint ColIndex)
 	vector<string> Fields;
 	ReadTabbedLine(f, Fields, 2);
 	asserta(Fields[0] == "col");
-	asserta(StrToUint(Fields[1]) == ColIndex);
+	m_ColIndex = StrToUint(Fields[1]);
 	m_FreqsVec.clear();
 	m_ScoresVec.clear();
 	m_FreqsVec.resize(FeatureCount);
