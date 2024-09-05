@@ -134,7 +134,7 @@ float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
 		}
 
 	DONE_TRACE(BestScore, Besti, Bestj, TB);
-	if (BestScore == 0.0f)
+	if (BestScore <= 0.0f)
 		return 0.0f;
 
 	TraceBackBitSW(Mem, LA, LB, Besti+1, Bestj+1,

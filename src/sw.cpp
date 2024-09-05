@@ -200,7 +200,7 @@ float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
 		}
 
 	DONE_TRACE(BestScore, Besti, Bestj, TB);
-	if (BestScore == 0.0f)
+	if (BestScore <= 0.0f)
 		return 0.0f;
 
 	TraceBackBitSW(Mem, LA, LB, Besti+1, Bestj+1,
