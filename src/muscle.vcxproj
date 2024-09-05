@@ -233,6 +233,7 @@
     <ClCompile Include="loadinput.cpp" />
     <ClCompile Include="logaln_masm.cpp" />
     <ClCompile Include="pathscorer.cpp" />
+    <ClCompile Include="swmasm_megaprof.cpp" />
     <ClCompile Include="test_sw_aa.cpp" />
     <ClCompile Include="viterbimega.cpp" />
     <ClCompile Include="writelocalaln.cpp" />

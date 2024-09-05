@@ -6,6 +6,9 @@
 float SWFast_Strings_BLOSUM62(XDPMem &Mem,
   const string &A, const string &B, float Open, float Ext,
   uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
+float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
+  const vector<vector<byte> > &PB, float Open, float Ext,
+  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
 
 static uint g_LA;
 static uint g_LB;
@@ -36,6 +39,48 @@ static void OnPath(uint PosA, uint PosB, const string &Path)
 		g_BestPosA = PosA;
 		g_BestPosB = PosB;
 		}
+	}
+
+static MASM *MakeMASM_AA(const string &Seq)
+	{
+	MultiSequence *Aln = new MultiSequence;
+	Sequence *s = NewSequence();
+	s->FromString("LABEL", Seq);
+	Aln->AddSequence(s, true);
+	MASM *M = new MASM;
+	M->FromMSA(*Aln, "MSA", g_GapOpen, g_GapExt);
+	return M;
+	}
+
+static void MakeMegaProfile_AA(const string &Seq,
+  vector<vector<byte> > &Prof)
+	{
+	const uint L = SIZE(Seq);
+	Prof.clear();
+	Prof.resize(1);
+	for (uint Pos = 0; Pos < L; ++Pos)
+		{
+		vector<byte> Col;
+		char c = Seq[Pos];
+		byte Letter = g_CharToLetterAmino[c];
+		if (Letter >= 20)
+			Letter = 0;
+		Col.push_back(Letter);
+		}
+	}
+
+static void Test_MASM_Mega(const string &A, const string &B)
+	{
+	MASM &MA = *MakeMASM_AA(A);
+	vector<vector<byte> > PB;
+	MakeMegaProfile_AA(B, PB);
+	XDPMem Mem;
+	uint Loi, Loj, Leni, Lenj;
+	string Path;
+	float Score = SWFast_MASM_MegaProf(Mem, MA, PB, g_GapOpen, g_GapExt,
+	  Loi, Loj, Leni, Lenj, Path);
+	Log("Test_MASM_Mega %.3g (%u, %u) %s\n",
+	  Score, Loi, Loj, Path.c_str());
 	}
 
 static void Test(const string &A, const string &B)

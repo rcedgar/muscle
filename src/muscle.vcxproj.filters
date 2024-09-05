@@ -650,6 +650,9 @@
     <ClCompile Include="test_sw_aa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="swmasm_megaprof.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">
