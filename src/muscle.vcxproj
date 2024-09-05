@@ -235,6 +235,7 @@
     <ClCompile Include="pathscorer.cpp" />
     <ClCompile Include="swmasm_megaprof.cpp" />
     <ClCompile Include="test_sw_aa.cpp" />
+    <ClCompile Include="test_sw_mm.cpp" />
     <ClCompile Include="viterbimega.cpp" />
     <ClCompile Include="writelocalaln.cpp" />
     <ClCompile Include="m3alnparams.cpp" />

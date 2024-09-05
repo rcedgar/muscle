@@ -85,7 +85,7 @@ float PathScorer_MASM_Mega::GetScoreMD(uint PosA, uint PosB)
 
 float PathScorer_MASM_Mega::GetScoreMI(uint PosA, uint PosB)
 	{
-	float Score = m_MASM->m_GapOpen/2;
+	float Score = -m_MASM->m_GapOpen/2;
 	asserta(Score != FLT_MAX);
 	asserta(Score < 0);
 	return Score;
@@ -110,7 +110,7 @@ float PathScorer_MASM_Mega::GetScoreDD(uint PosA, uint PosB)
 float PathScorer_MASM_Mega::GetScoreIM(uint PosA, uint PosB)
 	{
 	float m = GetMatchScore(PosA, PosB);
-	float Score = m_MASM->m_GapOpen/2;
+	float Score = -m_MASM->m_GapOpen/2;
 	asserta(Score != FLT_MAX);
 	asserta(Score < 0);
 	return m + Score;
@@ -118,7 +118,7 @@ float PathScorer_MASM_Mega::GetScoreIM(uint PosA, uint PosB)
 
 float PathScorer_MASM_Mega::GetScoreII(uint PosA, uint PosB)
 	{
-	float Score = m_MASM->m_GapExt;
+	float Score = -m_MASM->m_GapExt;
 	asserta(Score != FLT_MAX);
 	asserta(Score < 0);
 	return Score;

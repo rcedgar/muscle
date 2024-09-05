@@ -69,6 +69,7 @@ void MakeBlosum62SMx(const string &A, const string &B, Mx<float> &MxS)
 			}
 		}
 	}
+
 void GetBlosum62LogOddsLetterMx(vector<vector<float> > &LogOddsMx)
 	{
 	LogOddsMx.clear();

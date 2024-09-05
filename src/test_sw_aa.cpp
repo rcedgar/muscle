@@ -55,7 +55,7 @@ static MASM *MakeMASM_AA(const string &Seq)
 	return M;
 	}
 
-static void MakeMegaProfile_AA(const string &Seq,
+void MakeMegaProfile_AA(const string &Seq,
   vector<vector<byte> > &Prof)
 	{
 	const uint L = SIZE(Seq);
