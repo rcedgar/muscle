@@ -35,9 +35,11 @@ public:
 		m_FeatureAlnVec.clear();
 		}
 
-	uint GetColCount() const { return m_ColCount; }
+// MSA sequences must match sequences in Mega
 	void FromMSA(const MultiSequence &Aln, const string &Label,
 	  float GapOpen, float GapExt);
+
+	uint GetColCount() const { return m_ColCount; }
 	const MASMCol &GetCol(uint i) const
 		{
 		assert(i < SIZE(m_Cols));

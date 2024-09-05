@@ -19,6 +19,7 @@ static float g_BestScore;
 static string g_BestPath;
 static uint g_BestPosA;
 static uint g_BestPosB;
+static bool g_LogAllPaths = false;
 
 static void ClearBrute()
 	{
@@ -31,7 +32,8 @@ static void ClearBrute()
 static void OnPath(uint PosA, uint PosB, const string &Path)
 	{
 	float Score = g_PS->GetLocalScore(PosA, PosB, g_LA, g_LB, Path);
-	Log("%10.3g  %5u  %5u  %s\n", Score, PosA, PosB, Path.c_str());
+	if (g_LogAllPaths)
+		Log("%10.3g  %5u  %5u  %s\n", Score, PosA, PosB, Path.c_str());
 	if (Score > g_BestScore)
 		{
 		g_BestScore = Score;
@@ -48,7 +50,8 @@ static MASM *MakeMASM_AA(const string &Seq)
 	s->FromString("LABEL", Seq);
 	Aln->AddSequence(s, true);
 	MASM *M = new MASM;
-	M->FromMSA(*Aln, "MSA", g_GapOpen, g_GapExt);
+	Mega::FromMSA_AAOnly(*Aln, g_GapOpen, g_GapExt);
+	M->FromMSA(*Aln, "MSA", -g_GapOpen, -g_GapExt);
 	return M;
 	}
 
@@ -57,7 +60,6 @@ static void MakeMegaProfile_AA(const string &Seq,
 	{
 	const uint L = SIZE(Seq);
 	Prof.clear();
-	Prof.resize(1);
 	for (uint Pos = 0; Pos < L; ++Pos)
 		{
 		vector<byte> Col;
@@ -66,6 +68,7 @@ static void MakeMegaProfile_AA(const string &Seq,
 		if (Letter >= 20)
 			Letter = 0;
 		Col.push_back(Letter);
+		Prof.push_back(Col);
 		}
 	}
 
@@ -104,6 +107,8 @@ static void Test(const string &A, const string &B)
 	Log("  Brute %.3g (%u, %u), SW %.3g (%u, %u) %s %s\n",
 	  g_BestScore, g_BestPosA, g_BestPosB,
 	  SWScore, Loi, Loj, g_BestPath.c_str(), SWPath.c_str());
+
+	Test_MASM_Mega(A, B);
 	}
 
 static void TestPath(const string &A, const string &B,
@@ -129,8 +134,9 @@ void cmd_test_sw_aa()
 	g_PS = &PS;
 
 	Test("SEWWE", "WQW");
-	Test("WWESE", "WQW");
-	Test("WMW", "WWESE");
+	//Test("WWESE", "WQW");
+	//Test("WMW", "WWESE");
 	//TestPath("WMW", "WWESE", 0, 0, "MDM");
 	//TestPath("WMW", "WWESE", 0, 0, "MIM");
+	//Test_MASM_Mega("SEWWE", "WQW");
 	}

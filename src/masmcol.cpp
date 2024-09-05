@@ -60,26 +60,6 @@ void MASMCol::SetScoreVec()
 		}
 	}
 
-//void MASMCol::SetSortOrderVec()
-//	{
-//	const uint FeatureCount = SIZE(m_FreqsVec);
-//	m_SortOrderVec.resize(FeatureCount);
-//	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
-//		{
-//		uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
-//		vector<byte> &SortOrder = m_SortOrderVec[FeatureIdx];
-//		const vector<float> &Freqs = m_FreqsVec[FeatureIdx];
-//		vector<uint> Order(AlphaSize);
-//		QuickSortOrderDesc(Freqs.data(), AlphaSize, Order.data());
-//		for (uint i = 0; i < AlphaSize; ++i)
-//			{
-//			uint Letter = Order[i];
-//			asserta(Letter < AlphaSize);
-//			SortOrder.push_back(byte(Letter));
-//			}
-//		}
-//	}
-
 const vector<float> &MASMCol::GetAAScores() const
 	{
 	uint AAFeatureIdx = m_MASM->m_AAFeatureIdx;
@@ -127,8 +107,6 @@ void MASMCol::FromFile(FILE *f, uint ColIndex)
 	asserta(f != 0);
 	asserta(m_MASM != 0);
 	const uint FeatureCount = m_MASM->m_FeatureCount;
-	//asserta(SIZE(m_SortOrderVec) == FeatureCount);
-	//fprintf(f, "col\t%u\t%u\n", ColIndex, FeatureCount);
 	vector<string> Fields;
 	ReadTabbedLine(f, Fields, 2);
 	asserta(Fields[0] == "col");
@@ -139,9 +117,6 @@ void MASMCol::FromFile(FILE *f, uint ColIndex)
 	m_ScoresVec.resize(FeatureCount);
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
 		{
-		//uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
-		//const string &Name = Mega::GetFeatureName(FeatureIdx);
-		//fprintf(f, "feature\t%u\t%s\n", FeatureIdx, Name.c_str());
 		ReadTabbedLine(f, Fields, 2);
 		asserta(Fields[0] == "colfeature");
 		asserta(StrToUint(Fields[1]) == FeatureIdx);
@@ -149,10 +124,6 @@ void MASMCol::FromFile(FILE *f, uint ColIndex)
 
 		vector<float> &Freqs = m_FreqsVec[FeatureIdx];
 		vector<float> &Scores = m_ScoresVec[FeatureIdx];
-		//fprintf(f, "freqs");
-		//for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-		//	fprintf(f, "\t%.3g", Freqs[Letter]);
-		//fprintf(f, "\n");
 		ReadTabbedLine(f, Fields, AlphaSize+1);
 		asserta(Fields[0] == "freqs");
 		float SumFreqs = 0;
@@ -164,26 +135,23 @@ void MASMCol::FromFile(FILE *f, uint ColIndex)
 			}
 		asserta(SumFreqs < 1.001);
 
-		//const vector<float> &Scores = m_ScoresVec[FeatureIdx];
-		//fprintf(f, "scores");
-		//for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-		//	fprintf(f, "\t%.3g", Scores[Letter]);
-		//fprintf(f, "\n");
 		ReadTabbedLine(f, Fields, AlphaSize+1);
 		asserta(Fields[0] == "scores");
 		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
 			Scores.push_back((float) StrToFloat(Fields[Letter+1]));
-
-		//const vector<byte> &SortOrder = m_SortOrderVec[FeatureIdx];
-		//fprintf(f, "sort");
-		//for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-		//	fprintf(f, "\t%u", SortOrder[Letter]);
-		//fprintf(f, "\n");
 		}
 	}
 
 float MASMCol::GetMatchScore_MegaProfilePos(const vector<byte> &ProfPos) const
 	{
-	Die("TODO");
-	return 0;
+	float Total = 0;
+	const uint FeatureCount = SIZE(ProfPos);
+	assert(FeatureCount == m_MASM->m_FeatureCount);
+	assert(SIZE(m_ScoresVec) == FeatureCount);
+	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
+		{
+		byte Letter = ProfPos[FeatureIdx];
+		Total += m_ScoresVec[FeatureIdx][Letter];
+		}
+	return Total;
 	}

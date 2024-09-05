@@ -3,6 +3,8 @@
 #include "alpha.h"
 #include "pairhmm.h"
 
+void GetBlosum62LogOddsLetterMx(vector<vector<float> > &LogOddsMx);
+
 static const float VERY_SMALL_FREQ = 1e-6f;
 
 string Mega::m_FileName;
@@ -410,4 +412,67 @@ uint Mega::GetAAFeatureIdx()
 			return FeatureIdx;
 	Die("Mega::GetAAFeatureIdx(), not found");
 	return UINT_MAX;
+	}
+
+void Mega::FromMSA_AAOnly(const MultiSequence &Aln,
+  float GapOpen, float GapExt)
+	{
+	m_FileName = "FromMSA_AAOnly()";
+	m_Lines.clear();
+
+	m_FeatureNames.clear();
+	m_FeatureNames.push_back("AA");
+
+	m_Weights.clear();
+	m_Weights.push_back(1.0f);
+
+	m_AlphaSizes.clear();
+	m_AlphaSizes.push_back(20);
+	m_FeatureCount = 1;
+
+	m_LabelToIdx.clear();
+	m_SeqToIdx.clear();
+	m_Labels.clear();
+	m_Seqs.clear();
+	m_Profiles.clear();
+	const uint SeqCount = Aln.GetSeqCount();
+	m_Profiles.resize(SeqCount);
+	for (uint SeqIdx = 0; SeqIdx < SeqCount; ++SeqIdx)
+		{
+		const string &Label = Aln.GetLabelStr(SeqIdx);
+		m_Labels.push_back(Label);
+		string Seq;
+		Aln.GetSeqStr(SeqIdx, Seq);
+		string UngappedSeq;
+		for (uint i = 0; i < SIZE(Seq); ++i)
+			{
+			char c = Seq[i];
+			if (!isgap(c))
+				UngappedSeq += c;
+			}
+		m_Seqs.push_back(UngappedSeq);
+		m_LabelToIdx[Label] = SeqIdx;
+		m_SeqToIdx[UngappedSeq] = SeqIdx;
+
+		vector<vector<byte> > &Profile = m_Profiles[SeqIdx];
+		for (uint i = 0; i < SIZE(UngappedSeq); ++i)
+			{
+			char c = UngappedSeq[i];
+			byte Letter = g_CharToLetterAmino[c];
+			if (Letter >= 20)
+				Letter = 0;
+			vector<byte> Col;
+			Col.push_back(Letter);
+			Profile.push_back(Col);
+			}
+		}
+
+	m_LogProbsVec.clear();
+	m_LogProbMxVec.clear();
+	m_LogOddsMxVec.clear();
+	m_LogOddsMxVec.resize(1);
+	GetBlosum62LogOddsLetterMx(m_LogOddsMxVec[0]);
+	m_GapOpen = GapOpen;
+	m_GapExt = GapExt;
+	m_Loaded = true;
 	}

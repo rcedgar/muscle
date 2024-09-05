@@ -5,7 +5,6 @@
 static float ScorePP(const MASMCol &PPA, const vector<byte> &ProfColB)
 	{
 	const uint FeatureCount = Mega::GetFeatureCount();
-	assert(SIZE(ProfColB) == FeatureCount);
 
 	float TotalScore = 0;
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
@@ -91,12 +90,13 @@ void MASM::GetFreqs(uint ColIndex, uint FeatureIdx, vector<float> &Freqs)
 
 void MASM::GetFreqsVec(uint ColIndex, vector<vector<float> > &FreqsVec)
 	{
-	const uint FeatureCount = Mega::GetFeatureCount();
+	const uint FeatureCount = m_FeatureCount;
 	FreqsVec.resize(FeatureCount);
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
 		GetFreqs(ColIndex, FeatureIdx, FreqsVec[FeatureIdx]);
 	}
 
+// MSA sequences must match sequences in Mega
 void MASM::FromMSA(const MultiSequence &Aln, const string &Label,
   float GapOpen, float GapExt)
 	{
@@ -114,6 +114,7 @@ void MASM::FromMSA(const MultiSequence &Aln, const string &Label,
 	m_FeatureNames = Mega::m_FeatureNames;
 	m_AlphaSizes = Mega::m_AlphaSizes;
 	m_AAFeatureIdx = Mega::GetAAFeatureIdx();
+
 	SetUngappedSeqs();
 	SetFeatureAlnVec();
 	for (uint ColIndex = 0; ColIndex < m_ColCount; ++ColIndex)
@@ -159,7 +160,7 @@ void MASM::ToFile(FILE *f) const
 	if (f == 0)
 		return;
 	fprintf(f, "MASM\t%u\t%u\t%u\t%.4g\t%.4g\t%s\n",
-	  m_SeqCount, m_ColCount, Mega::GetFeatureCount(), 
+	  m_SeqCount, m_ColCount, m_FeatureCount,
 	  m_GapOpen, m_GapExt, m_Label.c_str());
 	for (uint i = 0; i < m_FeatureCount; ++i)
 		fprintf(f, "feature\t%u\t%s\t%u\n",
@@ -170,10 +171,9 @@ void MASM::ToFile(FILE *f) const
 
 void MASM::SetFeatureAlnVec()
 	{
-	const uint FeatureCount = Mega::GetFeatureCount();
 	m_FeatureAlnVec.clear();
-	m_FeatureAlnVec.resize(FeatureCount);
-	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
+	m_FeatureAlnVec.resize(m_FeatureCount);
+	for (uint FeatureIdx = 0; FeatureIdx < m_FeatureCount; ++FeatureIdx)
 		SetFeatureAln(FeatureIdx);
 	}
 

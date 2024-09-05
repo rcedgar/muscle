@@ -1,5 +1,6 @@
 #pragma once
 
+#include "multisequence.h"
 #include <unordered_map>
 
 class Mega
@@ -32,10 +33,12 @@ public:
 	static float m_GapExt;
 
 public:
+	static void FromMSA_AAOnly(const MultiSequence &Aln,
+	  float GapOpen, float GapExt);
+	static void FromFile(const string &FileName);
 	static uint GetProfileCount() { return SIZE(m_Profiles); }
 	static const vector<vector<byte> > &GetProfile(uint ProfileIdx);
 	static const string &GetLabel(uint ProfileIdx);
-	static void FromFile(const string &FileName);
 	static uint GetFeatureCount() { return m_FeatureCount; }
 	static uint GetAlphaSize(uint FeatureIndex);
 	static float GetWeight(uint FeatureIndex);

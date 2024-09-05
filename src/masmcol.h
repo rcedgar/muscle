@@ -24,9 +24,6 @@ public:
 // Score = m_ScoresVec[FeatureIdx][Letter]
 	vector<vector<float> > m_ScoresVec;
 
-//// Letter = m_SortOrderVec[FeatureIdx][k]
-//	vector<vector<byte> > m_SortOrderVec;
-
 public:
 	void SetScoreVec();
 	void ToFile(FILE *f, uint ColIndex) const;
