@@ -17,13 +17,16 @@ public:
 
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path) = 0;
+	virtual const char *GetName() const = 0;
 	};
 
 class SWer_Enum_Seqs_AA_BLOSUM62 : public SWer
 	{
-public:
+private:
 	float m_GapOpen = FLT_MAX;
 	float m_GapExt = FLT_MAX;
+
+public:
 	float m_BestScore = 0;
 	string m_BestPath;
 	uint m_BestPosA = UINT_MAX;
@@ -32,6 +35,10 @@ public:
 
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
+	virtual const char *GetName() const { return "Enum_Seqs_AA_BLOSUM62"; };
+
+public:
+	void SetGaps(float Open, float Ext);
 	};
 
 class SWer_Fast_Seqs_AA_BLOSUM62: public SWer
@@ -42,6 +49,7 @@ public:
 
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
+	virtual const char *GetName() const { return "Fast_Seqs_AA_BLOSUM62"; };
 	};
 
 class SWer_Simple_Seqs_AA_BLOSUM62: public SWer
@@ -53,4 +61,5 @@ public:
 
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
+	virtual const char *GetName() const { return "Simple_Seqs_AA_BLOSUM62"; };
 	};

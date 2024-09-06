@@ -53,7 +53,7 @@ float SWSimple(PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 		}
 
 // Main loop
-	float BestScore = MINUS_INFINITY;
+	float BestScore = 0;
 	uint Besti = UINT_MAX;
 	uint Bestj = UINT_MAX;
 	for (uint i = 0; i < LA; ++i)
@@ -64,10 +64,11 @@ float SWSimple(PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 			{
 		// xM
 			{
-			float SM = PS.GetScoreMM(i, j);
-			float MM = FwdM[i][j] + SM;
-			float DM = FwdD[i][j] + PS.GetScoreDM(i, j);
-			float IM = FwdI[i][j] + PS.GetScoreIM(i, j);
+			float m = PS.GetMatchScore(i, j);
+			float SM = m;
+			float MM = FwdM[i][j] + PS.GetScoreMM(i, j) + m;
+			float DM = FwdD[i][j] + PS.GetScoreDM(i, j) + m;
+			float IM = FwdI[i][j] + PS.GetScoreIM(i, j) + m;
 
 			float s = MM;
 			char t = 'M';
@@ -132,7 +133,7 @@ float SWSimple(PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 		}
 
 	if (Besti == UINT_MAX)
-		return MINUS_INFINITY;
+		return 0;
 
 	uint i = Besti;
 	uint j = Bestj;

@@ -401,4 +401,10 @@ extern string g_Arg1;
 typedef void fn_thread_body(uint ThreadIndex, void *ptrUserData);
 void RunThreads(fn_thread_body Body, void *ptrUserData);
 
+#ifdef _MSC_VER
+#define brk(x)       if (x) __debugbreak()
+#else
+#define brk(x)		(0)
+#endif
+
 #endif	// myutils_h

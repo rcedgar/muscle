@@ -36,6 +36,15 @@ static void OnPath(uint PosA, uint PosB, const string &Path)
 		}
 	}
 
+
+void SWer_Enum_Seqs_AA_BLOSUM62::SetGaps(float Open, float Ext)
+	{
+	m_GapOpen = Open;
+	m_GapExt = Ext;
+	m_PS.m_GapOpen = Open;
+	m_PS.m_GapExt = Ext;
+	}
+
 float SWer_Enum_Seqs_AA_BLOSUM62::SW(uint &LoA, uint &LoB, string &Path)
 	{
 	m_BestScore = 0;
@@ -50,6 +59,7 @@ float SWer_Enum_Seqs_AA_BLOSUM62::SW(uint &LoA, uint &LoB, string &Path)
 	EnumPathsLocal(m_LA, m_LB, OnPath);
 	LoA = m_BestPosA;
 	LoB = m_BestPosB;
+	Path = m_BestPath;
 	return m_BestScore;
 	}
 
@@ -78,6 +88,8 @@ float SWer_Simple_Seqs_AA_BLOSUM62::SW(uint &LoA, uint &LoB, string &Path)
 	m_PS.m_GapExt = m_GapExt;
 	m_PS.m_SeqA = m_A;
 	m_PS.m_SeqB = m_B;
+	m_PS.m_LA = SIZE(m_A);
+	m_PS.m_LB = SIZE(m_B);
 
 	float Score = SWSimple(m_PS, LoA, LoB, Path);
 	return Score;
