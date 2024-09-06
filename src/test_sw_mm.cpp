@@ -261,18 +261,26 @@ void cmd_test_sw_mm()
 	PathScorer_MASM_Mega PS;
 	g_PS = &PS;
 
+//WAQHEAW  >A0
+//CTFWH  >B
+//     5.51  MDDM  (0, 3)  Brute
+//     5.25  M  (0, 3)  MASM_Mega 
+	Test("WAQHEAW", "CTFWH");
+	LogPath("WAQHEAW", "CTFWH", 0, 3, "MDDM");
+	return;
+
 	//Test("SEQ|SEQ", "SEQ");
 	//Test("SE-|-EQ", "SEQ");
 	//Test("SEV-|V-EQ|DDD-", "WEQ");
 	//LogPath("SEV-|V-EQ|DDD-", "WEQ", 1, 1, "MDM");
 	//LogPath("SEV-|V-EQ|DDD-", "WEQ", 2, 1, "MM");
-	const uint ITERS = 10000;
-	for (uint Iter = 0; Iter < ITERS; ++Iter)
-		{
-		ProgressStep(Iter, ITERS, "Running %u ok, %u pathdiff, %u scorediff",
-		  g_NAllOk, g_NPathDiff, g_NScoreDiff);
-		TestRandom();
-		}
+	//const uint ITERS = 10000;
+	//for (uint Iter = 0; Iter < ITERS; ++Iter)
+	//	{
+	//	ProgressStep(Iter, ITERS, "Running %u ok, %u pathdiff, %u scorediff",
+	//	  g_NAllOk, g_NPathDiff, g_NScoreDiff);
+	//	TestRandom();
+	//	}
 
 	Log("N %u, allok %u, pathdiff %u, scorediff %u\n",
 	  g_N, g_NAllOk, g_NPathDiff, g_NScoreDiff);

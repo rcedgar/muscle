@@ -55,6 +55,14 @@ float PathScorer::GetScore(char FromState, char ToState,
 	return FLT_MAX;
 	}
 
+void PathScorer_MASM_Mega::Init(MASM &MA, const vector<vector<byte> > &PB)
+	{
+	m_MASM = &MA;
+	m_MegaProfile = &PB;
+	m_LA = MA.GetColCount();
+	m_LB = SIZE(PB);
+	}
+
 // Count match score in GetScoreXM(), not GetScoreMX()
 //    (either should work)
 // D is gap in MegaProfile
@@ -104,7 +112,7 @@ float PathScorer_MASM_Mega::GetScoreDD(uint PosA, uint PosB)
 	{
 	asserta(PosA < m_MASM->GetColCount());
 	const MASMCol &MCol = m_MASM->GetCol(PosA);
-	return MCol.m_GapExt;
+	return -MCol.m_GapExt;
 	}
 
 float PathScorer_MASM_Mega::GetScoreIM(uint PosA, uint PosB)

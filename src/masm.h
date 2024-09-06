@@ -1,6 +1,10 @@
 #pragma once
 
 #include "masmcol.h"
+#include "mx.h"
+
+class MultiSequence;
+class Sequence;
 
 class MASM
 	{

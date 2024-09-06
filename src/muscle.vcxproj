@@ -233,7 +233,10 @@
     <ClCompile Include="loadinput.cpp" />
     <ClCompile Include="logaln_masm.cpp" />
     <ClCompile Include="pathscorer.cpp" />
+    <ClCompile Include="swer.cpp" />
     <ClCompile Include="swmasm_megaprof.cpp" />
+    <ClCompile Include="swsimple.cpp" />
+    <ClCompile Include="swtester.cpp" />
     <ClCompile Include="test_sw_aa.cpp" />
     <ClCompile Include="test_sw_mm.cpp" />
     <ClCompile Include="viterbimega.cpp" />
@@ -522,6 +525,8 @@
     <ClInclude Include="super6.h" />
     <ClInclude Include="super7.h" />
     <ClInclude Include="sweeper.h" />
+    <ClInclude Include="swer.h" />
+    <ClInclude Include="swtester.h" />
     <ClInclude Include="swtrace.h" />
     <ClInclude Include="textfile.h" />
     <ClInclude Include="timing.h" />
