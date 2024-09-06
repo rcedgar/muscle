@@ -11,6 +11,9 @@ float SWer::Run(const string &A, const string &B,
 	{
 	m_RowsA.clear();
 	m_A = A;
+	m_B = B;
+	m_LA = SIZE(m_A);
+	m_LB = SIZE(m_B);
 	size_t n = A.find('|');
 	if (n == string::npos)
 		Split(A, m_RowsA, '|');
@@ -20,10 +23,10 @@ float SWer::Run(const string &A, const string &B,
 
 static void OnPath(uint PosA, uint PosB, const string &Path)
 	{
-	PathScorer *PS = g_ptrSWer_Brute->m_PS;
+	PathScorer &PS = g_ptrSWer_Brute->m_PS;
 	uint LA = g_ptrSWer_Brute->m_LA;
 	uint LB = g_ptrSWer_Brute->m_LB;
-	float Score = PS->GetLocalScore(PosA, PosB, LA, LB, Path);
+	float Score = PS.GetLocalScore(PosA, PosB, LA, LB, Path);
 	if (Score > g_ptrSWer_Brute->m_BestScore)
 		{
 		g_ptrSWer_Brute->m_BestScore = Score;
@@ -41,6 +44,9 @@ float SWer_Enum_Seqs_AA_BLOSUM62::SW(uint &LoA, uint &LoB, string &Path)
 	m_BestPosB = UINT_MAX;
 
 	g_ptrSWer_Brute = this;
+	g_ptrSWer_Brute->m_PS.m_GapOpen = m_GapOpen;
+	g_ptrSWer_Brute->m_PS.m_SeqA = m_A;
+	g_ptrSWer_Brute->m_PS.m_SeqB = m_B;
 	EnumPathsLocal(m_LA, m_LB, OnPath);
 	LoA = m_BestPosA;
 	LoB = m_BestPosB;

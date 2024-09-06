@@ -31,7 +31,13 @@ public:
 	string Y_Path;
 
 public:
-	void Cmp(SWer &X, SWer &Y, const string &A, const string &B);
+	void SetX(SWer &X) { m_X = &X; }
+	void SetY(SWer &Y) { m_Y = &Y; }
+	void RunX(const string &A, const string &B);
+	void RunY(const string &A, const string &B);
+	void RunXY(SWer &X, SWer &Y, const string &A, const string &B);
+	void RunAB(const string &A, const string &B);
+	void CmpXY();
 	void LogResult(const char *Msg) const;
 	void RunRandomSeqs(uint MinL, uint MaxL);
 	void RunRandomMSASeq(uint MinN, int MaxN, uint MinL, uint MaxL);

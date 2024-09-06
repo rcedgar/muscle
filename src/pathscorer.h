@@ -21,6 +21,8 @@ public:
 	uint GetLB() const { asserta(m_LB != UINT_MAX); return m_LB; }
 
 public:
+	virtual float GetMatchScore(uint PosA, uint PosB) = 0;
+
 	virtual float GetScoreMM(uint PosA, uint PosB) = 0;
 	virtual float GetScoreMD(uint PosA, uint PosB) = 0;
 	virtual float GetScoreMI(uint PosA, uint PosB) = 0;
@@ -39,7 +41,7 @@ public:
 	const vector<vector<byte> > *m_MegaProfile = 0;
 
 public:
-	float GetMatchScore(uint PosA, uint PosB);
+	virtual float GetMatchScore(uint PosA, uint PosB);
 	void Init(MASM &MA, const vector<vector<byte> > &PB);
 
 public:

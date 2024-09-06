@@ -2,17 +2,38 @@
 #include "swtester.h"
 #include "alpha.h"
 
-void SWTester::Cmp(SWer &X, SWer &Y, const string &A, const string &B)
+void SWTester::RunX(const string &A, const string &B)
 	{
-	m_X = &X;
-	m_Y = &Y;
-
 	m_A = A;
 	m_B = B;
-
 	X_Score = m_X->Run(m_A, m_B, X_LoA, X_LoB, X_Path);
-	Y_Score = m_Y->Run(m_A, m_B, Y_LoA, Y_LoB, Y_Path);
+	}
 
+void SWTester::RunY(const string &A, const string &B)
+	{
+	m_A = A;
+	m_B = B;
+	Y_Score = m_Y->Run(m_A, m_B, Y_LoA, Y_LoB, Y_Path);
+	}
+
+void SWTester::RunXY(SWer &X, SWer &Y, const string &A, const string &B)
+	{
+	SetX(X);
+	SetY(Y);
+	RunX(A, B);
+	RunY(A, B);
+	CmpXY();
+	}
+
+void SWTester::RunAB( const string &A, const string &B)
+	{
+	RunX(A, B);
+	RunY(A, B);
+	CmpXY();
+	}
+
+void SWTester::CmpXY()
+	{
 	bool Agree = true;
 	++m_N;
 	if (X_Score != Y_Score)
@@ -65,17 +86,7 @@ void SWTester::RunRandomSeqs(uint MinL, uint MaxL)
 	string A, B;
 	GetRandomSeq(LA, A);
 	GetRandomSeq(LB, B);
-	Run(A, B);
-	}
-
-void SWTester::RunRandomSeqs(uint MinL, uint MaxL)
-	{
-	uint LA = MinL + randu32()%(MaxL - MinL + 1);
-	uint LB = MinL + randu32()%(MaxL - MinL + 1);
-	string A, B;
-	GetRandomSeq(LA, A);
-	GetRandomSeq(LB, B);
-	Run(A, B);
+	RunAB(A, B);
 	}
 
 void SWTester::RunRandomMSASeq(uint MinN, int MaxN, uint MinL, uint MaxL)
@@ -95,5 +106,5 @@ void SWTester::RunRandomMSASeq(uint MinN, int MaxN, uint MinL, uint MaxL)
 
 	string B;
 	GetRandomSeq(LB, B);
-	Run(A, B);
+	RunAB(A, B);
 	}

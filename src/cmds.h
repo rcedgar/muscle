@@ -101,5 +101,6 @@ C(masm_stats)
 C(mega2)
 C(test_sw_aa)
 C(test_sw_mm)
+C(swtest)
 
 #undef C

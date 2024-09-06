@@ -22,11 +22,13 @@ public:
 class SWer_Enum_Seqs_AA_BLOSUM62 : public SWer
 	{
 public:
+	float m_GapOpen = FLT_MAX;
+	float m_GapExt = FLT_MAX;
 	float m_BestScore = 0;
 	string m_BestPath;
 	uint m_BestPosA = UINT_MAX;
 	uint m_BestPosB = UINT_MAX;
-	PathScorer_AA_BLOSUM62 *m_PS = 0;
+	PathScorer_AA_BLOSUM62 m_PS;
 
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
