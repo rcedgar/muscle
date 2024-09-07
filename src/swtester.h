@@ -14,6 +14,8 @@ public:
 	uint m_NScoreDiff = 0;
 	uint m_NPathDiff = 0;
 	uint m_NPosDiff = 0;
+	uint m_NPSScoreOk = 0;
+	uint m_NPSScoreDiff = 0;
 
 	string m_A;
 	string m_B;
@@ -38,6 +40,8 @@ public:
 		m_NScoreDiff = 0;
 		m_NPathDiff = 0;
 		m_NPosDiff = 0;
+		m_NPSScoreOk = 0;
+		m_NPSScoreDiff = 0;
 		}
 	void SetX(SWer &X) { m_X = &X; }
 	void SetY(SWer &Y) { m_Y = &Y; }

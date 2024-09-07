@@ -14,6 +14,8 @@ public:
 public:
 	float Run(const string &A, const string &B,
 	  uint &LoA, uint &LoB, string &Path);
+	uint GetNA(const string &Path) const;
+	uint GetNB(const string &Path) const;
 
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path) = 0;

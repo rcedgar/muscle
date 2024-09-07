@@ -7,6 +7,14 @@ void SWTester::RunX(const string &A, const string &B)
 	m_A = A;
 	m_B = B;
 	X_Score = m_X->Run(m_A, m_B, X_LoA, X_LoB, X_Path);
+	if (X_Score <= 0)
+		return;
+	PathScorer *PS = m_X->GetPS(); 
+	float ScorePS = PS->GetLocalScore(X_LoA, X_LoB, X_Path);
+	if (feq(X_Score, ScorePS))
+		++m_NPSScoreOk;
+	else
+		++m_NPSScoreDiff;
 	}
 
 void SWTester::RunY(const string &A, const string &B)
@@ -29,6 +37,8 @@ void SWTester::RunXAB(SWer &X, const string &A, const string &B, bool Trace)
 	{
 	SetX(X);
 	RunX(A, B);
+	if (X_Score <= 0)
+		return;
 	PathScorer &PS = *m_X->GetPS();
 	PS.m_Trace = Trace;
 	float ScorePS = PS.GetLocalScore(X_LoA, X_LoB, X_Path);
@@ -161,4 +171,6 @@ void SWTester::Stats()
 	ProgressLog("%10u  Score diff\n", m_NScoreDiff);
 	ProgressLog("%10u  Path diff\n", m_NPathDiff);
 	ProgressLog("%10u  Pos diff\n", m_NPosDiff);
+	ProgressLog("%10u  PS score ok\n", m_NPSScoreOk);
+	ProgressLog("%10u  PS score diff\n", m_NPSScoreDiff);
 	}

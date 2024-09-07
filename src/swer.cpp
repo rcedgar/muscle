@@ -60,6 +60,30 @@ static void MakeMegaProfile(const string &Seq,
 		}
 	}
 
+uint SWer::GetNA(const string &Path) const
+	{
+	uint n = 0;
+	for (uint i = 0; i < SIZE(Path); ++i)
+		{
+		char c = Path[i];
+		if (c == 'M' || c == 'D')
+			++n;
+		}
+	return n;
+	}
+
+uint SWer::GetNB(const string &Path) const
+	{
+	uint n = 0;
+	for (uint i = 0; i < SIZE(Path); ++i)
+		{
+		char c = Path[i];
+		if (c == 'M' || c == 'I')
+			++n;
+		}
+	return n;
+	}
+
 float SWer::Run(const string &A, const string &B,
   uint &LoA, uint &LoB, string &Path)
 	{
@@ -70,6 +94,14 @@ float SWer::Run(const string &A, const string &B,
 	m_LB = SIZE(m_B);
 	Split(A, m_RowsA, '|');
 	float Score = SW(LoA, LoB, Path);
+	if (Score <= 0)
+		return 0;
+	uint NA = GetNA(Path);
+	uint NB = GetNB(Path);
+	uint HiA = LoA + NA - 1;
+	uint HiB = LoB + NB - 1;
+	asserta(HiA < m_LA);
+	asserta(HiB < m_LB);
 	return Score;
 	}
 
@@ -162,9 +194,15 @@ float SWer_MASM_Mega_Seqs::SW(uint &LoA, uint &LoB, string &Path)
 	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
 	asserta(m_GapExt != FLT_MAX && m_GapExt < 0);
 
+
 	MASM *MA = MakeMASM_Seq(m_A, m_GapOpen, m_GapExt);
-	vector<vector<byte> > PB;
+	vector<vector<byte> > &PB = *new vector<vector<byte> >;
 	MakeMegaProfile(m_B, PB);
+
+	m_PS.m_LA = m_LA;
+	m_PS.m_LB = m_LB;
+	m_PS.m_MASM = MA;
+	m_PS.m_MegaProfile = &PB;
 
 	XDPMem Mem;
 	uint Leni, Lenj;

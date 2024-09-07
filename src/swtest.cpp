@@ -52,6 +52,7 @@ void cmd_swtest()
 	const uint MinL = 3;
 	const uint MaxL = 9;
 	const uint Iters = 1000;
+	ST.RunXAB(Simple_MASM_Mega, "ESK", "MMMW", true);
 
 	ST.ClearStats();
 	ST.SetY(Fast_Seqs_AA_BLOSUM62);
