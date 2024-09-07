@@ -43,7 +43,9 @@ static void ClearBrute()
 
 static void OnPath(uint PosA, uint PosB, const string &Path)
 	{
-	float Score = g_PS->GetLocalScore(PosA, PosB, g_LA, g_LB, Path);
+	g_PS->m_LA = g_LA;
+	g_PS->m_LB = g_LB;
+	float Score = g_PS->GetLocalScore(PosA, PosB, Path);
 	if (g_LogAllPaths)
 		Log("%10.3g  %5u  %5u  %s\n", Score, PosA, PosB, Path.c_str());
 	if (Score > g_BestScore)
@@ -197,7 +199,9 @@ static void LogPath(const string &sA, const string &B,
 	g_PS->m_MASM = &MA;
 	g_PS->m_MegaProfile = &PB;
 	g_PS->m_Trace = true;
-	g_PS->GetLocalScore(PosA, PosB, g_LA, g_LB, Path);
+	g_PS->m_LA = g_LA;
+	g_PS->m_LB = g_LB;
+	g_PS->GetLocalScore(PosA, PosB, Path);
 	g_PS->m_Trace = false;
 	}
 

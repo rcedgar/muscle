@@ -25,10 +25,18 @@ void SWTester::RunXY(SWer &X, SWer &Y, const string &A, const string &B)
 	CmpXY();
 	}
 
-void SWTester::RunXAB(SWer &X, const string &A, const string &B)
+void SWTester::RunXAB(SWer &X, const string &A, const string &B, bool Trace)
 	{
 	SetX(X);
 	RunX(A, B);
+	PathScorer &PS = *m_X->GetPS();
+	PS.m_Trace = Trace;
+	float ScorePS = PS.GetLocalScore(X_LoA, X_LoB, X_Path);
+	Log("\nRunXAB(%s)\n", m_X->GetName());
+	Log("A %s\n", A.c_str());
+	Log("B %s\n", B.c_str());
+	Log("ScoreSW %.3g, ScorePS %.3g", X_Score, ScorePS);
+	Log("   %s\n", X_Path.c_str());
 	}
 
 void SWTester::RunAB( const string &A, const string &B)
@@ -48,7 +56,7 @@ void SWTester::CmpXY()
 		return;
 		}
 
-	if (X_Score != Y_Score)
+	if (!feq(X_Score, Y_Score))
 		{
 		if (Agree)
 			LogResult("@SCOREDIFF");
@@ -79,7 +87,8 @@ void SWTester::LogResult(const char *Msg) const
 	Log("A: %s\n", m_A.c_str());
 	Log("B: %s\n", m_B.c_str());
 	Log("  %.3g/%.3g", X_Score, Y_Score);
-	Log("  %u,%u", X_LoA, Y_LoA);
+	Log("  loa %u,%u", X_LoA, Y_LoA);
+	Log("  lob %u,%u", X_LoB, Y_LoB);
 	Log("  %s,%s", X_Path.c_str(), Y_Path.c_str());
 	Log("\n");
 	}

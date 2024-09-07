@@ -11,8 +11,7 @@ public:
 	uint m_LB = UINT_MAX;
 
 public:
-	float GetLocalScore(uint PosA, uint PosB, uint LA, uint LB, 
-	  const string &Path);
+	float GetLocalScore(uint PosA, uint PosB, const string &Path);
 	float GetScore(char FromState, char ToState,
 	  uint PosA, uint PosB);
 	void Trace(bool On) { m_Trace = On; }

@@ -41,7 +41,7 @@ public:
 		}
 	void SetX(SWer &X) { m_X = &X; }
 	void SetY(SWer &Y) { m_Y = &Y; }
-	void RunXAB(SWer &X, const string &A, const string &B);
+	void RunXAB(SWer &X, const string &A, const string &B, bool Trace);
 	void RunX(const string &A, const string &B);
 	void RunY(const string &A, const string &B);
 	void RunXY(SWer &X, SWer &Y, const string &A, const string &B);

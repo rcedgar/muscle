@@ -1,17 +1,42 @@
 #include "myutils.h"
 #include "swtester.h"
 
+static float GapOpen = -1;
+static float GapExt = -0.4f;
+
+/***
+@SCOREDIFF SWer_Simple_MASM_Mega Fast_Seqs_AA_BLOSUM62
+A: EVRDYIQ
+B: RQGEG
+  3.98/3.58  loa 2,2  lob 0,0  MDDDM,MDDDM
+***/
+static void Bug()
+	{
+	SWer_Simple_MASM_Mega S;
+	S.m_GapOpen = GapOpen;
+	S.m_GapExt = GapExt;
+
+	SWTester ST;
+	ST.RunXAB(S, "EVRDYIQ", "RQGEG", true);
+
+	SWer_Fast_Seqs_AA_BLOSUM62 S2;
+	S2.m_GapOpen = GapOpen;
+	S2.m_GapExt = GapExt;
+	ST.RunXAB(S2, "EVRDYIQ", "RQGEG", true);
+	}
+
 void cmd_swtest()
 	{
+	//Bug();
+	//return;
+
 	SWTester ST;
 
 	SWer_Enum_Seqs_AA_BLOSUM62 Enum_Seqs_AA_BLOSUM62;
 	SWer_Fast_Seqs_AA_BLOSUM62 Fast_Seqs_AA_BLOSUM62;
 	SWer_Simple_Seqs_AA_BLOSUM62 Simple_Seqs_AA_BLOSUM62;
 	SWer_Mega_Prof_Seqs Mega_Prof_Seqs;
-
-	float GapOpen = -1;
-	float GapExt = -0.5;
+	SWer_Simple_MASM_Mega Simple_MASM_Mega;
 
 	Enum_Seqs_AA_BLOSUM62.SetGaps(GapOpen, GapExt);
 
@@ -24,14 +49,18 @@ void cmd_swtest()
 	Mega_Prof_Seqs.m_GapOpen = GapOpen;
 	Mega_Prof_Seqs.m_GapExt = GapExt;
 
-	//ST.RunXAB(Enum_Seqs_AA_BLOSUM62, "SEQVE", "EQV");
-	//ST.RunXY(Enum_Seqs_AA_BLOSUM62, Fast_Seqs_AA_BLOSUM62, "SEQVE", "EQV");
-	//ST.RunXY(Enum_Seqs_AA_BLOSUM62, Simple_Seqs_AA_BLOSUM62, "SEQVE", "EQV");
-	//ST.Stats();
+	Simple_MASM_Mega.m_GapOpen = GapOpen;
+	Simple_MASM_Mega.m_GapExt = GapExt;
 
 	const uint MinL = 3;
-	const uint MaxL = 7;
+	const uint MaxL = 9;
 	const uint Iters = 1000;
+
+	ST.ClearStats();
+	ST.SetY(Fast_Seqs_AA_BLOSUM62);
+	ST.SetX(Simple_MASM_Mega);
+	ST.RunRandomSeqsIters(MinL, MaxL, Iters);
+	ST.Stats();
 
 	ST.ClearStats();
 	ST.SetY(Fast_Seqs_AA_BLOSUM62);

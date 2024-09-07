@@ -18,6 +18,7 @@ public:
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path) = 0;
 	virtual const char *GetName() const = 0;
+	virtual PathScorer *GetPS() = 0;
 	};
 
 class SWer_Enum_Seqs_AA_BLOSUM62 : public SWer
@@ -36,6 +37,7 @@ public:
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
 	virtual const char *GetName() const { return "Enum_Seqs_AA_BLOSUM62"; };
+	virtual PathScorer *GetPS() { return &m_PS; }
 
 public:
 	void SetGaps(float Open, float Ext);
@@ -46,10 +48,12 @@ class SWer_Fast_Seqs_AA_BLOSUM62: public SWer
 public:
 	float m_GapOpen = FLT_MAX;
 	float m_GapExt = FLT_MAX;
+	PathScorer_AA_BLOSUM62 m_PS;
 
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
 	virtual const char *GetName() const { return "Fast_Seqs_AA_BLOSUM62"; };
+	virtual PathScorer *GetPS() { return &m_PS; }
 	};
 
 class SWer_Simple_Seqs_AA_BLOSUM62: public SWer
@@ -62,6 +66,7 @@ public:
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
 	virtual const char *GetName() const { return "Simple_Seqs_AA_BLOSUM62"; };
+	virtual PathScorer *GetPS() { return &m_PS; }
 	};
 
 class SWer_Mega_Prof_Seqs: public SWer
@@ -69,8 +74,23 @@ class SWer_Mega_Prof_Seqs: public SWer
 public:
 	float m_GapOpen = FLT_MAX;
 	float m_GapExt = FLT_MAX;
+	PathScorer_MASM_Mega m_PS;
 
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
 	virtual const char *GetName() const { return "SWer_Mega_Prof_Seqs"; };
+	virtual PathScorer *GetPS() { return &m_PS; };
+	};
+
+class SWer_Simple_MASM_Mega: public SWer
+	{
+public:
+	float m_GapOpen = FLT_MAX;
+	float m_GapExt = FLT_MAX;
+	PathScorer_MASM_Mega m_PS;
+
+public:
+	virtual float SW(uint &LoA, uint &LoB, string &Path);
+	virtual const char *GetName() const { return "SWer_Simple_MASM_Mega"; };
+	virtual PathScorer *GetPS() { return &m_PS; }
 	};

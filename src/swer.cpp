@@ -7,7 +7,8 @@
 
 static SWer_Enum_Seqs_AA_BLOSUM62 *g_ptrSWer_Brute;
 
-static MASM *MakeMASM(const string &Seq, float GapOpen, float GapExt)
+static MASM *MakeMASM_Seq(const string &Seq,
+  float GapOpen, float GapExt)
 	{
 	MultiSequence *Aln = new MultiSequence;
 	Sequence *s = NewSequence();
@@ -16,6 +17,29 @@ static MASM *MakeMASM(const string &Seq, float GapOpen, float GapExt)
 	MASM *M = new MASM;
 	Mega::FromMSA_AAOnly(*Aln, GapOpen, GapExt);
 	M->FromMSA(*Aln, "MSA", -GapOpen, -GapExt);
+	return M;
+	}
+
+static MASM *MakeMASM_Rows(const vector<string> &Rows,
+  float GapOpen, float GapExt)
+	{
+	MultiSequence *Aln = new MultiSequence;
+	const uint SeqCount = SIZE(Rows);
+	uint ColCount = UINT_MAX;
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		const string &Row = Rows[i];
+		if (i == 0)
+			ColCount = SIZE(Row);
+		else
+			asserta(SIZE(Row) == ColCount);
+		Sequence *s = NewSequence();
+		s->FromString("Row", Row);
+		Aln->AddSequence(s, true);
+		}
+	MASM *M = new MASM;
+	Mega::FromMSA_AAOnly(*Aln, GapOpen, GapExt);
+	M->FromMSA(*Aln, "Rows", -GapOpen, -GapExt);
 	return M;
 	}
 
@@ -54,9 +78,9 @@ float SWer::Run(const string &A, const string &B,
 static void OnPath(uint PosA, uint PosB, const string &Path)
 	{
 	PathScorer &PS = g_ptrSWer_Brute->m_PS;
-	uint LA = g_ptrSWer_Brute->m_LA;
-	uint LB = g_ptrSWer_Brute->m_LB;
-	float Score = PS.GetLocalScore(PosA, PosB, LA, LB, Path);
+	PS.m_LA = g_ptrSWer_Brute->m_LA;
+	PS.m_LB  = g_ptrSWer_Brute->m_LB;
+	float Score = PS.GetLocalScore(PosA, PosB, Path);
 	if (Score > g_ptrSWer_Brute->m_BestScore)
 		{
 		g_ptrSWer_Brute->m_BestScore = Score;
@@ -65,7 +89,6 @@ static void OnPath(uint PosA, uint PosB, const string &Path)
 		g_ptrSWer_Brute->m_BestPosB = PosB;
 		}
 	}
-
 
 void SWer_Enum_Seqs_AA_BLOSUM62::SetGaps(float Open, float Ext)
 	{
@@ -101,6 +124,13 @@ float SWer_Fast_Seqs_AA_BLOSUM62::SW(uint &LoA, uint &LoB, string &Path)
 	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
 	asserta(m_GapExt != FLT_MAX && m_GapExt < 0);
 
+	m_PS.m_GapOpen = m_GapOpen;
+	m_PS.m_GapExt = m_GapExt;
+	m_PS.m_LA = m_LA;
+	m_PS.m_LB = m_LB;
+	m_PS.m_SeqA = m_A;
+	m_PS.m_SeqB = m_B;
+
 	XDPMem Mem;
 	uint Leni, Lenj;
 	float Score = SWFast_Strings_BLOSUM62(Mem, m_A, m_B, m_GapOpen, m_GapExt,
@@ -134,7 +164,7 @@ float SWer_Mega_Prof_Seqs::SW(uint &LoA, uint &LoB, string &Path)
 	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
 	asserta(m_GapExt != FLT_MAX && m_GapExt < 0);
 
-	MASM *MA = MakeMASM(m_A, m_GapOpen, m_GapExt);
+	MASM *MA = MakeMASM_Seq(m_A, m_GapOpen, m_GapExt);
 	vector<vector<byte> > PB;
 	MakeMegaProfile(m_B, PB);
 
@@ -143,5 +173,22 @@ float SWer_Mega_Prof_Seqs::SW(uint &LoA, uint &LoB, string &Path)
 	float Score = SWFast_MASM_MegaProf(Mem, *MA, PB, m_GapOpen, m_GapExt,
 	  LoA, LoB, Leni, Lenj, Path);
 
+	return Score;
+	}
+
+float SWer_Simple_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
+	{
+	float SWSimple(PathScorer &PS, uint &LoA, uint &LoB, string &Path);
+	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
+	asserta(m_GapExt != FLT_MAX && m_GapExt < 0);
+
+	vector<vector<byte> > &PB = *new vector<vector<byte> >;
+	MakeMegaProfile(m_B, PB);
+	m_PS.m_MASM = MakeMASM_Rows(m_RowsA, m_GapOpen, m_GapExt);
+	m_PS.m_MegaProfile = &PB;
+	m_PS.m_LA = SIZE(m_A);
+	m_PS.m_LB = SIZE(m_B);
+
+	float Score = SWSimple(m_PS, LoA, LoB, Path);
 	return Score;
 	}
