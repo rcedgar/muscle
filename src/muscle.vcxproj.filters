@@ -668,6 +668,9 @@
     <ClCompile Include="swtest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="swtestmm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">

@@ -109,6 +109,16 @@ void SWTester::RunRandomSeqsIters(uint MinL, uint MaxL, uint Iters)
 		}
 	}
 
+void SWTester::RunRandomMSASeqIters(uint MinN, uint MaxN, 
+  uint MinL, uint MaxL, uint Iters)
+	{
+	for (uint Iter = 0; Iter < Iters; ++Iter)
+		{
+		ProgressStep(Iter, Iters, "RunRandomMSASeqIters");
+		RunRandomMSASeq(MinN, MaxN, MinL, MaxL);
+		}
+	}
+
 void SWTester::RunRandomSeqs(uint MinL, uint MaxL)
 	{
 	uint LA = MinL + randu32()%(MaxL - MinL + 1);
@@ -119,7 +129,7 @@ void SWTester::RunRandomSeqs(uint MinL, uint MaxL)
 	RunAB(A, B);
 	}
 
-void SWTester::RunRandomMSASeq(uint MinN, int MaxN, uint MinL, uint MaxL)
+void SWTester::RunRandomMSASeq(uint MinN, uint MaxN, uint MinL, uint MaxL)
 	{
 	uint N = MinN + randu32()%(MaxN - MinN + 1);
 	uint LA = MinL + randu32()%(MaxL - MinL + 1);

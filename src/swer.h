@@ -69,7 +69,7 @@ public:
 	virtual PathScorer *GetPS() { return &m_PS; }
 	};
 
-class SWer_Mega_Prof_Seqs: public SWer
+class SWer_MASM_Mega_Seqs: public SWer
 	{
 public:
 	float m_GapOpen = FLT_MAX;
@@ -78,7 +78,7 @@ public:
 
 public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
-	virtual const char *GetName() const { return "SWer_Mega_Prof_Seqs"; };
+	virtual const char *GetName() const { return "SWer_MASM_Mega_Seqs"; };
 	virtual PathScorer *GetPS() { return &m_PS; };
 	};
 
@@ -93,4 +93,17 @@ public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
 	virtual const char *GetName() const { return "SWer_Simple_MASM_Mega"; };
 	virtual PathScorer *GetPS() { return &m_PS; }
+	};
+
+class SWer_MASM_Mega: public SWer
+	{
+public:
+	float m_GapOpen = FLT_MAX;
+	float m_GapExt = FLT_MAX;
+	PathScorer_MASM_Mega m_PS;
+
+public:
+	virtual float SW(uint &LoA, uint &LoB, string &Path);
+	virtual const char *GetName() const { return "SWer_MASM_Mega"; };
+	virtual PathScorer *GetPS() { return &m_PS; };
 	};

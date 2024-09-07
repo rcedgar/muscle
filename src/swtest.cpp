@@ -27,15 +27,12 @@ static void Bug()
 
 void cmd_swtest()
 	{
-	//Bug();
-	//return;
-
 	SWTester ST;
 
 	SWer_Enum_Seqs_AA_BLOSUM62 Enum_Seqs_AA_BLOSUM62;
 	SWer_Fast_Seqs_AA_BLOSUM62 Fast_Seqs_AA_BLOSUM62;
 	SWer_Simple_Seqs_AA_BLOSUM62 Simple_Seqs_AA_BLOSUM62;
-	SWer_Mega_Prof_Seqs Mega_Prof_Seqs;
+	SWer_MASM_Mega_Seqs Mega_Prof_Seqs;
 	SWer_Simple_MASM_Mega Simple_MASM_Mega;
 
 	Enum_Seqs_AA_BLOSUM62.SetGaps(GapOpen, GapExt);

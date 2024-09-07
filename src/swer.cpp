@@ -68,9 +68,7 @@ float SWer::Run(const string &A, const string &B,
 	m_B = B;
 	m_LA = SIZE(m_A);
 	m_LB = SIZE(m_B);
-	size_t n = A.find('|');
-	if (n == string::npos)
-		Split(A, m_RowsA, '|');
+	Split(A, m_RowsA, '|');
 	float Score = SW(LoA, LoB, Path);
 	return Score;
 	}
@@ -155,7 +153,7 @@ float SWer_Simple_Seqs_AA_BLOSUM62::SW(uint &LoA, uint &LoB, string &Path)
 	return Score;
 	}
 
-float SWer_Mega_Prof_Seqs::SW(uint &LoA, uint &LoB, string &Path)
+float SWer_MASM_Mega_Seqs::SW(uint &LoA, uint &LoB, string &Path)
 	{
 	float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
 	  const vector<vector<byte> > &PB, float Open, float Ext,
@@ -186,9 +184,30 @@ float SWer_Simple_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
 	MakeMegaProfile(m_B, PB);
 	m_PS.m_MASM = MakeMASM_Rows(m_RowsA, m_GapOpen, m_GapExt);
 	m_PS.m_MegaProfile = &PB;
-	m_PS.m_LA = SIZE(m_A);
+	m_PS.m_LA = SIZE(m_RowsA[0]);
 	m_PS.m_LB = SIZE(m_B);
 
 	float Score = SWSimple(m_PS, LoA, LoB, Path);
+	return Score;
+	}
+
+float SWer_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
+	{
+	float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
+	  const vector<vector<byte> > &PB, float Open, float Ext,
+	  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
+
+	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
+	asserta(m_GapExt != FLT_MAX && m_GapExt < 0);
+
+	MASM *MA = MakeMASM_Rows(m_RowsA, m_GapOpen, m_GapExt);
+	vector<vector<byte> > PB;
+	MakeMegaProfile(m_B, PB);
+
+	XDPMem Mem;
+	uint Leni, Lenj;
+	float Score = SWFast_MASM_MegaProf(Mem, *MA, PB, m_GapOpen, m_GapExt,
+	  LoA, LoB, Leni, Lenj, Path);
+
 	return Score;
 	}
