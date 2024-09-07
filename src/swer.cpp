@@ -3,8 +3,38 @@
 #include "enumpaths.h"
 #include "pathscorer.h"
 #include "xdpmem.h"
+#include "alpha.h"
 
 static SWer_Enum_Seqs_AA_BLOSUM62 *g_ptrSWer_Brute;
+
+static MASM *MakeMASM(const string &Seq, float GapOpen, float GapExt)
+	{
+	MultiSequence *Aln = new MultiSequence;
+	Sequence *s = NewSequence();
+	s->FromString("LABEL", Seq);
+	Aln->AddSequence(s, true);
+	MASM *M = new MASM;
+	Mega::FromMSA_AAOnly(*Aln, GapOpen, GapExt);
+	M->FromMSA(*Aln, "MSA", -GapOpen, -GapExt);
+	return M;
+	}
+
+static void MakeMegaProfile(const string &Seq,
+  vector<vector<byte> > &Prof)
+	{
+	const uint L = SIZE(Seq);
+	Prof.clear();
+	for (uint Pos = 0; Pos < L; ++Pos)
+		{
+		vector<byte> Col;
+		char c = Seq[Pos];
+		byte Letter = g_CharToLetterAmino[c];
+		if (Letter >= 20)
+			Letter = 0;
+		Col.push_back(Letter);
+		Prof.push_back(Col);
+		}
+	}
 
 float SWer::Run(const string &A, const string &B,
   uint &LoA, uint &LoB, string &Path)
@@ -92,5 +122,26 @@ float SWer_Simple_Seqs_AA_BLOSUM62::SW(uint &LoA, uint &LoB, string &Path)
 	m_PS.m_LB = SIZE(m_B);
 
 	float Score = SWSimple(m_PS, LoA, LoB, Path);
+	return Score;
+	}
+
+float SWer_Mega_Prof_Seqs::SW(uint &LoA, uint &LoB, string &Path)
+	{
+	float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
+	  const vector<vector<byte> > &PB, float Open, float Ext,
+	  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
+
+	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
+	asserta(m_GapExt != FLT_MAX && m_GapExt < 0);
+
+	MASM *MA = MakeMASM(m_A, m_GapOpen, m_GapExt);
+	vector<vector<byte> > PB;
+	MakeMegaProfile(m_B, PB);
+
+	XDPMem Mem;
+	uint Leni, Lenj;
+	float Score = SWFast_MASM_MegaProf(Mem, *MA, PB, m_GapOpen, m_GapExt,
+	  LoA, LoB, Leni, Lenj, Path);
+
 	return Score;
 	}

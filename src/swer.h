@@ -63,3 +63,14 @@ public:
 	virtual float SW(uint &LoA, uint &LoB, string &Path);
 	virtual const char *GetName() const { return "Simple_Seqs_AA_BLOSUM62"; };
 	};
+
+class SWer_Mega_Prof_Seqs: public SWer
+	{
+public:
+	float m_GapOpen = FLT_MAX;
+	float m_GapExt = FLT_MAX;
+
+public:
+	virtual float SW(uint &LoA, uint &LoB, string &Path);
+	virtual const char *GetName() const { return "SWer_Mega_Prof_Seqs"; };
+	};

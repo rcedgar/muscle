@@ -8,6 +8,7 @@ void cmd_swtest()
 	SWer_Enum_Seqs_AA_BLOSUM62 Enum_Seqs_AA_BLOSUM62;
 	SWer_Fast_Seqs_AA_BLOSUM62 Fast_Seqs_AA_BLOSUM62;
 	SWer_Simple_Seqs_AA_BLOSUM62 Simple_Seqs_AA_BLOSUM62;
+	SWer_Mega_Prof_Seqs Mega_Prof_Seqs;
 
 	float GapOpen = -1;
 	float GapExt = -0.5;
@@ -19,6 +20,9 @@ void cmd_swtest()
 
 	Simple_Seqs_AA_BLOSUM62.m_GapOpen = GapOpen;
 	Simple_Seqs_AA_BLOSUM62.m_GapExt = GapExt;
+
+	Mega_Prof_Seqs.m_GapOpen = GapOpen;
+	Mega_Prof_Seqs.m_GapExt = GapExt;
 
 	//ST.RunXAB(Enum_Seqs_AA_BLOSUM62, "SEQVE", "EQV");
 	//ST.RunXY(Enum_Seqs_AA_BLOSUM62, Fast_Seqs_AA_BLOSUM62, "SEQVE", "EQV");
@@ -38,6 +42,12 @@ void cmd_swtest()
 	ST.ClearStats();
 	ST.SetY(Fast_Seqs_AA_BLOSUM62);
 	ST.SetX(Enum_Seqs_AA_BLOSUM62);
+	ST.RunRandomSeqsIters(MinL, MaxL, Iters);
+	ST.Stats();
+
+	ST.ClearStats();
+	ST.SetY(Fast_Seqs_AA_BLOSUM62);
+	ST.SetX(Mega_Prof_Seqs);
 	ST.RunRandomSeqsIters(MinL, MaxL, Iters);
 	ST.Stats();
 	}
