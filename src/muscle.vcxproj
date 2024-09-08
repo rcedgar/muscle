@@ -233,6 +233,7 @@
     <ClCompile Include="loadinput.cpp" />
     <ClCompile Include="logaln_masm.cpp" />
     <ClCompile Include="pathscorer.cpp" />
+    <ClCompile Include="swenumdp.cpp" />
     <ClCompile Include="swer.cpp" />
     <ClCompile Include="swmasm_megaprof.cpp" />
     <ClCompile Include="swsimple.cpp" />
@@ -434,6 +435,7 @@
     <ClCompile Include="viterbifastmem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="allocmx.h" />
     <ClInclude Include="enumpaths.h" />
     <ClInclude Include="m3alnparams.h" />
     <ClInclude Include="alpha.h" />

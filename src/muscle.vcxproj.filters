@@ -671,6 +671,9 @@
     <ClCompile Include="swtestmm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="swenumdp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alpha.h">
@@ -1010,6 +1013,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="swer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="allocmx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

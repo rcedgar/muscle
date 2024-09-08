@@ -1,7 +1,7 @@
 #include "myutils.h"
 #include "enumpaths.h"
 
-static uint GetNA(const string &Path)
+uint GetNA(const string &Path)
 	{
 	uint n = 0;
 	for (uint i = 0; i < SIZE(Path); ++i)
@@ -13,7 +13,7 @@ static uint GetNA(const string &Path)
 	return n;
 	}
 
-static uint GetNB(const string &Path)
+uint GetNB(const string &Path)
 	{
 	uint n = 0;
 	for (uint i = 0; i < SIZE(Path); ++i)
