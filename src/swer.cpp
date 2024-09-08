@@ -5,8 +5,6 @@
 #include "xdpmem.h"
 #include "alpha.h"
 
-static SWer_Enum_Seqs_AA_BLOSUM62 *g_ptrSWer_Brute;
-
 static MASM *MakeMASM_Seq(const string &Seq,
   float GapOpen, float GapExt)
 	{
@@ -105,6 +103,7 @@ float SWer::Run(const string &A, const string &B,
 	return Score;
 	}
 
+static SWer_Enum_Seqs_AA_BLOSUM62 *g_ptrSWer_Brute;
 static void OnPath(uint PosA, uint PosB, const string &Path)
 	{
 	PathScorer &PS = g_ptrSWer_Brute->m_PS;
@@ -194,7 +193,6 @@ float SWer_MASM_Mega_Seqs::SW(uint &LoA, uint &LoB, string &Path)
 	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
 	asserta(m_GapExt != FLT_MAX && m_GapExt < 0);
 
-
 	MASM *MA = MakeMASM_Seq(m_A, m_GapOpen, m_GapExt);
 	vector<vector<byte> > &PB = *new vector<vector<byte> >;
 	MakeMegaProfile(m_B, PB);
@@ -248,4 +246,52 @@ float SWer_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
 	  LoA, LoB, Leni, Lenj, Path);
 
 	return Score;
+	}
+
+static SWer_Enum_MASM_Mega *g_ptrSWer_Brute2;
+static void OnPath2(uint PosA, uint PosB, const string &Path)
+	{
+	PathScorer &PS = g_ptrSWer_Brute2->m_PS;
+	PS.m_LA = g_ptrSWer_Brute2->m_LA;
+	PS.m_LB  = g_ptrSWer_Brute2->m_LB;
+	float Score = PS.GetLocalScore(PosA, PosB, Path);
+	if (Score > g_ptrSWer_Brute2->m_BestScore)
+		{
+		g_ptrSWer_Brute2->m_BestScore = Score;
+		g_ptrSWer_Brute2->m_BestPath = Path;
+		g_ptrSWer_Brute2->m_BestPosA = PosA;
+		g_ptrSWer_Brute2->m_BestPosB = PosB;
+		}
+	}
+
+float SWer_Enum_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
+	{
+	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
+	asserta(m_GapExt != FLT_MAX && m_GapExt < 0);
+
+	MASM *MA = MakeMASM_Seq(m_A, m_GapOpen, m_GapExt);
+	vector<vector<byte> > &PB = *new vector<vector<byte> >;
+	MakeMegaProfile(m_B, PB);
+
+	m_PS.m_LA = m_LA;
+	m_PS.m_LB = m_LB;
+	m_PS.m_MASM = MA;
+	m_PS.m_MegaProfile = &PB;
+
+	m_BestScore = 0;
+	m_BestPath.clear();
+	m_BestPosA = UINT_MAX;
+	m_BestPosB = UINT_MAX;
+
+	g_ptrSWer_Brute2 = this;
+	g_ptrSWer_Brute2->m_RowsA = m_RowsA;
+	g_ptrSWer_Brute2->m_A = m_A;
+	g_ptrSWer_Brute2->m_B = m_B;
+
+	EnumPathsLocal(m_LA, m_LB, OnPath2);
+
+	LoA = m_BestPosA;
+	LoB = m_BestPosB;
+	Path = m_BestPath;
+	return m_BestScore;
 	}
