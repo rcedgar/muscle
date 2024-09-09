@@ -52,8 +52,8 @@ static void TestSeqs()
 void cmd_swtestmm()
 	{
 	//TestSeqs();
-	Bug();
-	return;
+	//Bug();
+	//return;
 
 	SWTester ST;
 
@@ -74,7 +74,7 @@ void cmd_swtestmm()
 	const uint MaxN = 5;
 	const uint MinL = 3;
 	const uint MaxL = 5;
-	const uint Iters = 10;
+	const uint Iters = 1000;
 
 	//ST.ClearStats();
 	//ST.SetX(Simple_MASM_Mega);

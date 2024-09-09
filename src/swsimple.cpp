@@ -11,12 +11,12 @@ template <typename T> void AllocMx(vector<vector<T> > &Mx,
 		Mx[i].resize(LB, InitialValue);
 	}
 
-float SWSimple(PathScorer &PS, uint &LoA, uint &LoB, string &Path)
+float SWSimpleFwdM(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
+  vector<vector<float> > &FwdM)
 	{
 	uint LA = PS.GetLA();
 	uint LB = PS.GetLB();
 
-	vector<vector<float> > FwdM;
 	vector<vector<float> > FwdD;
 	vector<vector<float> > FwdI;
 
@@ -181,4 +181,11 @@ float SWSimple(PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 	asserta(Bestj >= LoB);
 
 	return BestScore;
+	}
+
+float SWSimple(PathScorer &PS, uint &LoA, uint &LoB, string &Path)
+	{
+	vector<vector<float> > FwdM;
+	float Score = SWSimpleFwdM(PS, LoA, LoB, Path, FwdM);
+	return Score;
 	}
