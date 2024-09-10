@@ -73,7 +73,7 @@ void cmd_swtestmm()
 	const uint MinN = 1;
 	const uint MaxN = 5;
 	const uint MinL = 3;
-	const uint MaxL = 5;
+	const uint MaxL = 7;
 	const uint Iters = 1000;
 
 	//ST.ClearStats();

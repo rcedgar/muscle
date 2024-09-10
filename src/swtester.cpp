@@ -103,11 +103,16 @@ void SWTester::LogResult(const char *Msg) const
 	Log("\n");
 	}
 
-void SWTester::GetRandomSeq(uint L, string &s)
+void SWTester::GetRandomSeq(uint L, string &s, bool WithGaps)
 	{
 	s.clear();
 	for (uint i = 0; i < L; ++i)
-		s += g_LetterToCharAmino[randu32()%20];
+		{
+		if (WithGaps && randu32()%3 == 0)
+			s += '-';
+		else
+			s += g_LetterToCharAmino[randu32()%20];
+		}
 	}
 
 void SWTester::RunRandomSeqsIters(uint MinL, uint MaxL, uint Iters)
@@ -134,9 +139,57 @@ void SWTester::RunRandomSeqs(uint MinL, uint MaxL)
 	uint LA = MinL + randu32()%(MaxL - MinL + 1);
 	uint LB = MinL + randu32()%(MaxL - MinL + 1);
 	string A, B;
-	GetRandomSeq(LA, A);
-	GetRandomSeq(LB, B);
+	GetRandomSeq(LA, A, false);
+	GetRandomSeq(LB, B, false);
 	RunAB(A, B);
+	}
+
+void SWTester::FixGaps(string &AlnBar)
+	{
+	vector<string> RowsA;
+	Split(AlnBar, RowsA, '|');
+	const uint SeqCount = SIZE(RowsA);
+	uint ColCount = SIZE(RowsA[0]);
+	for (uint Col = 0; Col < ColCount; ++Col)
+		{
+		bool AllGaps = true;
+		for (uint i = 0; i < SeqCount; ++i)
+			{
+			if (RowsA[i][Col] != '-')
+				{
+				AllGaps = false;
+				break;
+				}
+			}
+		if (AllGaps)
+			{
+			uint SeqIndex = randu32()%SeqCount;
+			RowsA[SeqIndex][Col] = g_LetterToCharAmino[randu32()%20];
+			}
+		}
+	AlnBar = "";
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		if (i > 0)
+			AlnBar += '|';
+		AlnBar += RowsA[i];
+		}
+
+	Split(AlnBar, RowsA, '|');
+	ColCount = SIZE(RowsA[0]);
+	for (uint Col = 0; Col < ColCount; ++Col)
+		{
+		bool AllGaps = true;
+		for (uint i = 0; i < SeqCount; ++i)
+			{
+			if (RowsA[i][Col] != '-')
+				{
+				AllGaps = false;
+				break;
+				}
+			}
+		asserta(!AllGaps);
+		}
 	}
 
 void SWTester::RunRandomMSASeq(uint MinN, uint MaxN, uint MinL, uint MaxL)
@@ -150,12 +203,13 @@ void SWTester::RunRandomMSASeq(uint MinN, uint MaxN, uint MinL, uint MaxL)
 		if (i > 0)
 			A += '|';
 		string s;
-		GetRandomSeq(LA, s);
+		GetRandomSeq(LA, s, true);
 		A += s;
 		}
+	FixGaps(A);
 
 	string B;
-	GetRandomSeq(LB, B);
+	GetRandomSeq(LB, B, false);
 	RunAB(A, B);
 	}
 

@@ -54,8 +54,9 @@ public:
 	void LogResult(const char *Msg) const;
 	void RunRandomSeqs(uint MinL, uint MaxL);
 	void RunRandomMSASeq(uint MinN, uint MaxN, uint MinL, uint MaxL);
-	void GetRandomSeq(uint L, string &Seq);
+	void GetRandomSeq(uint L, string &Seq, bool WithGaps);
 	void RunRandomSeqsIters(uint MinL, uint MaxL, uint Iters);
 	void RunRandomMSASeqIters(uint MinN, uint MaxN, uint MinL, uint MaxL, uint Iters);
 	void Stats();
+	void FixGaps(string &AlnBar);
 	};
