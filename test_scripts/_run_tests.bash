@@ -2,7 +2,6 @@
 
 cd ../src
 rm -rf o/ ../bin/muscle*
-chmod +x ./build_linux.py
 chmod +x ./build_linux.bash
 ./build_linux.bash
 cd ../test_scripts
