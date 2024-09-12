@@ -236,7 +236,9 @@
     <ClCompile Include="swenumdp.cpp" />
     <ClCompile Include="swer.cpp" />
     <ClCompile Include="swmasm_megaprof.cpp" />
+    <ClCompile Include="swps.cpp" />
     <ClCompile Include="swsimple.cpp" />
+    <ClCompile Include="swsimple2.cpp" />
     <ClCompile Include="swtest.cpp" />
     <ClCompile Include="swtester.cpp" />
     <ClCompile Include="swtestmm.cpp" />

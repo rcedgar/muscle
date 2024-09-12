@@ -1,24 +1,15 @@
 #include "myutils.h"
 #include "mx.h"
 #include "pathscorer.h"
+#include "allocmx.h"
 
-template <typename T> void AllocMx(vector<vector<T> > &Mx,
-  uint LA, uint LB, T InitialValue)
-	{
-	Mx.clear();
-	Mx.resize(LA);
-	for (uint i = 0; i < LA; ++i)
-		Mx[i].resize(LB, InitialValue);
-	}
-
-float SWSimpleFwdM(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
-  vector<vector<float> > &FwdM)
+float SWSimpleFwdMDI(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
+  vector<vector<float> > &FwdM,
+  vector<vector<float> > &FwdD,
+  vector<vector<float> > &FwdI)
 	{
 	uint LA = PS.GetLA();
 	uint LB = PS.GetLB();
-
-	vector<vector<float> > FwdD;
-	vector<vector<float> > FwdI;
 
 	vector<vector<char> > TBM;
 	vector<vector<char> > TBD;
@@ -34,7 +25,7 @@ float SWSimpleFwdM(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
 
 	for (uint i = 0; i <= LA; ++i)
 		{
-		FwdM[i][0] = 0;
+		FwdM[i][0] = MINUS_INFINITY;
 		FwdD[i][0] = MINUS_INFINITY;
 		FwdI[i][0] = MINUS_INFINITY;
 		TBM[i][0] = 'S';
@@ -44,7 +35,7 @@ float SWSimpleFwdM(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
 
 	for (uint j = 0; j <= LB; ++j)
 		{
-		FwdM[0][j] = 0;
+		FwdM[0][j] = MINUS_INFINITY;
 		FwdD[0][j] = MINUS_INFINITY;
 		FwdI[0][j] = MINUS_INFINITY;
 		TBM[0][j] = 'S';
@@ -183,9 +174,20 @@ float SWSimpleFwdM(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
 	return BestScore;
 	}
 
+float SWSimpleFwdM(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
+  vector<vector<float> > &FwdM)
+	{
+	vector<vector<float> > FwdD;
+	vector<vector<float> > FwdI;
+	float Score = SWSimpleFwdMDI(PS, LoA, LoB, Path, FwdM, FwdD, FwdI);
+	return Score;
+	}
+
 float SWSimple(PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 	{
 	vector<vector<float> > FwdM;
-	float Score = SWSimpleFwdM(PS, LoA, LoB, Path, FwdM);
+	vector<vector<float> > FwdD;
+	vector<vector<float> > FwdI;
+	float Score = SWSimpleFwdMDI(PS, LoA, LoB, Path, FwdM, FwdD, FwdI);
 	return Score;
 	}

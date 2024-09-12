@@ -118,7 +118,7 @@ float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
 	uint Bestj = UINT_MAX;
 
 // Main loop
-	float M0 = float (0);
+	float M0 = 0;
 	for (uint i = 0; i < LA; ++i)
 		{
 		const float *SMxRow = SMxData[i];

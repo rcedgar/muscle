@@ -103,5 +103,6 @@ C(test_sw_aa)
 C(test_sw_mm)
 C(swtest)
 C(swtestmm)
+C(swsimple2)
 
 #undef C

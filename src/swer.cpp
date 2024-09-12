@@ -290,7 +290,7 @@ float SWer_Simple_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
 	//Log("Score %.3g, Score2 %.3g, Score3 %.3g\n", Score, Score2, Score3);
 	asserta(feq(Score, Score2));
 	asserta(feq(Score, Score3));
-	CmpFwdM(EnumFwdM, SimpleFwdM);
+	//CmpFwdM(EnumFwdM, SimpleFwdM);
 
 	return Score;
 	}
