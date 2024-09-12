@@ -6,14 +6,13 @@
 float SWSimpleFwdMDI(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
   vector<vector<float> > &FwdM,
   vector<vector<float> > &FwdD,
-  vector<vector<float> > &FwdI)
+  vector<vector<float> > &FwdI,
+  vector<vector<char> > &TBM,
+  vector<vector<char> > &TBD,
+  vector<vector<char> > &TBI)
 	{
 	uint LA = PS.GetLA();
 	uint LB = PS.GetLB();
-
-	vector<vector<char> > TBM;
-	vector<vector<char> > TBD;
-	vector<vector<char> > TBI;
 
 	AllocMx(FwdM, LA+1, LB+1, FLT_MAX);
 	AllocMx(FwdD, LA+1, LB+1, FLT_MAX);
@@ -179,7 +178,11 @@ float SWSimpleFwdM(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
 	{
 	vector<vector<float> > FwdD;
 	vector<vector<float> > FwdI;
-	float Score = SWSimpleFwdMDI(PS, LoA, LoB, Path, FwdM, FwdD, FwdI);
+	vector<vector<char> > TBM;
+	vector<vector<char> > TBD;
+	vector<vector<char> > TBI;
+	float Score = SWSimpleFwdMDI(PS, LoA, LoB, Path, FwdM, FwdD, FwdI,
+	  TBM, TBD, TBI);
 	return Score;
 	}
 
@@ -188,6 +191,10 @@ float SWSimple(PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 	vector<vector<float> > FwdM;
 	vector<vector<float> > FwdD;
 	vector<vector<float> > FwdI;
-	float Score = SWSimpleFwdMDI(PS, LoA, LoB, Path, FwdM, FwdD, FwdI);
+	vector<vector<char> > TBM;
+	vector<vector<char> > TBD;
+	vector<vector<char> > TBI;
+	float Score = SWSimpleFwdMDI(PS, LoA, LoB, Path, FwdM, FwdD, FwdI,
+	  TBM, TBD, TBI);
 	return Score;
 	}

@@ -128,3 +128,14 @@ public:
 	virtual const char *GetName() const { return "Enum_MASM_Mega"; };
 	virtual PathScorer *GetPS() { return &m_PS; }
 	};
+
+class SWer_PS : public SWer
+	{
+public:
+	PathScorer *m_PS = 0;
+
+public:
+	virtual float SW(uint &LoA, uint &LoB, string &Path);
+	virtual const char *GetName() const { return "PS"; };
+	virtual PathScorer *GetPS() { return m_PS; }
+	};

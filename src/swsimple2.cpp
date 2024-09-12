@@ -25,7 +25,10 @@ static char trace_mx = 0;
 float SWSimpleFwdMDI(PathScorer &PS, uint &LoA, uint &LoB, string &Path,
   vector<vector<float> > &FwdM,
   vector<vector<float> > &FwdD,
-  vector<vector<float> > &FwdI);
+  vector<vector<float> > &FwdI,
+  vector<vector<char> > &TBM,
+  vector<vector<char> > &TBD,
+  vector<vector<char> > &TBI);
 
 static void Logx(float x)
 	{
@@ -53,6 +56,25 @@ static void LogMx(const char *Name, const vector<vector<float> > &Mx)
 		Log("%3u | ", i);
 		for (uint j = 0; j < LB; ++j)
 			Logx(Mx[i][j]);
+		Log("\n");
+		}
+	Log("\n");
+	}
+
+static void LogTBMx(const char *Name, const vector<vector<char> > &Mx)
+	{
+	const uint LA = SIZE(Mx);
+	const uint LB = SIZE(Mx[0]);
+	Log("\nLogMx(%s)\n", Name);
+	Log("      ");
+	for (uint j = 0; j < LB; ++j)
+		Log("  %u", j%10);
+	Log("\n");
+	for (uint i = 0; i < LA; ++i)
+		{
+		Log("%3u | ", i);
+		for (uint j = 0; j < LB; ++j)
+			Log("%c", Mx[i][j]);
 		Log("\n");
 		}
 	Log("\n");
@@ -139,18 +161,45 @@ float SWSimple2(XDPMem &Mem, PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 	vector<vector<float> > Simple_FwdM;
 	vector<vector<float> > Simple_FwdD;
 	vector<vector<float> > Simple_FwdI;
+	vector<vector<char> > Simple_TBM;
+	vector<vector<char> > Simple_TBD;
+	vector<vector<char> > Simple_TBI;
 	string Simple_Path;
 	uint Simple_LoA;
 	uint Simple_LoB;
 	float Simple_Score =
 	  SWSimpleFwdMDI(PS, Simple_LoA, Simple_LoB, Simple_Path,
-		Simple_FwdM, Simple_FwdD, Simple_FwdI);
+		Simple_FwdM, Simple_FwdD, Simple_FwdI,
+		Simple_TBM, Simple_TBD, Simple_TBI);
 	LogMx("Simple_M", Simple_FwdM);
 	LogMx("Simple_D", Simple_FwdD);
 	LogMx("Simple_I", Simple_FwdI);
+	LogTBMx("Simple_TBM", Simple_TBM);
+	LogTBMx("Simple_TBD", Simple_TBD);
+	LogTBMx("Simple_TBI", Simple_TBI);
 
 	const uint LA = PS.GetLA();
 	const uint LB = PS.GetLB();
+
+	float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
+	  float Open, float Ext, uint &Loi, uint &Loj, uint &Leni, uint &Lenj,
+	  string &Path);
+	Mx<float> SMx;
+	SMx.Alloc(LA, LB);
+	for (uint i = 0; i < LA; ++i)
+		{
+		for (uint j = 0; j < LB; ++j)
+			{
+			float x = PS.GetMatchScore(i, j);
+			SMx.Put(i, j, x);
+			}
+		}
+	float Open = PS.GetScoreMD(0, 0);
+	float Ext = PS.GetScoreDD(0, 0);
+	uint SMx_Loi, SMx_Loj, SMx_Leni, SMx_Lenj;
+	string SMx_Path;
+	float SMx_Score = SWFast_SMx(Mem, SMx, Open, Ext,
+	  SMx_Loi, SMx_Loj, SMx_Leni, SMx_Lenj, SMx_Path);
 
 	vector<vector<float> > FwdM;
 	vector<vector<float> > FwdD;
@@ -202,9 +251,9 @@ float SWSimple2(XDPMem &Mem, PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 			////////////////////////////
 
 			// Match input:
-			//	PrevSavedM = M[i][j]
-			//	Drow[j] = D[i][j]
-			//	Is = I[i][j]
+			//		PrevSavedM = M[i][j]
+			//		Drow[j] = D[i][j]
+			//		Is = I[i][j]
 			eq(PrevSavedM, Simple_FwdM[i][j]);
 			eq(Drow[j], Simple_FwdD[i][j]);
 			eq(Is, Simple_FwdI[i][j]);
@@ -213,12 +262,32 @@ float SWSimple2(XDPMem &Mem, PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 			float dm = Drow[j] + PS.GetScoreDM(i, j);
 			float im = Is + PS.GetScoreIM(i, j);
 
-			// Match output Mrow[j+1] = M[I][j+1]
-			float t = max(max(mm, dm), im);
+			float t = mm;
+			if (dm > t)
+				{
+				t = dm;
+				TraceBits = TRACEBITS_DM;
+				}
+			if (im > t)
+				{
+				t = im;
+				TraceBits = TRACEBITS_IM;
+				}
 			if (t < 0)
+				{
+				TraceBits = TRACEBITS_SM;
 				t = 0;
+				}
 			float m = t + PS.GetMatchScore(i, j);
-			BestScore = max(m, BestScore);
+			if (m > BestScore)
+				{
+				BestScore = m;
+				Besti = i;
+				Bestj = j;
+				}
+
+			// Match output (I = i+1, i will have been incremented when used):
+			//		Mrow[j+1] = M[I][j+1]
 			Mrow[j+1] = m;
 			eq(Mrow[j+1], Simple_FwdM[i+1][j+1]);
 			FwdM[i+1][j+1] = m;
@@ -237,8 +306,15 @@ float SWSimple2(XDPMem &Mem, PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 			float md = PrevSavedM + PS.GetScoreMD(i, j);
 			float dd = Drow[j] + PS.GetScoreDD(i, j);
 
-			// Delete output Drow[j] = D[I][j]
-			float d = max(md, dd);
+			// Delete output:
+			//		Drow[j] = D[I][j]
+			//float d = max(md, dd);
+			float d = dd;
+			if (md > dd)
+				{
+				d = md;
+				TraceBits |= TRACEBITS_MD;
+				}
 			Drow[j] = d;
 			eq(Drow[j], Simple_FwdD[i+1][j]);
 			FwdD[i+1][j] = d;
@@ -250,13 +326,20 @@ float SWSimple2(XDPMem &Mem, PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 			eq(Is, Simple_FwdI[i][j]);
 			float mi = PrevSavedM + PS.GetScoreMI(i, j);
 			float ii = Is + PS.GetScoreII(i, j);
-			Is = max(mi, ii);
+			//Is = max(mi, ii);
+			Is = ii;
+			if (mi > ii)
+				{
+				Is = mi;
+				TraceBits |= TRACEBITS_MI;
+				}
 			// Insert output:
 			//	Is = I[i][j+1]
 			eq(Is, Simple_FwdI[i][j+1]);
 			FwdI[i][j+1] = Is;
 
 			PrevSavedM = SavedM;
+			TBrow[j] = TraceBits;
 			}
 		//Log("i=%u Mrow=\n", i);
 		//for (uint j = 0; j <= LB; ++j)
@@ -269,15 +352,19 @@ float SWSimple2(XDPMem &Mem, PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 		}
 
 	asserta(myfeq(BestScore, Simple_Score));
-	return BestScore;///////@@@@@@
+	asserta(myfeq(BestScore, SMx_Score));
+
+//////////////////////////////////////////////////////////////
 	if (BestScore <= 0.0f)
 		return 0.0f;
 
+	LogTBSW("Simple2", Mem, LA, LB);
 	uint Leni, Lenj;
-	TraceBackBitSW(Mem, LA, LB, Besti+1, Bestj+1,
+	TraceBackBitSW(Mem, LA, LB, Besti, Bestj,
 	  Leni, Lenj, Path);
 	asserta(Besti+1 >= Leni);
 	asserta(Bestj+1 >= Lenj);
+	asserta(Path == Simple_Path);
 
 	LoA = Besti + 1 - Leni;
 	LoB = Bestj + 1 - Lenj;
@@ -301,7 +388,7 @@ float SWSimple2(XDPMem &Mem, PathScorer &PS, uint &LoA, uint &LoB, string &Path)
 void cmd_swsimple2()
 	{
 	string A = "SEQVENCE";
-	string B = "QVE";
+	string B = "QVEN";
 
 	PathScorer_AA_BLOSUM62 PS;
 	PS.m_GapOpen = -2.2f;
@@ -312,8 +399,8 @@ void cmd_swsimple2()
 	PS.m_LB = SIZE(B);
 
 	XDPMem Mem;
-	string Path;
 	uint LoA, LoB;
+	string Path;
 	float Score = SWSimple2(Mem, PS, LoA, LoB, Path);
-	Log("Score %.3g %s\n", Score, Path.c_str());
+	Log("Score %.3g path=%s\n", Score, Path.c_str());
 	}

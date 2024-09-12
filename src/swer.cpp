@@ -354,3 +354,26 @@ float SWer_Enum_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
 	float Score = SWEnumDP(m_PS, m_LA, m_LB, LoA, LoB, Path);
 	return Score;
 	}
+
+float SWer_PS::SW(uint &LoA, uint &LoB, string &Path)
+	{
+	float SWPS(XDPMem &Mem, PathScorer &PS, uint &Loi, uint &Loj, string &Path);
+	float SWSimple2(XDPMem &Mem, PathScorer &PS, uint &LoA, uint &LoB, string &Path);
+
+	asserta(m_PS != 0);
+	PathScorer_AA_BLOSUM62 *PS = (PathScorer_AA_BLOSUM62 *) m_PS;
+	PS->m_SeqA = m_A;
+	PS->m_SeqB = m_B;
+	PS->m_LA = m_LA;
+	PS->m_LB = m_LB;
+
+	XDPMem Mem;
+	float Score = SWPS(Mem, *m_PS, LoA, LoB, Path);
+
+	XDPMem Mem2;
+	uint LoA2, LoB2;
+	string Path2;
+	float Score2 = SWSimple2(Mem2, *m_PS, LoA2, LoB2, Path);
+	asserta(feq(Score, Score2));
+	return Score;
+	}

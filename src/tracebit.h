@@ -13,5 +13,6 @@ static const byte TRACEBITS_UNINIT = ~0x1f;
 void TraceBackBitSW(XDPMem &Mem,
   uint LA, uint LB, uint Besti, uint Bestj,
   uint &Leni, uint &Lenj, string &Path);
+void LogTBSW(const char *Msg, XDPMem &Mem, uint LA, uint LB);
 
 #endif // tracebit_h

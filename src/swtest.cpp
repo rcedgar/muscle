@@ -35,6 +35,12 @@ void cmd_swtest()
 	SWer_MASM_Mega_Seqs Mega_Prof_Seqs;
 	SWer_Simple_MASM_Mega Simple_MASM_Mega;
 
+	SWer_PS SPS; 
+	PathScorer_AA_BLOSUM62 PSAB;
+	PSAB.m_GapOpen = GapOpen;
+	PSAB.m_GapExt = GapExt;
+	SPS.m_PS = &PSAB;
+
 	Enum_Seqs_AA_BLOSUM62.SetGaps(GapOpen, GapExt);
 
 	Fast_Seqs_AA_BLOSUM62.m_GapOpen = GapOpen;
@@ -52,7 +58,15 @@ void cmd_swtest()
 	const uint MinL = 3;
 	const uint MaxL = 9;
 	const uint Iters = 1000;
-	ST.RunXAB(Simple_MASM_Mega, "ESK", "MMMW", true);
+	//ST.RunXAB(Simple_MASM_Mega, "ESK", "MMMW", true);
+
+	ST.ClearStats();
+	ST.SetY(SPS);
+	ST.SetX(Fast_Seqs_AA_BLOSUM62);
+	ST.RunAB("SEQV", "EQ");
+	//ST.RunRandomSeqsIters(MinL, MaxL, Iters);
+	ST.Stats();
+	return;
 
 	ST.ClearStats();
 	ST.SetY(Fast_Seqs_AA_BLOSUM62);
