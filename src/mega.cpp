@@ -222,6 +222,8 @@ void Mega::FromFile(const string &FileName)
                 if (FeatureIdx == 0)
 				    {
                     uint Letter = g_CharToLetterAmino[Sym];
+					if (Letter >= 20)
+						Letter = 0;
                     Profile[Pos].push_back(Letter);
                     S += Sym;
 					}
