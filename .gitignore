@@ -239,6 +239,8 @@ StyleCopReport.xml
 *.pidb
 *.svclog
 *.scc
+make.stderr
+make.stdout
 
 # Chutzpah Test 
 

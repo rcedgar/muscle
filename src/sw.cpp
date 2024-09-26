@@ -263,8 +263,6 @@ float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
 	DONE_TRACE(BestScore, Besti, Bestj, TB);
 	if (BestScore <= 0.0f)
 		return 0.0f;
-#pragma warning("DELETEME");
-	LogTBSW("SMx", Mem, LA, LB);
 	TraceBackBitSW(Mem, LA, LB, Besti+1, Bestj+1,
 	  Leni, Lenj, Path);
 	asserta(Besti+1 >= Leni);
