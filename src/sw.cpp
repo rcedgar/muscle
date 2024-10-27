@@ -7,10 +7,71 @@
 void MakeBlosum62SMx(const Sequence &A, const Sequence &B, Mx<float> &MxS);
 void MakeBlosum62SMx(const string &A, const string &B, Mx<float> &MxS);
 
+void LogTBSW(const char *Msg, XDPMem &Mem, uint LA, uint LB)
+	{
+	byte **TB = Mem.GetTBBit();
+	Log("TBM %s\n", Msg);
+	for (uint i = 0; i < LA; ++i)
+		{
+		Log("%3u | ", i);
+		for (uint j = 0; j < LB; ++j)
+			{
+			char c = 'M';
+			byte Bits = TB[i][j];
+			if (Bits == TRACEBITS_UNINIT)
+				c = '*';
+			else if (Bits & TRACEBITS_DM)
+				c = 'D';
+			else if (Bits & TRACEBITS_IM)
+				c = 'I';
+			else if (Bits & TRACEBITS_SM)
+				c = 'S';
+			Log("%c", c);
+			}
+		Log("\n");
+		}
+
+	Log("\nTBD %s\n", Msg);
+	for (uint i = 0; i < LA; ++i)
+		{
+		Log("%3u | ", i);
+		for (uint j = 0; j < LB; ++j)
+			{
+			char c = 'D';
+			byte Bits = TB[i][j];
+			if (Bits == TRACEBITS_UNINIT)
+				c = '*';
+			else if (Bits & TRACEBITS_MD)
+				c = 'M';
+			Log("%c", c);
+			}
+		Log("\n");
+		}
+
+	Log("\nTBI\n", Msg);
+	for (uint i = 0; i < LA; ++i)
+		{
+		Log("%3u | ", i);
+		for (uint j = 0; j < LB; ++j)
+			{
+			char c = 'I';
+			byte Bits = TB[i][j];
+			if (Bits == TRACEBITS_UNINIT)
+				c = '*';
+			else if (Bits & TRACEBITS_MI)
+				c = 'M';
+			Log("%c", c);
+			}
+		Log("\n");
+		}
+	}
+
 void TraceBackBitSW(XDPMem &Mem,
   uint LA, uint LB, uint Besti, uint Bestj,
   uint &Leni, uint &Lenj, string &Path)
 	{
+	asserta(Besti < LA);
+	asserta(Bestj < LB);
 	Path.clear();
 	byte **TB = Mem.GetTBBit();
 
@@ -118,7 +179,7 @@ float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
 	uint Bestj = UINT_MAX;
 
 // Main loop
-	float M0 = float (0);
+	float M0 = 0;
 	for (uint i = 0; i < LA; ++i)
 		{
 		const float *SMxRow = SMxData[i];
@@ -202,7 +263,6 @@ float SWFast_SMx(XDPMem &Mem, const Mx<float> &SMx,
 	DONE_TRACE(BestScore, Besti, Bestj, TB);
 	if (BestScore <= 0.0f)
 		return 0.0f;
-
 	TraceBackBitSW(Mem, LA, LB, Besti+1, Bestj+1,
 	  Leni, Lenj, Path);
 	asserta(Besti+1 >= Leni);

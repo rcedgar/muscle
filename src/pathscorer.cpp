@@ -1,13 +1,13 @@
 #include "muscle.h"
 #include "pathscorer.h"
 
-float PathScorer::GetLocalScore(uint PosA, uint PosB, uint LA, uint LB,
-  const string &Path)
+float PathScorer::GetLocalScore(uint PosA, uint PosB, const string &Path)
 	{
 	const uint ColCount = SIZE(Path);
 	asserta(ColCount > 0);
 	asserta(Path[0] == 'M');
 	asserta(Path[ColCount-1] == 'M');
+	asserta(m_LA != UINT_MAX && m_LB != UINT_MAX);
 
 	float Total = 0;
 	char LastState = 'M';
@@ -28,7 +28,7 @@ float PathScorer::GetLocalScore(uint PosA, uint PosB, uint LA, uint LB,
 			}
 		LastState = State;
 		}
-	asserta(PosA <= LA && PosB <= LB);
+	asserta(PosA <= m_LA && PosB <= m_LB);
 	return Total;
 	}
 

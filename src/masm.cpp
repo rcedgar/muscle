@@ -138,7 +138,7 @@ void MASM::FromMSA(const MultiSequence &Aln, const string &Label,
 
 		Col.m_GapOpen = (1 - Col.m_GapOpenFreq)*GapOpen/2;
 		Col.m_GapClose = (1 - Col.m_GapCloseFreq)*GapOpen/2;
-		Col.m_GapExt = (1 - Col.m_GapExtFreq)*GapExt/2;
+		Col.m_GapExt = (1 - Col.m_GapExtFreq)*GapExt;
 
 		GetFreqsVec(ColIndex, Col.m_FreqsVec);
 		Col.SetScoreVec();
