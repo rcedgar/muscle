@@ -1,4 +1,4 @@
-![Muscle5](http://drive5.com/images/muscle5_header.jpg)
+![Muscle5](https://drive5.com/images/muscle5_header.jpg)
 
 Muscle is widely-used software for making multiple alignments of biological sequences. 
 
