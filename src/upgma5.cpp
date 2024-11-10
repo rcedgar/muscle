@@ -477,6 +477,7 @@ void UPGMA5::ReadDistMx2(const string &FileName)
 		m_DistMx[i].resize(m_LeafCount, 0);
 
 // Pass 2, distances
+	uint DistCount = 0;
 	while (ReadLineStdioFile(f, Line))
 		{
 		Split(Line, Fields, '\t');
@@ -485,11 +486,16 @@ void UPGMA5::ReadDistMx2(const string &FileName)
 		uint Index2 = StrToUint(Fields[1]);
 		asserta(Index1 < m_LeafCount);
 		asserta(Index2 < m_LeafCount);
-		asserta(Index1 != Index2);
+		if (Index1 == Index2)
+			continue;
 		float Dist = (float) StrToFloat(Fields[2]);
 		m_DistMx[Index1][Index2] = Dist;
 		m_DistMx[Index2][Index1] = Dist;
+		++DistCount;
 		}
+	ProgressLog("%u pair-wise distances\n", DistCount);
+	if (DistCount < m_LeafCount)
+		Die("Distance matrix too sparse");
 
 	CloseStdioFile(f);
 	Progress(" done.\n");
