@@ -240,6 +240,7 @@ StyleCopReport.xml
 *.svclog
 *.scc
 make.stderr
+test.stderr
 make.stdout
 
 # Chutzpah Test 
