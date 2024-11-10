@@ -1,5 +1,5 @@
 #ifndef MY_VERSION
-#define MY_VERSION	"5.2"
+#define MY_VERSION	"5.3"
 #endif
 
 #define PROGRAM_NAME	"muscle"
