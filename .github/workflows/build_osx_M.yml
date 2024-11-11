@@ -25,9 +25,9 @@ jobs:
       - name: Build-commands
         run: |
           cd $GITHUB_WORKSPACE/src
-          curl -fsSL https://raw.githubusercontent.com/rcedgar/vcxproj_make/806d016/vcxproj_make.py > vcxproj_make.py
+          curl -fsSL https://raw.githubusercontent.com/rcedgar/vcxproj_make/2eee480/vcxproj_make.py > vcxproj_make.py
           chmod u+x ./vcxproj_make.py
-          ./vcxproj_make.py --openmp --cppcompiler g++-11 
+          ./vcxproj_make.py --openmp --cppcompiler g++-11 --nonative
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
