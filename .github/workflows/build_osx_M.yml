@@ -25,9 +25,11 @@ jobs:
       - name: Build-commands
         run: |
           cd $GITHUB_WORKSPACE/src
-          curl -fsSL https://raw.githubusercontent.com/rcedgar/vcxproj_make/806d016/vcxproj_make.py > vcxproj_make.py
-          chmod u+x ./vcxproj_make.py
-          ./vcxproj_make.py --openmp --cppcompiler g++-11 
+          # curl -fsSL https://raw.githubusercontent.com/rcedgar/vcxproj_make/806d016/vcxproj_make.py > vcxproj_make.py
+          # chmod u+x ./vcxproj_make.py
+          # ./vcxproj_make.py --openmp --cppcompiler g++-11
+          g++-11 --version > compiler.txt
+          make -f Makefile_osxm
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
@@ -37,3 +39,4 @@ jobs:
               /Users/runner/work/muscle/muscle/src/Makefile
               /Users/runner/work/muscle/muscle/src/make.stdout
               /Users/runner/work/muscle/muscle/src/make.stderr
+              /Users/runner/work/muscle/muscle/src/compiler.txt
