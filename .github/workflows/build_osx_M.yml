@@ -32,4 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: muscle-osx-m
-          path: /Users/runner/work/muscle/muscle/bin/muscle
+          path: |
+              /Users/runner/work/muscle/muscle/bin/muscle
+              /Users/runner/work/muscle/muscle/src/make.stdout
+              /Users/runner/work/muscle/muscle/src/make.stderr
