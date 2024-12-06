@@ -269,3 +269,34 @@ uint MultiSequence::GetMinSeqLength() const
 		MinSeqLength = min(MinSeqLength, GetSequence(i)->GetLength());
 	return MinSeqLength;
 	}
+
+void MultiSequence::GetUngappedSeqStr(uint SeqIdx, string &s) const
+	{
+	const Sequence &seq = *GetSequence(SeqIdx);
+	s.clear();
+	const uint L = seq.GetLength();
+	const char *CharSeq = seq.GetCharPtr();
+	for (uint i = 0; i < L; ++i)
+		{
+		char c = CharSeq[i];
+		if (!isgap(c))
+			s += toupper(c);
+		}
+	}
+
+void MultiSequence::FromStrings2(const vector<string> &Labels, const vector<string> &Rows)
+	{
+	const uint SeqCount = SIZE(Labels);
+	asserta(SIZE(Rows) == SeqCount);
+	asserta(SeqCount > 0);
+	const uint ColCount = SIZE(Rows[0]);
+	m_DupeLabelsOk = false;
+	m_Seqs.reserve(SeqCount);
+	m_Owners.reserve(SeqCount);
+	for (uint i = 0; i < SeqCount; ++i)
+		{
+		Sequence *seq = Sequence::NewSequence();
+		seq->FromString(Labels[i], Rows[i]);
+		AddSequence(seq, true);
+		}
+	}

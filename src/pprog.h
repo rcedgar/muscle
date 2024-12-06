@@ -43,11 +43,11 @@ public:
 	float AlignMSAsFlat(const string &ProgressStr,
 	  const MultiSequence &MSA1, const MultiSequence &MSA2,
 	  uint TargetPairCount, string &Path);
-	float AlignMSAsFlat3(const string &ProgressStr,
-	  const MultiSequence &MSA1, const MultiSequence &MSA2,
-	  const vector<MySparseMx *> &SparseMxVec,
-	  uint Index1, uint Index2,
-	  uint TargetPairCount, string &Path);
+	//float AlignMSAsFlat3(const string &ProgressStr,
+	//  const MultiSequence &MSA1, const MultiSequence &MSA2,
+	//  const vector<MySparseMx *> &SparseMxVec,
+	//  uint Index1, uint Index2,
+	//  uint TargetPairCount, string &Path);
 
 	void LoadMSAs(const vector<string> &FileNames, bool &IsNucleo);
 	void SetMSAs(const vector<const MultiSequence *> &MSAs,

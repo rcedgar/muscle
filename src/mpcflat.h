@@ -95,8 +95,8 @@ public:
 	  float *Post);
 	uint GetSeqLength(uint SeqIndex) const;
 	const Sequence *GetSequence(uint SeqIndex) const;
-	MultiSequence *AlignAlns(const MultiSequence &MSA1,
-	  const MultiSequence &MSA2, float *ptrScore = 0);
+	MultiSequence *AlignAlns(const MultiSequence *MSA1,
+	  const MultiSequence *MSA2, float *ptrScore = 0);
 	void GetLabelToMSASeqIndex(unordered_map<string, uint> &LabelToMSASeqIndex) const;
 	void SortMSA_ByInputOrder();
 	void SortMSA_ByGuideTree();

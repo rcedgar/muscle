@@ -175,4 +175,7 @@ public:
 	uint GetSeqLength(uint SeqIndex) const;
 	void LogMe() const;
 	bool ColIsAllGaps(uint Col) const;
+
+	void GetUngappedSeqStr(uint SeqIdx, string &s) const;
+	void FromStrings2(const vector<string> &Labels, const vector<string> &Rows);
 	};

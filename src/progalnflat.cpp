@@ -49,7 +49,7 @@ void MPCFlat::ProgAln(uint JoinIndex)
 	MultiSequence *MSA2 = m_ProgMSAs[Index2];
 	assert(MSA1 != 0);
 	assert(MSA2 != 0);
-	MultiSequence *MSA12 = AlignAlns(*MSA1, *MSA2);
+	MultiSequence *MSA12 = AlignAlns(MSA1, MSA2);
 
 #if 0//TRACE
 	uint SeqCount12 = MSA12->GetSeqCount();
