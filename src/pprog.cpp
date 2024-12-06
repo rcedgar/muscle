@@ -1,7 +1,6 @@
 #include "muscle.h"
 #include "pprog.h"
 
-const uint MAX_COL_COUNT = 5000;
 MultiSequence *SqueezeGappyCols(const MultiSequence &Aln);
 
 void ReadStringsFromFile(const string &FileName,
@@ -351,7 +350,8 @@ void PProg::Join_ByPrecomputedPath(uint Index1, uint Index2)
 	Log("  Join_%u.Y=%s\n", m_JoinIndex+1, MSALabel2.c_str());
 
 	uint ColCount12 = MSA12->GetColCount();
-	if (ColCount12 > MAX_COL_COUNT)
+	const uint MAX_COL_COUNT = optd(maxcols, 5000);
+	if (opt(squeeze) && ColCount12 > MAX_COL_COUNT)
 		{
 		MultiSequence *SqueezedMSA12 = SqueezeGappyCols(*MSA12);
 		delete MSA12;

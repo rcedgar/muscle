@@ -1,8 +1,6 @@
 #include "muscle.h"
 #include "pprog.h"
 
-const uint MAX_COL_COUNT = 5000;
-
 MultiSequence *SqueezeGappyCols(const MultiSequence &Aln);
 
 void ReadStringsFromFile(const string &FileName,
@@ -10,6 +8,8 @@ void ReadStringsFromFile(const string &FileName,
 
 void PProg::AlignAndJoin(uint Index1, uint Index2)
 	{
+	const uint MAX_COL_COUNT = optd(maxcols, 5000);
+
 	m_JoinMSAIndexes1.push_back(Index1);
 	m_JoinMSAIndexes2.push_back(Index2);
 
@@ -39,7 +39,7 @@ void PProg::AlignAndJoin(uint Index1, uint Index2)
 	AlignMSAsByPath(MSA1, MSA2, Path, *MSA12);
 
 	uint ColCount12 = MSA12->GetColCount();
-	if (ColCount12 > MAX_COL_COUNT)
+	if (opt(squeeze) && ColCount12 > MAX_COL_COUNT)
 		{
 		MultiSequence *ptrSqueezedMSA12 = SqueezeGappyCols(*MSA12);
 		delete MSA12;

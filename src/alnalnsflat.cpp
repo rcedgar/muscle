@@ -4,13 +4,12 @@
 float CalcAlnFlat(const float *Post, uint LX, uint LY,
   float *DPRows, char *TB, string &Path);
 
-const uint MAX_COL_COUNT = 5000;
-
 MultiSequence *SqueezeGappyCols(const MultiSequence &Aln);
 
 MultiSequence *MPCFlat::AlignAlns(const MultiSequence *ptrMSA1,
   const MultiSequence *ptrMSA2, float *ptrScore)
 	{
+	const uint MAX_COL_COUNT = optd(maxcols, 5000);
 	const uint SeqCount1 = ptrMSA1->GetSeqCount();
 	const uint SeqCount2 = ptrMSA2->GetSeqCount();
 
@@ -19,13 +18,13 @@ MultiSequence *MPCFlat::AlignAlns(const MultiSequence *ptrMSA1,
 
 	MultiSequence *ptrSqueezedMSA1 = 0;
 	MultiSequence *ptrSqueezedMSA2 = 0;
-	if (ColCount1 > MAX_COL_COUNT)
+	if (opt(squeeze) && ColCount1 > MAX_COL_COUNT)
 		{
 		ptrMSA1 = ptrSqueezedMSA1 = SqueezeGappyCols(*ptrMSA1);
 		ColCount1 = ptrMSA1->GetColCount();
 		}
 
-	if (ColCount2 > MAX_COL_COUNT)
+	if (opt(squeeze) && ColCount2 > MAX_COL_COUNT)
 		{
 		ptrMSA2 = ptrSqueezedMSA2 = SqueezeGappyCols(*ptrMSA2);
 		ColCount2 = ptrMSA2->GetColCount();

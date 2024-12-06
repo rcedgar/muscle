@@ -1,9 +1,6 @@
 #include "muscle.h"
 #include "pprog.h"
 
-//const uint MAX_COL_COUNT = 5000;
-//MultiSequence *SqueezeGappyCols(const MultiSequence &Aln);
-
 float PProg::AlignMSAsFlat(const string &ProgressStr,
   const MultiSequence &MSA1, const MultiSequence &MSA2,
   uint TargetPairCount, string &Path)
