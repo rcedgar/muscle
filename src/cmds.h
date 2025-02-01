@@ -104,5 +104,6 @@ C(test_sw_mm)
 C(swtest)
 C(swtestmm)
 C(swsimple2)
+C(solution)
 
 #undef C
