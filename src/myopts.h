@@ -86,6 +86,7 @@ UNS_OPT(blosumparamset)
 UNS_OPT(warmup_pct)
 UNS_OPT(treeiters)
 UNS_OPT(shrub_size)
+UNS_OPT(mincol)
 
 FLT_OPT(min_cons_pct)
 FLT_OPT(max_gap_fract)
