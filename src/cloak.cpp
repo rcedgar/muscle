@@ -532,6 +532,14 @@ std::vector<std::vector<char>> remove_singletons(
     return return_array;
 }
 
+
+// Checks whether two vectors of NumOrDash objects are equal
+// in both size and content.Two NumOrDash elements are considered equal if:
+// Their types(NumOrDashType::INTEGER or CHARACTER) match.
+// Their corresponding values(intValue or charValue) are equal.
+// The function is used, for example, to eliminate duplicate NumOrDash vectors
+// from a collection.
+
 bool equalNumOrDashVector(const std::vector<NumOrDash>& a,
     const std::vector<NumOrDash>& b)
 {
@@ -559,6 +567,16 @@ bool equalNumOrDashVector(const std::vector<NumOrDash>& a,
     }
     return true;
 }
+
+
+// Recursively filters and adds valid divvied alignments to the output set.
+// Given an initial vector of alignment indices(`toSearch`) from the first alignment,
+// this function explores all alternative "divvied" representations derived from the
+// other alignments and determines whether each should be added to the output.
+// A candidate divvy is added to the output if it can be found without relying on
+// subsequent divvies(i.e., it is valid independently).Otherwise, the function
+// recursively evaluates the dependencies of that divvy before deciding.
+// Divvies identical to the original `toSearch` are skipped to avoid redundant work.
 
 void add_to_output_or_discard(
     const std::vector<std::vector<NumOrDash>>& indices_of_all_alignments,
@@ -612,7 +630,17 @@ void add_to_output_or_discard(
 }
 
 
-// Main function: create_output
+// Constructs the initial numeric consensus output from aligned input sequences.
+// For each column in the first alignment of the ensemble, this function generates a
+// representative column(`toSearch`) and checks whether it is consistent across all
+// alignments.If consistent, it is directly added to the output.If not, the column
+// is "divvied" into one or more alternative representations based on alignment - specific
+// mappings.Valid divvied representations are recursively added via
+// add_to_output_or_discard().
+//
+// param all_als A 3D vector representing all input alignments in NumOrDash format,
+// where all_als[i][r][c] corresponds to column c in row r of alignment i.
+// return A 2D vector of NumOrDash elements representing the consensus output.
 std::vector<std::vector<NumOrDash>> create_output(
     const std::vector<std::vector<std::vector<NumOrDash>>>& all_als)
 {
@@ -723,6 +751,7 @@ std::vector<std::vector<char>> produce_output_in_letters(
 
 
 void cmd_cloak()
+
 {
     // Parse user options
     std::string ensemblePath = opt(cloak);  // user runs: muscle -cloak myfile ...
@@ -751,7 +780,8 @@ void cmd_cloak()
         return;
     }
 
-
+    Log("Starting cloak. Ensemble path: %s, Output filename: %s, Minimum columns requested: %u\n",
+        ensemblePath.c_str(), outputFilename.c_str(), userMincol);
 
     // Load the entire ensemble from the user-supplied file
     Ensemble E;
@@ -768,18 +798,24 @@ void cmd_cloak()
     // Convert the ensemble into a 3D array of chars
     // plus keep a parallel 2D array of labels for each MSA.
     // allLabels[i][r] = label for row r in the i-th MSA
+
+    Log("Converting ensemble to 3D array of letters...\n");
+
     std::vector<std::vector<std::string>> allLabels;
     auto three_d_array_letters = convertEnsembleTo3D(E, allLabels);
 
 
     // CLOAK Algorithm
     // 1) Convert letters -> numbers (and dashes)
+    Log("Converting letters to numeric representation.\n");
     auto nums_answer = convert_to_nums(three_d_array_letters);
 
     // 2) Create initial numeric output
+    Log("Creating initial numeric output.\n");
     auto nums_array_output_initial = create_output(nums_answer);
 
     // 3) Remove duplicates
+    Log("Removing duplicates from numeric output.\n");
     std::vector<std::vector<NumOrDash>> nums_array_output;
     for (const auto& num_array : nums_array_output_initial)
     {
@@ -800,10 +836,12 @@ void cmd_cloak()
     auto reference_alignment = three_d_array_letters[0];
 
     // 5) Convert numeric output back to letters
+    Log("Converting numeric output back to letters.\n");
     auto transposed_reference = transpose_output(reference_alignment);
     auto letters_array_output_initial =
         produce_output_in_letters(nums_array_output, transposed_reference);
 
+    Log("Removing singletons with minimum column threshold = %u.\n", minimumColumns);
     auto letters_array_output = remove_singletons(letters_array_output_initial, minimumColumns);
 
     letters_array_output = transpose_output(letters_array_output);
@@ -838,6 +876,8 @@ void cmd_cloak()
             finalSeqs.push_back(rowStr);
         }
     }
+
+    Log("Building final MSA with %u sequences.\n", (unsigned)finalSeqs.size());
 
     // Create a new MSA from these labels & sequences
     MSA mCloaked;
