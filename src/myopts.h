@@ -142,6 +142,7 @@ FLAG_OPT(missingtestfileok)
 FLAG_OPT(bysequence)
 FLAG_OPT(reseek)
 FLAG_OPT(mega)
+FLAG_OPT(squeeze)
 
 #undef FLAG_OPT
 #undef UNS_OPT

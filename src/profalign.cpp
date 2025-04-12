@@ -48,7 +48,7 @@ static MultiSequence *ProfAlign(MPCFlat &M,
 		}
 
 	float Score = 0;
-	MultiSequence *MSA = M.AlignAlns(MSA1, MSA2, &Score);
+	MultiSequence *MSA = M.AlignAlns(&MSA1, &MSA2, &Score);
 	return MSA;
 	}
 

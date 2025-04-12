@@ -1,6 +1,7 @@
 #include "muscle.h"
 #include "pprog.h"
 
+#if 0
 float PProg::AlignMSAsFlat3(const string &ProgressStr,
   const MultiSequence &MSA1, const MultiSequence &MSA2,
   const vector<MySparseMx *> &SparseMxVec,
@@ -50,3 +51,4 @@ float PProg::AlignMSAsFlat3(const string &ProgressStr,
 
 	return AvgEA;
 	}
+#endif // 0

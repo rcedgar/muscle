@@ -143,6 +143,9 @@ void cmd_super7()
 		ShrubSize = opt(shrub_size);
 	if (ShrubSize < 3)
 		Die("-shrub_size must be >= 3");
+	opt_reseek = true;
+	optset_reseek = true;
+	optused_reseek = true;
 
 	MultiSequence InputSeqs;
 	LoadInput(InputSeqs);

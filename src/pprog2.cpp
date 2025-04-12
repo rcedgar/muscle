@@ -1,11 +1,15 @@
 #include "muscle.h"
 #include "pprog.h"
 
+MultiSequence *SqueezeGappyCols(const MultiSequence &Aln);
+
 void ReadStringsFromFile(const string &FileName,
   vector<string> &Strings);
 
 void PProg::AlignAndJoin(uint Index1, uint Index2)
 	{
+	const uint MAX_COL_COUNT = optd(maxcols, 5000);
+
 	m_JoinMSAIndexes1.push_back(Index1);
 	m_JoinMSAIndexes2.push_back(Index2);
 
@@ -19,6 +23,12 @@ void PProg::AlignAndJoin(uint Index1, uint Index2)
 	string ProgressStr;
 	Ps(ProgressStr, "Join %u / %u", m_JoinIndex+1, m_JoinCount);
 
+	//const uint ColCount1 = MSA1.GetColCount();
+	//const uint ColCount2 = MSA2.GetColCount();
+	//if (double(ColCount1)*double(ColCount2)*5 + 100 > double(INT_MAX))
+	//	Die("AlignAndJoin() Cols1=%u, Cols2=%u overflow 64-bit HMM buffers",
+	//		ColCount1, ColCount2);
+
 	string Path;
 	AlignMSAsFlat(ProgressStr, MSA1, MSA2, m_TargetPairCount, Path);
 
@@ -27,6 +37,15 @@ void PProg::AlignAndJoin(uint Index1, uint Index2)
 
 	MultiSequence *MSA12 = new MultiSequence;
 	AlignMSAsByPath(MSA1, MSA2, Path, *MSA12);
+
+	uint ColCount12 = MSA12->GetColCount();
+	if (opt(squeeze) && ColCount12 > MAX_COL_COUNT)
+		{
+		MultiSequence *ptrSqueezedMSA12 = SqueezeGappyCols(*MSA12);
+		delete MSA12;
+		MSA12 = ptrSqueezedMSA12;
+		}
+
 	AssertSeqsEq(MSA1, *MSA12);
 	AssertSeqsEq(MSA2, *MSA12);
 	AssertSameSeqsJoin(MSA1, MSA2, *MSA12);

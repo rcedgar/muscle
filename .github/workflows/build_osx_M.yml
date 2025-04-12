@@ -28,8 +28,14 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/rcedgar/vcxproj_make/2eee480/vcxproj_make.py > vcxproj_make.py
           chmod u+x ./vcxproj_make.py
           ./vcxproj_make.py --openmp --cppcompiler g++-11 --nonative
+          g++-11 --version > compiler.txt
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: muscle-osx-m
-          path: /Users/runner/work/muscle/muscle/bin/muscle
+          path: |
+              /Users/runner/work/muscle/muscle/bin/muscle
+              /Users/runner/work/muscle/muscle/src/Makefile
+              /Users/runner/work/muscle/muscle/src/make.stdout
+              /Users/runner/work/muscle/muscle/src/make.stderr
+              /Users/runner/work/muscle/muscle/src/compiler.txt

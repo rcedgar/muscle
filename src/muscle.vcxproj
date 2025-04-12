@@ -236,6 +236,7 @@
     <ClCompile Include="loadinput.cpp" />
     <ClCompile Include="logaln_masm.cpp" />
     <ClCompile Include="pathscorer.cpp" />
+    <ClCompile Include="sequeezegappy.cpp" />
     <ClCompile Include="swenumdp.cpp" />
     <ClCompile Include="swer.cpp" />
     <ClCompile Include="swmasm_megaprof.cpp" />

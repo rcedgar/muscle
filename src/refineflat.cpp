@@ -23,7 +23,7 @@ void MPCFlat::RefineIter()
 	const MultiSequence *MSA2 = m_MSA->Project(SeqIndexes2);
 	delete m_MSA;
 
-	MultiSequence *MSA12 = AlignAlns(*MSA1, *MSA2);
+	MultiSequence *MSA12 = AlignAlns(MSA1, MSA2);
 	m_MSA = MSA12;
 
 	delete MSA1;
