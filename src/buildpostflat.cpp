@@ -37,7 +37,7 @@ void MPCFlat::BuildPost(const MultiSequence &MSA1, const MultiSequence &MSA2,
 		const Sequence *Seq1 = MSA1.GetSequence(SeqIndex1);
 		uint SMI_1 = GetMyInputSeqIndex(Seq1->m_Label);
 		asserta(SMI_1 != UINT_MAX);
-		const float w1 = m_Weights[SeqIndex1];
+		const float w1 = m_Weights.empty() ? 1.0f : m_Weights[SeqIndex1];
 
 		Seq1->GetPosToCol(PosToCol1);
 
@@ -48,7 +48,7 @@ void MPCFlat::BuildPost(const MultiSequence &MSA1, const MultiSequence &MSA2,
 			uint SMI_2 = GetMyInputSeqIndex(Seq2->m_Label);
 			asserta(SMI_2 != UINT_MAX);
 			asserta(SMI_1 != SMI_2);
-			const float w2 = m_Weights[SeqIndex2];
+			const float w2 = m_Weights.empty() ? 1.0f : m_Weights[SeqIndex2];
 
 			Seq2->GetPosToCol(PosToCol2);
 

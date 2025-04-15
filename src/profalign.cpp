@@ -66,6 +66,23 @@ void cmd_profalign()
 	else
 		SetAlpha(ALPHA_Amino);
 
+	MultiSequence InputSeqs;
+	uint SeqCount1 = MSA1.GetSeqCount();
+	for (uint SeqIndex1 = 0; SeqIndex1 < SeqCount1; ++SeqIndex1)
+		{
+		const Sequence *s = MSA1.GetSequence(SeqIndex1);
+		Sequence *Ungapped = s->CopyDeleteGaps();
+		InputSeqs.AddSequence(Ungapped, false);
+		}
+	uint SeqCount2 = MSA2.GetSeqCount();
+	for (uint SeqIndex2 = 0; SeqIndex2 < SeqCount2; ++SeqIndex2)
+		{
+		const Sequence *s = MSA2.GetSequence(SeqIndex2);
+		Sequence *Ungapped = s->CopyDeleteGaps();
+		InputSeqs.AddSequence(Ungapped, false);
+		}
+	SetGlobalInputMS(InputSeqs);
+
 	uint PerturbSeed = 0;
 	if (optset_perturb)
 		PerturbSeed = opt(perturb);

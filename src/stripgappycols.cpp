@@ -28,7 +28,10 @@ void cmd_strip_gappy_cols()
 		uint GapCount = Aln.GetGapCount(Col);
 		double GapFract = double(GapCount)/double(SeqCount);
 		if (GapFract <= MaxGapFract)
+			{
+			Log("keep %u\n", Col);
 			KeepCols.push_back(Col);
+			}
 		else
 			++GappyCount;
 		}
