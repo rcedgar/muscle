@@ -61,6 +61,8 @@ void cmd_profseq()
 	MultiSequence MSA1;
 	MultiSequence Query;
 	MSA1.LoadMFA(opt(profseq), false);
+	ProgressLog("MSA %u seqs, %u cols\n",
+				MSA1.GetSeqCount(), MSA1.GetColCount());
 	Query.LoadMFA(opt(input2), true);
 	bool IsNucleo = MSA1.GuessIsNucleo();
 	bool IsNucleo2 = Query.GuessIsNucleo();
@@ -74,6 +76,23 @@ void cmd_profseq()
 	if (optset_perturb)
 		PerturbSeed = opt(perturb);
 
+	MultiSequence InputSeqs;
+	uint SeqCount1 = MSA1.GetSeqCount();
+	for (uint SeqIndex1 = 0; SeqIndex1 < SeqCount1; ++SeqIndex1)
+		{
+		const Sequence *s = MSA1.GetSequence(SeqIndex1);
+		Sequence *Ungapped = s->CopyDeleteGaps();
+		InputSeqs.AddSequence(Ungapped, false);
+		}
+	uint SeqCount2 = Query.GetSeqCount();
+	for (uint SeqIndex2 = 0; SeqIndex2 < SeqCount2; ++SeqIndex2)
+		{
+		const Sequence *s = Query.GetSequence(SeqIndex2);
+		Sequence *Ungapped = s->CopyDeleteGaps();
+		InputSeqs.AddSequence(Ungapped, false);
+		}
+	SetGlobalInputMS(InputSeqs);
+
 	HMMParams HP;
 	HP.FromDefaults(IsNucleo);
 	HP.CmdLineUpdate();
@@ -84,14 +103,21 @@ void cmd_profseq()
 		}
 	HP.ToPairHMM();
 
+	FILE *fOut = CreateStdioFile(opt(output));
 	const uint QuerySeqCount = Query.GetSeqCount();
 	for (uint QuerySeqIndex = 0; QuerySeqIndex < QuerySeqCount; ++QuerySeqIndex)
 		{
+		Progress("Aligning %u / %u\n", QuerySeqIndex, QuerySeqCount);
 		const Sequence *seq = Query.GetSequence(QuerySeqIndex);
 		MPCFlat M;
 		string Path;
 		ProfSeq(M, MSA1, *seq, Path);
-		Log("%s\n", Path.c_str());
+		if (fOut != 0)
+			{
+			fprintf(fOut, "%s\t%s\n", seq->GetLabel().c_str(), Path.c_str());
+			fflush(fOut);
+			}
 		}
+	CloseStdioFile(fOut);
 	}
  
