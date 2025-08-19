@@ -1,5 +1,5 @@
 #include "muscle.h"
-#include "mega.h"
+//#include "mega.h"
 
 void MakeReplicateFileName(const string &Pattern, TREEPERM TP,
   uint PerturbSeed, string &FileName)
