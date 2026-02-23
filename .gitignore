@@ -6,6 +6,8 @@
 test_output/
 test_logs/
 github_releases/
+*.tmp
+tmp/
 
 # User-specific files
 *.rsuser

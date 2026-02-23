@@ -10,7 +10,7 @@ fi
 
 PATH=$PATH:/usr/bin
 
-git describe --abbrev=6 --dirty --long --always \
+git describe --abbrev=7 --dirty --long --always \
   > gitver.tmp
 
 sed -i '-es/"//g' gitver.tmp

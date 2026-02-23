@@ -228,9 +228,11 @@
     <ClCompile Include="cmd_newbench_selectpfams.cpp" />
     <ClCompile Include="cmd_squeeze_inserts.cpp" />
     <ClCompile Include="cmp_ref_msas.cpp" />
+    <ClCompile Include="core_blocks.cpp" />
     <ClCompile Include="enumpaths.cpp" />
     <ClCompile Include="fwdflat_mega.cpp" />
     <ClCompile Include="getpostpairsalignedflat_mega.cpp" />
+    <ClCompile Include="greedy_rects.cpp" />
     <ClCompile Include="hscore.cpp" />
     <ClCompile Include="loadinput.cpp" />
     <ClCompile Include="logaln_masm.cpp" />
@@ -518,6 +520,7 @@
     <ClInclude Include="qscorer2.h" />
     <ClInclude Include="qscorer3.h" />
     <ClInclude Include="quarts.h" />
+    <ClInclude Include="rect.h" />
     <ClInclude Include="scorehistory.h" />
     <ClInclude Include="scoretype.h" />
     <ClInclude Include="seq.h" />
