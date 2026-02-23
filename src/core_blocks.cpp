@@ -26,7 +26,11 @@ void cmd_core_blocks()
 	ProgressLog("%u seqs, %u cols\n", SeqCount, ColCount);
 
 	uint MinBlockLength = 8;
-	uint MinBlockSeqs = 4;
+	uint MinBlockSeqs = 8;
+	if (optset_min_core_block_cols)
+		MinBlockLength = opt(min_core_block_cols);
+	if (optset_min_core_block_seqs)
+		MinBlockSeqs = opt(min_core_block_seqs);
 
 	vector<vector<bool> > UngappedMx(SeqCount);
 	for (uint SeqIdx = 0; SeqIdx < SeqCount; ++SeqIdx)
@@ -47,7 +51,7 @@ void cmd_core_blocks()
 	for (uint BlockIdx = 0; BlockIdx < BlockCount; ++BlockIdx)
 		{
 		const Rect &r = Blocks[BlockIdx];
-		fprintf(fOut, "block\t%u\t%u\n", BlockIdx, r.width);
+		fprintf(fOut, "block\t%u\t%u\t%u\n", BlockIdx, r.width, r.height);
 		for (int SeqIdx = r.top; SeqIdx < r.top + r.height; ++SeqIdx)
 			{
 			string Label;
