@@ -14,6 +14,7 @@ void greedy_rects(
 void cmd_core_blocks()
 	{
 	const string &MSAFileName = g_Arg1;
+	FILE *fOut = CreateStdioFile(opt(output));
 
 	MSA Aln;
 	TextFile TF(MSAFileName.c_str());
@@ -42,21 +43,23 @@ void cmd_core_blocks()
 	uint BlockCount = SIZE(Blocks);
 
 	ProgressLog("%u blocks\n", BlockCount);
+	fprintf(fOut, "core_blocks\t%u\n", BlockCount);
 	for (uint BlockIdx = 0; BlockIdx < BlockCount; ++BlockIdx)
 		{
 		const Rect &r = Blocks[BlockIdx];
-		Log("\nBlock %u width=%d\n", BlockIdx, r.width);
-		for (uint SeqIdx = r.top; SeqIdx < r.top + r.height; ++SeqIdx)
+		fprintf(fOut, "block\t%u\t%u\n", BlockIdx, r.width);
+		for (int SeqIdx = r.top; SeqIdx < r.top + r.height; ++SeqIdx)
 			{
 			string Label;
 			Aln.GetSeqLabel(SeqIdx, Label);
 			vector<uint> ColToPos;
 			Aln.GetColToPos(SeqIdx, ColToPos);
 			for (int ColIdx = r.left; ColIdx < r.left + r.width; ++ColIdx)
-				Log("%c", Aln.GetChar(SeqIdx, ColIdx));
-			Log(" %d", ColToPos[r.left]);
-			Log(" %s", Label.c_str());
-			Log("\n");
+				fprintf(fOut, "%c", Aln.GetChar(SeqIdx, ColIdx));
+			fprintf(fOut, "\t%d", ColToPos[r.left]);
+			fprintf(fOut, "\t%s", Label.c_str());
+			fprintf(fOut, "\n");
 			}
 		}
+	CloseStdioFile(fOut);
 	}
