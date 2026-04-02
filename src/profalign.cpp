@@ -24,6 +24,7 @@ static MultiSequence *ProfAlign(MPCFlat &M,
 		CombinedSeqs.AddSequence(seq2, false);
 		}
 
+	SetGlobalInputMS(CombinedSeqs);
 	M.InitSeqs(&CombinedSeqs);
 	M.InitPairs();
 	uint PairCount = SIZE(M.m_Pairs);

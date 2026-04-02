@@ -13,6 +13,12 @@ MultiSequence *MPCFlat::AlignAlns(const MultiSequence &MSA1,
 	const uint ColCount1 = MSA1.GetColCount();
 	const uint ColCount2 = MSA2.GetColCount();
 
+	// BuildPost uses m_Weights per sequence (see MPCFlat::Run: ClustalWeights, currently
+	// overridden to 1). Paths such as -profalign skip Run() and never fill m_Weights.
+	const uint SeqCount = GetSeqCount();
+	if (SIZE(m_Weights) != SeqCount)
+		m_Weights.assign(SeqCount, 1.0f);
+
 	float *Post = AllocPost(ColCount1, ColCount2);
 	BuildPost(MSA1, MSA2, Post);
 
