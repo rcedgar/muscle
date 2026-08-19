@@ -84,9 +84,15 @@ typedef unsigned uint;
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
 #elif defined(__GNUC__)
+#ifdef _WIN32
+// Windows is LLP64, so long is 32 bits even in a 64-bit build (mingw-w64).
+typedef long long int64;
+typedef unsigned long long uint64;
+#else
 typedef long int64;
 typedef unsigned long uint64;
-#else	
+#endif
+#else
 #error	"int64 typedefs"
 #endif
 

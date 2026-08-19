@@ -29,7 +29,19 @@
 #include <io.h>
 #else
 #include <sys/time.h>
+#ifdef __MINGW32__
+// mingw-w64 has no <sys/resource.h>.  The memory and core-count helpers below
+// use the Win32 APIs instead, so include the Windows headers here, at the same
+// point in the file as the _MSC_VER branch above does.  The remaining POSIX
+// headers in this block are all provided by mingw-w64.
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#include <psapi.h>
+#else
 #include <sys/resource.h>
+#endif
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -104,7 +116,7 @@ const char *GetPlatform()
 	{
 #if	BITS==32
 	asserta(sizeof(void *) == 4);
-#ifdef _MSC_VER
+#ifdef _WIN32
 	return "win32";
 #elif defined(__APPLE__)
 	return "osx32";
@@ -115,7 +127,7 @@ const char *GetPlatform()
 #endif
 #elif BITS==64
 	asserta(sizeof(void *) == 8);
-#ifdef _MSC_VER
+#ifdef _WIN32
 	return "win64";
 #elif defined(__arm64__)
 	return "osxarm64";
@@ -237,7 +249,8 @@ void ParseFileName(const string &FileName, string &Path, string &Name)
 	if (n1 != string::npos)
 		n = n1;
 
-#if _MSC_VER
+// Windows path separators and drive letters need splitting under any compiler.
+#ifdef _WIN32
 	size_t n2 = FileName.rfind('\\');
 	size_t n3 = FileName.rfind(':');
 	if (n2 != string::npos && n2 > n)
@@ -770,7 +783,8 @@ double GetUsableMemBytes()
 	{
 	double RAM = GetPhysMemBytes();
 #if	BITS==32
-#ifdef	_MSC_VER
+// 32-bit Windows caps user address space at 2Gb, whatever the compiler.
+#ifdef	_WIN32
 	if (RAM > 2e9)
 		return 2e9;
 #else
@@ -960,7 +974,7 @@ void mysleep(unsigned ms)
 	}
 #endif
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 double GetMemUseBytes()
 	{
 	HANDLE hProc = GetCurrentProcess();
@@ -2297,7 +2311,7 @@ void ResetRand(unsigned Seed)
 
 unsigned GetCPUCoreCount()
 	{
-#ifdef _MSC_VER
+#ifdef _WIN32
 	SYSTEM_INFO SI;
 	GetSystemInfo(&SI);
 	unsigned n = SI.dwNumberOfProcessors;
