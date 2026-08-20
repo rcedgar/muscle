@@ -33,6 +33,7 @@
 #include <unordered_map>
 #include <inttypes.h>
 #include <thread>
+#include <atomic>
 #include "types.h"
 
 // isatty()
@@ -137,7 +138,8 @@ static inline const char *plurals(unsigned n) { return n == 1 ? "" : "s"; }
 const char *GetPlatform();
 unsigned GetElapsedSecs();
 void mysleep(unsigned ms);
-void mylistdir(const string &DirName, vector<string> &FileNames);
+void mylistdir(const string &DirName, vector<string> &FileNames,
+  vector<bool> &IsSubDirs);
 void PrintVersion(FILE *f);
 
 #define SIZE(c)	unsigned((c).size())
@@ -206,6 +208,8 @@ uint32 ReadStdioFile_NoFail(FILE *f, void *Buffer, uint32 Bytes);
 
 void ReadStdioFile(FILE *f, uint32 Pos, void *Buffer, uint32 Bytes);
 void ReadStdioFile64(FILE *f, uint64 Pos, void *Buffer, uint64 Bytes);
+uint64 ReadStdioFile64_NoFail(FILE *f, uint64 Pos, void *Buffer, uint64 Bytes);
+void ReadStdioFile64NoPos(FILE *f, void *Buffer, uint64 Bytes);
 
 void ReadStdioFile(FILE *f, void *Buffer, uint32 Bytes);
 void ReadStdioFile64(FILE *f, void *Buffer, uint64 Bytes);
@@ -308,16 +312,26 @@ inline bool feq(double x, double y)
 #define assertaeq(x, y)	asserta(feq(x, y))
 
 #define	memset_zero(a, n)	memset((a), 0, (n)*sizeof(a[0]))
+#define	zero_array(a, n)	memset_zero((a), (n))
 
 void ResetRand(unsigned Seed);
 unsigned randu32();
 uint64 randu64();
 void Split(const string &Str, vector<string> &Fields, char Sep = '\t');
+void SplitWhite(const string &Str, vector<string> &Fields);
 void StripWhiteSpace(string &Str);
+void StripAllWhiteSpace(string &Str);
 bool StartsWith(const string &s, const string &t);
 bool StartsWith(const char *s, const char *t);
 void ToUpper(const string &s, string &t);
 void ToLower(const string &s, string &t);
+void ToUpper(string &s);
+void ToLower(string &s);
+bool IsDirectory(const string &PathName);
+bool IsRegularFile(const string &PathName);
+void GetExtFromPathName(const string &PathName, string &Ext);
+void GetStemName(const string &PathName, string &Stem);
+char GetOneFromThree(const string &AAA);
 void Reverse(string &s);
 static inline double GetRatio(double x, double y) { if (y == 0) { asserta(x == 0); return 0; } return x/y; }
 static inline double GetPct(double x, double y) { return 100.0*GetRatio(x, y); }
@@ -332,6 +346,8 @@ static inline const char *MemBytesToStr(uint64 Bytes) { return MemBytesToStr((do
 double StrToMemBytes(const string &s);
 double StrToFloat(const char *s, bool StarIsDblMax = false);
 double StrToFloat(const string &s, bool StarIsDblMax = false);
+float StrToFloatf(const string &s);
+void ReadLinesFromFile(const string &FileName, vector<string> &Lines);
 bool IsValidFloatStr(const char *s);
 bool IsValidFloatStr(const string &s);
 const char *GetElapsedTimeStr(string &s);
@@ -344,11 +360,14 @@ const char *IntToStr2(uint64 i);
 const char *Int64ToStr(uint64 i);
 const char *FloatToStr(double d);
 const char *FloatToStr(uint64 i);
+static inline const char *FloatToStr(unsigned i) { return FloatToStr(double(i)); }
 const char *IntFloatToStr(double d);
 const char *SecsToStr(double Secs);
 bool IsUintStr(const char *s);
 unsigned StrToUint(const char *s, bool StarIsUnitMax = false);
 unsigned StrToUint(const string &s, bool StarIsUnitMax = false);
+int StrToInt(const char *s);
+int StrToInt(const string &s);
 uint64 StrToUint64(const char *s);
 uint64 StrToUint64(const string &s);
 bool EndsWith(const string &s, const string &t);
@@ -381,6 +400,7 @@ void CheckUsedOpts(bool LogAll);
 extern FILE *g_fLog;
 
 void SeqToFasta(FILE *f, const string &Seq, const string &Label);
+void SeqToFasta(FILE *f, const string &Label, const string &Seq, unsigned L);
 void SeqToFasta(FILE *f, const byte *Seq, unsigned L, const char *Label);
 void SeqToFastq(FILE *f, const byte *Seq, unsigned L, const char *Qual, const char *Label);
 void SeqToFastaRC(FILE *f, const byte *Seq, unsigned L, const char *Label);
@@ -389,6 +409,9 @@ void RevCompSeq(const byte *Seq, unsigned L, byte *RCSeq);
 void LogAllocs();
 unsigned GetRequestedThreadCount();
 void Dirize(string &Dir);
+
+void *aligned_malloc(size_t bytes);
+void aligned_free(void *p);
 
 inline char mytoupper(char c) { return c & (~0x20); }
 inline char mytoupper(byte c) { return c & (~0x20); }

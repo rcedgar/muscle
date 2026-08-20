@@ -357,6 +357,7 @@
     <ClCompile Include="profile3.cpp" />
     <ClCompile Include="masmcol.cpp" />
     <ClCompile Include="mega.cpp" />
+    <ClCompile Include="mega_structs.cpp" />
     <ClCompile Include="profpos3.cpp" />
     <ClCompile Include="profprof3.cpp" />
     <ClCompile Include="profseq.cpp" />
@@ -439,6 +440,31 @@
     <ClCompile Include="usage.cpp" />
     <ClCompile Include="usorter.cpp" />
     <ClCompile Include="viterbifastmem.cpp" />
+    <ClCompile Include="abcxyz.cpp" />
+    <ClCompile Include="alpha_collect.cpp" />
+    <ClCompile Include="bcadata.cpp" />
+    <ClCompile Include="chaq.cpp" />
+    <ClCompile Include="chaq_fast.cpp" />
+    <ClCompile Include="cif.cpp" />
+    <ClCompile Include="collect.cpp" />
+    <ClCompile Include="fan.cpp" />
+    <ClCompile Include="flat_alphas.cpp" />
+    <ClCompile Include="flat_chain.cpp" />
+    <ClCompile Include="flat_chain_reader.cpp" />
+    <ClCompile Include="flat_distmx.cpp" />
+    <ClCompile Include="flat_helpers.cpp" />
+    <ClCompile Include="flat_params.cpp" />
+    <ClCompile Include="linereader2.cpp" />
+    <ClCompile Include="pdbfilescanner.cpp" />
+    <ClCompile Include="peaker_spec.cpp" />
+    <ClCompile Include="read_alphadir.cpp" />
+    <ClCompile Include="sec_kmeans.cpp" />
+    <ClCompile Include="sec32_kmeans.cpp" />
+    <ClCompile Include="struct_desc.cpp" />
+    <ClCompile Include="varstr.cpp" />
+    <ClCompile Include="seqdb.cpp" />
+    <ClCompile Include="one2three.cpp" />
+    <ClCompile Include="stage1_stubs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allocmx.h" />

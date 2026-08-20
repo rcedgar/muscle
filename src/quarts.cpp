@@ -33,6 +33,7 @@ void GetQuarts(const vector<unsigned> &v, Quarts &Q)
 void GetQuartsFloat(const vector<float> &v, QuartsFloat &Q)
 	{
 	const unsigned N = SIZE(v);
+	Q.N = N;
 	Q.Min = 0.0f;
 	Q.LoQ = 0.0f;
 	Q.Med = 0.0f;
@@ -40,6 +41,7 @@ void GetQuartsFloat(const vector<float> &v, QuartsFloat &Q)
 	Q.Max = 0.0f;
 	Q.Total = 0.0f;
 	Q.Avg = 0.0f;
+	Q.StdDev = 0.0f;
 	if (N == 0)
 		return;
 

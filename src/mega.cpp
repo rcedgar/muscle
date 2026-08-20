@@ -22,6 +22,7 @@ vector<string> m_Labels;
 uint Mega::m_NextLineNr;
 uint Mega::m_FeatureCount;
 bool Mega::m_Loaded = false;
+bool Mega::m_FromStructs = false;
 float Mega::m_GapOpen = FLT_MAX;
 float Mega::m_GapExt = FLT_MAX;
 unordered_map<string, uint> Mega::m_LabelToIdx;
@@ -125,6 +126,7 @@ void Mega::FromFile(const string &FileName)
 	if (FileName == "")
 		Die("Missing mega filename");
 	m_Loaded = true;
+	m_FromStructs = false;
 
 	asserta(m_FeatureNames.empty());
 	asserta(m_FeatureCount == 0);
@@ -273,6 +275,8 @@ void Mega::FromFile(const string &FileName)
 float Mega::GetInsScore(const vector<vector<byte> > &Profile, uint Pos)
 	{
 	asserta(Pos < SIZE(Profile));
+	if (m_FromStructs)
+		return 0.0f;
 	const vector<byte> &ProfCol = Profile[Pos];
 	float Score = 0;
 	for (uint i = 0; i < m_FeatureCount; ++i)
@@ -340,6 +344,8 @@ float Mega::GetMatchScore(
   const vector<vector<byte> > &ProfileX, uint PosX,
   const vector<vector<byte> > &ProfileY, uint PosY)
 	{
+	if (m_FromStructs)
+		return GetMatchScore_LogOdds(ProfileX, PosX, ProfileY, PosY);
 	const uint LX = SIZE(ProfileX);
 	const uint LY = SIZE(ProfileY);
 	asserta(PosX < LX);
@@ -477,4 +483,5 @@ void Mega::FromMSA_AAOnly(const MultiSequence &Aln,
 	m_GapOpen = GapOpen;
 	m_GapExt = GapExt;
 	m_Loaded = true;
+	m_FromStructs = false;
 	}

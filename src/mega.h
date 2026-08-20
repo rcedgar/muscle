@@ -29,6 +29,8 @@ public:
 	static uint m_NextLineNr;
 	static uint m_FeatureCount;
 	static bool m_Loaded;
+	// True when profiles/matrices came from STRUCTS (log-odds HMM path)
+	static bool m_FromStructs;
 	static float m_GapOpen;
 	static float m_GapExt;
 
@@ -36,6 +38,8 @@ public:
 	static void FromMSA_AAOnly(const MultiSequence &Aln,
 	  float GapOpen, float GapExt);
 	static void FromFile(const string &FileName);
+	static void FromStructs(const string &FileName);
+	static bool IsStructsInput(const string &FileName);
 	static uint GetProfileCount() { return SIZE(m_Profiles); }
 	static const vector<vector<byte> > &GetProfile(uint ProfileIdx);
 	static const string &GetLabel(uint ProfileIdx);

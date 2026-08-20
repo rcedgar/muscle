@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+# Legacy .mega path (deprecated). Prefer STRUCTS once test structures are checked in.
 outdir=../test_output/rdrp
 logdir=../test_logs
 rm -rf ../tmp

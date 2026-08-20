@@ -56,6 +56,36 @@
 
 #include "myutils.h"
 
+bool IsDirectory(const string &PathName)
+	{
+#ifdef _WIN32
+	DWORD attrs = GetFileAttributesA(PathName.c_str());
+	if (attrs == INVALID_FILE_ATTRIBUTES)
+		return false;
+	return (attrs & FILE_ATTRIBUTE_DIRECTORY) != 0;
+#else
+	struct stat st;
+	if (stat(PathName.c_str(), &st) != 0)
+		return false;
+	return S_ISDIR(st.st_mode);
+#endif
+	}
+
+bool IsRegularFile(const string &PathName)
+	{
+#ifdef _WIN32
+	DWORD attrs = GetFileAttributesA(PathName.c_str());
+	if (attrs == INVALID_FILE_ATTRIBUTES)
+		return false;
+	return (attrs & FILE_ATTRIBUTE_DIRECTORY) == 0;
+#else
+	struct stat st;
+	if (stat(PathName.c_str(), &st) != 0)
+		return false;
+	return S_ISREG(st.st_mode);
+#endif
+	}
+
 unsigned g_AllocLine;
 const char *g_AllocFile;
 
@@ -430,6 +460,29 @@ void ReadStdioFile64(FILE *f, uint64 Pos, void *Buffer, uint64 Bytes)
 		LogStdioFileState(f);
 		Die("ReadStdioFile64 failed, attempted %lu bytes, errno=%d",
 		  (unsigned long) Bytes, errno);
+		}
+	}
+
+uint64 ReadStdioFile64_NoFail(FILE *f, uint64 Pos, void *Buffer, uint64 Bytes)
+	{
+	asserta(f != 0);
+	uint32 Bytes32 = (uint32) Bytes;
+	asserta(Bytes32 == Bytes);
+	SetStdioFilePos64(f, Pos);
+	return (uint64) fread(Buffer, 1, Bytes32, f);
+	}
+
+void ReadStdioFile64NoPos(FILE *f, void *Buffer, uint64 Bytes)
+	{
+	asserta(f != 0);
+	uint32 Bytes32 = (uint32) Bytes;
+	asserta(Bytes32 == Bytes);
+	uint64 BytesRead = (uint64) fread(Buffer, 1, Bytes32, f);
+	if (BytesRead != Bytes)
+		{
+		LogStdioFileState(f);
+		Die("ReadStdioFile64NoPos failed, attempted %llu bytes, read %llu, errno=%d",
+		  (unsigned long long) Bytes, (unsigned long long) BytesRead, errno);
 		}
 	}
 
@@ -1107,9 +1160,11 @@ double GetMemUseBytes()
 #endif
 
 #ifdef _MSC_VER
-void mylistdir(const string &DirName, vector<string> &FileNames)
+void mylistdir(const string &DirName, vector<string> &FileNames,
+  vector<bool> &IsSubDirs)
 	{
 	FileNames.clear();
+	IsSubDirs.clear();
 	bool First = true;
 	HANDLE h = INVALID_HANDLE_VALUE;
 	WIN32_FIND_DATA FFD;
@@ -1130,12 +1185,16 @@ void mylistdir(const string &DirName, vector<string> &FileNames)
 				return;
 			}
 		FileNames.push_back(string(FFD.cFileName));
+		IsSubDirs.push_back(bool(FFD.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 		}
 	}
 #else
-void mylistdir(const string &DirName, vector<string> &FileNames)
+// WARNING includes . and ..
+void mylistdir(const string &DirName, vector<string> &FileNames,
+  vector<bool> &IsSubDirs)
 	{
 	FileNames.clear();
+	IsSubDirs.clear();
 	DIR *dir = opendir(DirName.c_str());
 	if (dir == 0)
 		Die("Directory not found: %s", DirName.c_str());
@@ -1145,6 +1204,7 @@ void mylistdir(const string &DirName, vector<string> &FileNames)
 		if (dp == 0)
 			break;
 		FileNames.push_back(string(dp->d_name));
+		IsSubDirs.push_back(dp->d_type == DT_DIR);
 		}
 	closedir(dir);
 	}
@@ -1218,6 +1278,11 @@ bool IsValidFloatStr(const string &s)
 double StrToFloat(const string &s, bool StarIsDblMax)
 	{
 	return StrToFloat(s.c_str(), StarIsDblMax);
+	}
+
+float StrToFloatf(const string &s)
+	{
+	return (float) StrToFloat(s.c_str());
 	}
 
 double StrToFloat(const char *s, bool StarIsDblMax)
@@ -1327,6 +1392,17 @@ uint64 StrToUint64(const string &s)
 unsigned StrToUint(const string &s, bool StarIsUnitMax)
 	{
 	return StrToUint(s.c_str(), StarIsUnitMax);
+	}
+
+int StrToInt(const char *s)
+	{
+	return atoi(s);
+	}
+
+int StrToInt(const string &s)
+	{
+	asserta(s.size() > 0);
+	return StrToInt(s.c_str());
 	}
 
 const char *IntToStr2(uint64 i)
@@ -2014,6 +2090,20 @@ void ToLower(const string &s, string &t)
 		t.push_back(tolower(s[i]));
 	}
 
+void ToLower(string &Str)
+	{
+	unsigned n = SIZE(Str);
+	for (uint i = 0; i < n; ++i)
+		Str[i] = tolower(Str[i]);
+	}
+
+void ToUpper(string &Str)
+	{
+	unsigned n = SIZE(Str);
+	for (uint i = 0; i < n; ++i)
+		Str[i] = toupper(Str[i]);
+	}
+
 void StripWhiteSpace(string &Str)
 	{
 	unsigned n = SIZE(Str);
@@ -2040,6 +2130,38 @@ void StripWhiteSpace(string &Str)
 		t += c;
 		}
 	Str = t;
+	}
+
+void StripAllWhiteSpace(string &Str)
+	{
+	string tmp;
+	for (auto c : Str) if (!isspace(c)) tmp += c;
+	Str = tmp;
+	}
+
+void SplitWhite(const string &Str, vector<string> &Fields)
+	{
+	Fields.clear();
+	const unsigned Length = (unsigned) Str.size();
+	string Field;
+	for (unsigned i = 0; i < Length; ++i)
+		{
+		char c = Str[i];
+		if (isspace(c))
+			{
+			if (!Field.empty())
+				Fields.push_back(Field);
+			Field.clear();
+			}
+		else
+			Field.push_back(c);
+		}
+	if (!Field.empty())
+		{
+		StripWhiteSpace(Field);
+		if (!Field.empty())
+			Fields.push_back(Field);
+		}
 	}
 
 void Split(const string &Str, vector<string> &Fields, char Sep)
@@ -2572,9 +2694,59 @@ void GetBaseName(const string &PathName, string &BaseName)
 #undef x
 	}
 
+void GetExtFromPathName(const string &PathName, string &Ext)
+	{
+	string Base = string(BaseName(PathName.c_str()));
+	vector<string> Fields;
+	Split(Base, Fields, '.');
+	uint n = SIZE(Fields);
+	if (n == 1)
+		{
+		Ext = "";
+		return;
+		}
+	const string &LastField = Fields[n-1];
+
+// Special case for .ext.gz
+	if (LastField == "gz" && n > 2)
+		{
+		Ext = Fields[n-2] + ".gz";
+		return;
+		}
+	Ext = LastField;
+	}
+
+void GetStemName(const string &PathName, string &Stem)
+	{
+	Stem.clear();
+	string Base = string(BaseName(PathName.c_str()));
+	vector<string> Fields;
+	Split(Base, Fields, '.');
+	uint n = SIZE(Fields);
+	if (n == 1)
+		{
+		Stem = Fields[0];
+		return;
+		}
+	if (Fields[n-1] == "gz")
+		--n;
+	for (uint i = 0; i + 1 < n; ++i)
+		{
+		if (i > 0)
+			Stem += '.';
+		Stem += Fields[i];
+		}
+	}
+
 void SeqToFasta(FILE *f, const string &Seq, const string &Label)
 	{
 	SeqToFasta(f, (const byte *) Seq.c_str(), SIZE(Seq), Label.c_str());
+	}
+
+void SeqToFasta(FILE *f, const string &Label, const string &Seq, unsigned L)
+	{
+	asserta(L <= SIZE(Seq));
+	SeqToFasta(f, (const byte *) Seq.c_str(), L, Label.c_str());
 	}
 
 void SeqToFasta(FILE *f, const char *Seq, unsigned L, const char *Label)
@@ -2636,4 +2808,41 @@ void Dirize(string &Dir)
 	{
 	if (!EndsWith(Dir, "/"))
 		Dir += "/";
+	}
+
+void ReadLinesFromFile(const string &FileName, vector<string> &Lines)
+	{
+	if (EndsWith(FileName, ".gz"))
+		Die("ReadLinesFromFile: decompress '%s' first (.gz not supported here)",
+		  FileName.c_str());
+	Lines.clear();
+	FILE *f = OpenStdioFile(FileName);
+	string Line;
+	while (ReadLineStdioFile(f, Line))
+		Lines.push_back(Line);
+	CloseStdioFile(f);
+	}
+
+void *aligned_malloc(size_t bytes)
+	{
+	const size_t alignment = 64;
+#ifdef _MSC_VER
+	return _aligned_malloc(bytes, alignment);
+#else
+	void *p = 0;
+	if (posix_memalign(&p, alignment, bytes) != 0)
+		Die("posix_memalign(%u)", (unsigned) bytes);
+	return p;
+#endif
+	}
+
+void aligned_free(void *p)
+	{
+	if (p == 0)
+		return;
+#ifdef _MSC_VER
+	_aligned_free(p);
+#else
+	free(p);
+#endif
 	}

@@ -10,8 +10,10 @@ void LogAllocs();
 
 #if TRACE_ALLOC
 #define myalloc(t, m)	(t *) myalloc_track(__FILE__, __LINE__, sizeof(t), (m))
+#define myalloc64(t, n)	(t *) myalloc_track(__FILE__, __LINE__, sizeof(t), (size_t)(n))
 #define myfree(p)		myfree_track(p)
 #else
 #define myalloc(t, m)	(t *) myalloc_(sizeof(t), (m))
+#define myalloc64(t, n)	(t *) myalloc_(sizeof(t), (size_t)(n))
 #define myfree(p)		myfree_(p)
 #endif

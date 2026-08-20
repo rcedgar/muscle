@@ -1,6 +1,17 @@
 Align FASTA input, write aligned FASTA (AFA) output:
     muscle -align input.fa -output aln.afa
 
+Structure alignment (Muscle-3D): pass STRUCTS the same way as reseek
+(.pdb/.cif/.cal/.bca/.bcb/.files or a directory). Uses sf feature alphabets.
+    muscle -align STRUCTS -output aln.afa
+    muscle -super7 STRUCTS -distmxin distmx.txt -reseek -output aln.afa
+    -structs
+        Force STRUCTS input when the path is ambiguous.
+    -alphadir DIR
+        Optional alternate alphabet directory (default: embedded sf alphabets).
+    Legacy .mega files (from reseek pdb2mega) still work but are deprecated;
+    use -mega or a .mega suffix.
+
 Align large input using Super5 algorithm if -align is too expensive,
 typically needed with more than a few hundred sequences:
     muscle -super5 input.fa -output aln.afa

@@ -1,0 +1,59 @@
+# Canonical STRUCTS I/O + mega-profile sources for sharing with muscle.
+# Canonical copy lives in reseek; sync script later; do not hard-link.
+# Host-owned (do NOT share): myutils.*, alpha.*, opt/cmdline, gitver.
+# Search-only (do NOT share): chain_data.*, struct_data.*, bcadata_struct.h,
+#   parasail*, kappa*, reseeker*, flat_search_*, flat_bench*, flat_nu_aligner*,
+#   sw_flat_pssm*, fill_smx*, hitdata*.
+# Note: gzipfileio.cpp only (no gzipfileio.h in reseek).
+# Host-bundled alphabet blob (from reseek, required for =sf without -alphadir):
+#   alpha_collect.cpp
+
+# --- Scanner / chain I/O ---
+pdbfilescanner.cpp
+pdbfilescanner.h
+linereader2.cpp
+linereader2.h
+flat_chain_reader.cpp
+flat_chain_reader.h
+flat_chain.cpp
+flat_chain.h
+chainaa.h
+chainnu.h
+chainxyz.h
+flat_base.h
+flat_dist_types.h
+bcadata.cpp
+bcadata.h
+cif.cpp
+cif.h
+struct_desc.cpp
+struct_desc.h
+gzipfileio.cpp
+
+# --- Feature / mega profile ---
+chaq.cpp
+chaq.h
+chaq_fast.cpp
+fan.cpp
+fan.h
+flat_featlist.h
+flat_distmx.cpp
+flat_distmx.h
+flat_params.cpp
+flat_params.h
+flat_helpers.cpp
+flat_helpers.h
+read_alphadir.cpp
+flat_alphas.cpp
+varstr.cpp
+quantize.h
+abcxyz.cpp
+abcxyz.h
+scratch_mem.h
+collect.h
+collect.cpp
+sec_kmeans.cpp
+sec_kmeans.h
+sec32_kmeans.cpp
+tunable_flat_params.h
+tabbedlines.h

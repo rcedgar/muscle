@@ -17,6 +17,8 @@ extern byte g_CharToLetterEx[];
 extern byte g_LetterToCharAmino[];
 extern byte g_LetterToChar[];
 extern byte g_LetterExToChar[];
+extern unsigned char g_LetterToCharMu[];
+extern unsigned char g_CharToLetterMu[];
 
 #define CharToLetter(c)		(g_CharToLetter[(unsigned char) (c)])
 #define CharToLetterEx(c)	(g_CharToLetterEx[(unsigned char) (c)])
