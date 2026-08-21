@@ -54,7 +54,7 @@ void QScorer::InitRefLabels_bysequence()
 		m_Ref->GetUngappedSeqStr(RefSeqIndex, UnSeq);
 		if (m_RefSeqToSeqIndex.find(UnSeq) != m_RefSeqToSeqIndex.end())
 			{
-			Warning("Dupe seq >%s in ref MSA", Label.c_str());
+			Warning("Dupe seq >%s in ref MSA %s", Label.c_str(), m_Name.c_str());
 			continue;
 			}
 		m_RefSeqToSeqIndex[UnSeq] = RefSeqIndex;
@@ -76,13 +76,14 @@ void QScorer::InitRefToTest_bysequence()
 		map<string, uint>::const_iterator p = m_RefSeqToSeqIndex.find(UnSeq);
 		if (p == m_RefSeqToSeqIndex.end())
 			{
-			Warning("Test seq not in ref >%s", Label.c_str());
+			if (!opt(missingtestseqok))
+				Warning("Test seq not in ref >%s %s", Label.c_str(), m_Name.c_str());
 			continue;
 			}
 		uint RefSeqIndex = p->second;
 		asserta(RefSeqIndex < RefSeqCount);
 		if (m_RefSeqIndexToTestSeqIndex[RefSeqIndex] != UINT_MAX)
-			Warning("Ref seq found twice in test MSA >%s", Label.c_str());
+			Warning("Ref seq found twice in test MSA >%s %s", Label.c_str(), m_Name.c_str());
 		m_RefSeqIndexToTestSeqIndex[RefSeqIndex] = TestSeqIndex;
 
 		m_Labels.push_back(Label);
@@ -151,7 +152,12 @@ void QScorer::InitColPosVecs1(uint i)
 	m_Test->GetPosToCol(TestSeqIndex, m_PosToTestColVec[i]);
 	const uint RefUngappedLength = SIZE(m_PosToRefColVec[i]);
 	const uint TestUngappedLength = SIZE(m_PosToTestColVec[i]);
-	asserta(RefUngappedLength == TestUngappedLength);
+	if (RefUngappedLength != TestUngappedLength)
+		Die("RefUngappedLength(%u) != TestUngappedLength(%u) >%s %s",
+			RefUngappedLength,
+			TestUngappedLength,
+			Label.c_str(),
+			m_Name.c_str());
 
 	m_Ref->GetColToPos(RefSeqIndex, m_RefColToPosVec[i]);
 	m_Test->GetColToPos(TestSeqIndex, m_TestColToPosVec[i]);
