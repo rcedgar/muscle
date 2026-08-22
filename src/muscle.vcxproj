@@ -227,6 +227,7 @@
     <ClCompile Include="cmd_newbench_pfamgroups.cpp" />
     <ClCompile Include="cmd_newbench_selectpfams.cpp" />
     <ClCompile Include="cmd_squeeze_inserts.cpp" />
+    <ClCompile Include="cmd_msa_prep.cpp" />
     <ClCompile Include="cmp_ref_msas.cpp" />
     <ClCompile Include="core_blocks.cpp" />
     <ClCompile Include="enumpaths.cpp" />
@@ -314,6 +315,7 @@
     <ClCompile Include="make_substmx.cpp" />
     <ClCompile Include="masm.cpp" />
     <ClCompile Include="masm_train.cpp" />
+    <ClCompile Include="msa_prep.cpp" />
     <ClCompile Include="maxcc.cpp" />
     <ClCompile Include="mega_msas.cpp" />
     <ClCompile Include="mpcflat.cpp" />

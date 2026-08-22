@@ -98,7 +98,9 @@ void MASM::GetFreqsVec(uint ColIndex, vector<vector<float> > &FreqsVec)
 
 // MSA sequences must match sequences in Mega
 void MASM::FromMSA(const MultiSequence &Aln, const string &Label,
-  float GapOpen, float GapExt)
+  float GapOpen, float GapExt,
+  const vector<MSAPrepColMapEntry> *ColMap,
+  const vector<string> *FullUngappedSeqs)
 	{
 	asserta(GapOpen >= 0);
 	asserta(GapExt >= 0);
@@ -114,6 +116,16 @@ void MASM::FromMSA(const MultiSequence &Aln, const string &Label,
 	m_FeatureNames = Mega::m_FeatureNames;
 	m_AlphaSizes = Mega::m_AlphaSizes;
 	m_AAFeatureIdx = Mega::GetAAFeatureIdx();
+
+	if (ColMap != nullptr)
+		BuildResiduePosVec(*ColMap);
+	else
+		m_ResiduePosVec.clear();
+
+	if (FullUngappedSeqs != nullptr)
+		m_FullUngappedSeqs = *FullUngappedSeqs;
+	else
+		m_FullUngappedSeqs.clear();
 
 	SetUngappedSeqs();
 	SetFeatureAlnVec();
@@ -163,6 +175,7 @@ void MASM::ToFile(FILE *f) const
 	fprintf(f, "MASM\t%u\t%u\t%u\t%.4g\t%.4g\t%s\n",
 	  m_SeqCount, m_ColCount, m_FeatureCount,
 	  m_GapOpen, m_GapExt, m_Label.c_str());
+
 	for (uint i = 0; i < m_FeatureCount; ++i)
 		fprintf(f, "feature\t%u\t%s\t%u\n",
 		  i, m_FeatureNames[i].c_str(), m_AlphaSizes[i]);
@@ -197,6 +210,11 @@ void MASM::SetFeatureAlnVec()
 void MASM::SetUngappedSeqs()
 	{
 	m_UngappedSeqs.clear();
+	if (SIZE(m_FullUngappedSeqs) == m_SeqCount)
+		{
+		m_UngappedSeqs = m_FullUngappedSeqs;
+		return;
+		}
 	for (uint SeqIdx = 0; SeqIdx < m_SeqCount; ++SeqIdx)
 		{
 		string UngappedSeq;
@@ -210,6 +228,22 @@ void MASM::SetUngappedSeqs()
 				UngappedSeq += c;
 			}
 		m_UngappedSeqs.push_back(UngappedSeq);
+		}
+	}
+
+void MASM::BuildResiduePosVec(const vector<MSAPrepColMapEntry> &ColMap)
+	{
+	m_ResiduePosVec.clear();
+	m_ResiduePosVec.resize(m_SeqCount);
+	for (uint i = 0; i < m_SeqCount; ++i)
+		m_ResiduePosVec[i].resize(m_ColCount, UINT_MAX);
+
+	for (uint i = 0; i < SIZE(ColMap); ++i)
+		{
+		const MSAPrepColMapEntry &E = ColMap[i];
+		asserta(E.SeqIndex < m_SeqCount);
+		asserta(E.CleanCol < m_ColCount);
+		m_ResiduePosVec[E.SeqIndex][E.CleanCol] = E.ResiduePos;
 		}
 	}
 
@@ -229,6 +263,8 @@ void MASM::SetFeatureAln(uint FeatureIdx)
 		const Sequence &seq = *m_Aln->GetSequence(SeqIdx);
 		asserta(seq.GetLength() == m_ColCount);
 		const char *charseq = seq.GetCharPtr();
+		const bool UseMap = (SIZE(m_ResiduePosVec) == m_SeqCount &&
+		  SIZE(m_ResiduePosVec[SeqIdx]) == m_ColCount);
 		uint Pos = 0;
 		for (uint Col = 0; Col < m_ColCount; ++Col)
 			{
@@ -237,9 +273,16 @@ void MASM::SetFeatureAln(uint FeatureIdx)
 				Row.push_back(UINT8_MAX);
 			else
 				{
-				byte Letter = MegaProfile[Pos][FeatureIdx];
+				uint ResPos = Pos;
+				if (UseMap)
+					{
+					ResPos = m_ResiduePosVec[SeqIdx][Col];
+					asserta(ResPos < SIZE(MegaProfile));
+					}
+				byte Letter = MegaProfile[ResPos][FeatureIdx];
 				Row.push_back(Letter);
-				++Pos;
+				if (!UseMap)
+					++Pos;
 				}
 			}
 		}
@@ -291,10 +334,29 @@ void MASM::FromFile(const string &FileName)
 	m_ColCount = ColCount;
 	m_FeatureCount = FeatureCount;
 	m_AAFeatureIdx = UINT_MAX;
+
+	Ok = ReadLineStdioFile(f, Line);
+	asserta(Ok);
+	if (!Line.empty() && Line[0] == '>')
+		{
+		for (;;)
+			{
+			Ok = ReadLineStdioFile(f, Line);
+			asserta(Ok);
+			if (Line == "<END_FASTA")
+				break;
+			}
+		Ok = ReadLineStdioFile(f, Line);
+		asserta(Ok);
+		}
+
 	for (uint i = 0; i < FeatureCount; ++i)
 		{
-		bool Ok = ReadLineStdioFile(f, Line);
-		asserta(Ok);
+		if (i > 0)
+			{
+			Ok = ReadLineStdioFile(f, Line);
+			asserta(Ok);
+			}
 		Split(Line, Fields, '\t');
 		asserta(SIZE(Fields) == 4);
 		asserta(Fields[0] == "feature");

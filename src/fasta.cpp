@@ -1,4 +1,5 @@
 #include "muscle.h"
+#include "flat_helpers.h"
 
 const unsigned FASTA_BLOCK = 60;
 
@@ -49,7 +50,9 @@ void MSA::FromStrings(const vector<string> &Strings)
 			{
 			if (!Labels.empty())
 				Seqs.push_back(CurrSeq);
-			Labels.push_back(s.substr(1));
+			string Label = s.substr(1);
+			trunc_label(Label);
+			Labels.push_back(Label);
 			CurrSeq.clear();
 			}
 		else

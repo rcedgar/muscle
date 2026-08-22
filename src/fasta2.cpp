@@ -1,4 +1,5 @@
 #include "muscle.h"
+#include "flat_helpers.h"
 #include <stdio.h>
 #include <errno.h>
 
@@ -53,6 +54,11 @@ char *GetFastaSeq(FILE *f, unsigned *ptrSeqLength, char **ptrLabel, bool DeleteG
 
 // Nul-terminate label
 	ADD(0)
+	{
+	string LabelStr(Buffer);
+	trunc_label(LabelStr);
+	memcpy(Buffer, LabelStr.c_str(), LabelStr.size() + 1);
+	}
 	*ptrLabel = Buffer;
 
 	BufferLength = 0;

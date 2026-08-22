@@ -2,6 +2,8 @@
 
 #include "masmcol.h"
 #include "mx.h"
+#include "msa_prep_colmap.h"
+#include "msa.h"
 
 class MultiSequence;
 class Sequence;
@@ -19,6 +21,9 @@ public:
 	vector<MASMCol *> m_Cols;
 	vector<string> m_UngappedSeqs;
 	vector<vector<vector<byte> > > m_FeatureAlnVec;
+	vector<vector<uint> > m_ResiduePosVec;
+	vector<string> m_FullUngappedSeqs;
+	MSA m_SeedMSA;
 	float m_GapOpen = FLT_MAX;
 	float m_GapExt = FLT_MAX;
 	uint m_AAFeatureIdx = UINT_MAX;
@@ -37,11 +42,16 @@ public:
 		m_Cols.clear();
 		m_UngappedSeqs.clear();
 		m_FeatureAlnVec.clear();
+		m_ResiduePosVec.clear();
+		m_FullUngappedSeqs.clear();
+		m_SeedMSA.Clear();
 		}
 
 // MSA sequences must match sequences in Mega
 	void FromMSA(const MultiSequence &Aln, const string &Label,
-	  float GapOpen, float GapExt);
+	  float GapOpen, float GapExt,
+	  const vector<MSAPrepColMapEntry> *ColMap = nullptr,
+	  const vector<string> *FullUngappedSeqs = nullptr);
 
 	uint GetColCount() const { return m_ColCount; }
 	const MASMCol &GetCol(uint i) const
@@ -50,6 +60,7 @@ public:
 		return *m_Cols[i];
 		}
 	void SetUngappedSeqs();
+	void BuildResiduePosVec(const vector<MSAPrepColMapEntry> &ColMap);
 	void SetFeatureAlnVec();
 	void SetFeatureAln(uint FeatureIdx);
 	void MakeSMx(const vector<vector<byte> > &ProfB, Mx<float> &SMx) const;

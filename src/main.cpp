@@ -24,6 +24,8 @@ int main(int argc, char **argv)
 		}
 
 	MyCmdLine(argc, argv);
+	if (optset_trunclabels && optset_notrunclabels)
+		Die("Cannot use both -trunclabels and -notrunclabels");
 	if (!opt(quiet))
 		{
 		PrintBanner(stderr);

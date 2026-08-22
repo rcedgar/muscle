@@ -177,13 +177,11 @@ uint32_t get_flat_pssm_feature_block_offsets(
 void trunc_label(const string &Label, string &TruncatedLabel)
 	{
 	TruncatedLabel = Label;
-	size_t n = TruncatedLabel.find(' ');
-	if (n != string::npos)
-		TruncatedLabel.resize(n);
-	n = TruncatedLabel.find('|');
-	if (n != string::npos)
-		TruncatedLabel.resize(n);
-	n = TruncatedLabel.find('/');
+	extern bool optset_notrunclabels;
+	extern bool opt_notrunclabels;
+	if (optset_notrunclabels && opt_notrunclabels)
+		return;
+	size_t n = TruncatedLabel.find_first_of(" \t\r\n|/");
 	if (n != string::npos)
 		TruncatedLabel.resize(n);
 	}

@@ -1,5 +1,6 @@
 #include "myutils.h"
 #include "seqdb.h"
+#include "flat_helpers.h"
 
 void SeqDB::SetLabelToIndex()
 	{
@@ -81,6 +82,7 @@ void SeqDB::FromFasta(const string &FileName, bool AllowGaps)
 			if (HaveLabel && !Seq.empty())
 				AddSeq(Label, Seq);
 			Label = Line.substr(1);
+			trunc_label(Label);
 			Seq.clear();
 			HaveLabel = true;
 			}

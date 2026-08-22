@@ -1,5 +1,6 @@
 #include "muscle.h"
 #include "mega.h"
+#include "flat_helpers.h"
 #include "flat_params.h"
 #include "flat_chain.h"
 #include "flat_chain_reader.h"
@@ -49,12 +50,14 @@ static void AppendChainProfile(const flat_params &params,
 	asserta(nfeat > 0);
 
 	const string &Label = chain->m_label;
-	if (Mega::m_LabelToIdx.find(Label) != Mega::m_LabelToIdx.end())
-		Die("Duplicate label in STRUCTS >%s", Label.c_str());
+	string TruncLabel = Label;
+	trunc_label(TruncLabel);
+	if (Mega::m_LabelToIdx.find(TruncLabel) != Mega::m_LabelToIdx.end())
+		Die("Duplicate label in STRUCTS >%s", TruncLabel.c_str());
 
 	const uint ProfileIdx = SIZE(Mega::m_Profiles);
-	Mega::m_LabelToIdx[Label] = ProfileIdx;
-	Mega::m_Labels.push_back(Label);
+	Mega::m_LabelToIdx[TruncLabel] = ProfileIdx;
+	Mega::m_Labels.push_back(TruncLabel);
 
 	vector<vector<byte> > Profile;
 	Profile.resize(L);

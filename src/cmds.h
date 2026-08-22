@@ -107,5 +107,6 @@ C(swtest)
 C(swtestmm)
 C(swsimple2)
 C(core_blocks)
+C(msa_prep)
 
 #undef C

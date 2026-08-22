@@ -1,5 +1,9 @@
 #include "muscle.h"
+#include "msa.h"
+#include "msa_prep.h"
 #include "masm.h"
+#include "mega.h"
+#include "multisequence.h"
 
 void cmd_masm_stats()
 	{
@@ -13,6 +17,9 @@ void cmd_masm_stats()
 		  M.m_FeatureNames[FeatureIdx].c_str(), 
 		  M.m_AlphaSizes[FeatureIdx]); 
 	ProgressLog("\n");
+	if (M.m_SeedMSA.GetSeqCount() > 0)
+		ProgressLog("%10u  Seed MSA seqs (%u cols)\n",
+		  M.m_SeedMSA.GetSeqCount(), M.m_SeedMSA.GetColCount());
 	}
 
 void cmd_masm_train()
@@ -23,8 +30,8 @@ void cmd_masm_train()
 	Mega::RejectLegacyMega(StructsFN);
 	Mega::FromStructs(StructsFN);
 
-	MultiSequence Aln;
-	Aln.FromFASTA(AlnFN);
+	MSA OrigMSA;
+	OrigMSA.FromFASTAFile_PreserveCase(AlnFN);
 
 	string Label;
 	if (optset_label)
@@ -39,7 +46,48 @@ void cmd_masm_train()
 	if (optset_gapext)
 		GapExt = (float) opt(gapext);
 
+	const MSAPrepResult *PrepPtr = 0;
+	MSAPrepResult Prep;
+	if (!opt(noprep))
+		{
+		MSAPrepParams Params = GetMSAPrepParamsFromOpts();
+		Prep = MSAPrep(OrigMSA, Params);
+		PrepPtr = &Prep;
+		}
+
+	if (optset_jalview_features)
+		{
+		if (PrepPtr == 0)
+			Die("-jalview_features requires prep (omit -noprep)");
+		WriteMSAPrepBlocksJalView(opt(jalview_features), OrigMSA, *PrepPtr);
+		}
+
+	string MapFN;
+	if (optset_map)
+		{
+		if (PrepPtr == 0)
+			Die("-map requires prep (omit -noprep)");
+		MapFN = opt(map);
+		}
+	else if (PrepPtr != 0 && optset_output)
+		MapFN = opt(output) + ".map";
+	if (!MapFN.empty())
+		WriteMSAPrepMapFile(MapFN, *PrepPtr);
+
+	const MSA *TrainMSA = (PrepPtr != 0 ? &PrepPtr->CleanedMSA : &OrigMSA);
+	const vector<MSAPrepColMapEntry> *ColMap =
+	  (PrepPtr != 0 ? &PrepPtr->ColMap : 0);
+	const vector<string> *FullUngapped =
+	  (PrepPtr != 0 ? &PrepPtr->FullUngappedSeqs : 0);
+
+	MultiSequence TrainAln;
+	MSAToMultiSequence(*TrainMSA, TrainAln);
+	if (optset_seedmsaout)
+		TrainAln.ToFasta(opt(seedmsaout));
+
 	MASM M;
-	M.FromMSA(Aln, Label, GapOpen, GapExt);
+	M.FromMSA(TrainAln, Label, GapOpen, GapExt, ColMap, FullUngapped);
 	M.ToFile(opt(output));
+	ProgressLog("Wrote MASM %u cols to %s\n",
+	  M.GetColCount(), opt(output).c_str());
 	}

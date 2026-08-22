@@ -539,6 +539,9 @@
     <ClCompile Include="cmd_squeeze_inserts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cmd_msa_prep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cmd_newbench_selectpfams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -621,6 +624,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="masm_train.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="msa_prep.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="masm.cpp">

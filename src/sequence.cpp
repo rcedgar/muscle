@@ -1,6 +1,7 @@
 #include "myutils.h"
 #include "sequence.h"
 #include "alpha.h"
+#include "flat_helpers.h"
 
 static uint g_NewCount;
 static uint g_DeleteCount;
@@ -67,6 +68,8 @@ bool Sequence::FromFileBuffer(FileBuffer& infile, bool stripGaps)
 		GetAccFromLabel(m_Label, Acc);
 		m_Label = Acc;
 		}
+
+	trunc_label(m_Label);
 
 	m_CharVec.clear();
 

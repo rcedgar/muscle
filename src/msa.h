@@ -27,6 +27,8 @@ public:
 
 public:
 	MSA();
+	MSA(const MSA &rhs);
+	MSA &operator=(const MSA &rhs);
 	virtual ~MSA();
 
 public:

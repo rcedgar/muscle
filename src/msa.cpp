@@ -24,6 +24,31 @@ MSA::MSA()
 	m_uCacheSeqLength = 0;
 	}
 
+MSA::MSA(const MSA &rhs)
+	{
+	m_uSeqCount = 0;
+	m_uColCount = 0;
+
+	m_szSeqs = 0;
+	m_szNames = 0;
+
+	m_IdToSeqIndex = 0;
+	m_SeqIndexToId = 0;
+
+	m_uCacheSeqCount = 0;
+	m_uCacheSeqLength = 0;
+
+	Copy(rhs);
+	}
+
+MSA &MSA::operator=(const MSA &rhs)
+	{
+	if (this == &rhs)
+		return *this;
+	Copy(rhs);
+	return *this;
+	}
+
 MSA::~MSA()
 	{
 	Free();
