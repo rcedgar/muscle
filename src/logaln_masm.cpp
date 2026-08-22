@@ -7,7 +7,7 @@ void GetMegaProfileAASeq(const vector<vector<byte> > &Profile, string &Seq)
 	uint PI = UINT_MAX;
 	for (uint i = 0; i < SIZE(Mega::m_FeatureNames); ++i)
 		{
-		if (Mega::m_FeatureNames[i] == "AA")
+		if (Mega::IsAAFeatureName(Mega::m_FeatureNames[i]))
 			{
 			PI = i;
 			break;

@@ -238,7 +238,7 @@ float SWer_Simple_Seqs_AA_BLOSUM62::SW(uint &LoA, uint &LoB, string &Path)
 float SWer_MASM_Mega_Seqs::SW(uint &LoA, uint &LoB, string &Path)
 	{
 	float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
-	  const vector<vector<byte> > &PB, float Open, float Ext,
+	  const vector<vector<byte> > &PB,
 	  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
 
 	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
@@ -255,7 +255,7 @@ float SWer_MASM_Mega_Seqs::SW(uint &LoA, uint &LoB, string &Path)
 
 	XDPMem Mem;
 	uint Leni, Lenj;
-	float Score = SWFast_MASM_MegaProf(Mem, *MA, PB, m_GapOpen, m_GapExt,
+	float Score = SWFast_MASM_MegaProf(Mem, *MA, PB,
 	  LoA, LoB, Leni, Lenj, Path);
 
 	return Score;
@@ -298,7 +298,7 @@ float SWer_Simple_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
 float SWer_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
 	{
 	float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
-	  const vector<vector<byte> > &PB, float Open, float Ext,
+	  const vector<vector<byte> > &PB,
 	  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
 
 	asserta(m_GapOpen != FLT_MAX && m_GapOpen < 0);
@@ -310,7 +310,7 @@ float SWer_MASM_Mega::SW(uint &LoA, uint &LoB, string &Path)
 
 	XDPMem Mem;
 	uint Leni, Lenj;
-	float Score = SWFast_MASM_MegaProf(Mem, *MA, PB, m_GapOpen, m_GapExt,
+	float Score = SWFast_MASM_MegaProf(Mem, *MA, PB,
 	  LoA, LoB, Leni, Lenj, Path);
 
 	return Score;

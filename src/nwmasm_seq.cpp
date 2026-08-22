@@ -8,10 +8,10 @@ void WriteLocalAln(FILE *f, const string &LabelA, const byte *A,
   const string &LabelB, const byte *B,
   uint Loi, uint Loj, const char *Path);
 
-float SWFast_MASM_Seq(XDPMem &Mem, const MASM &A, const Sequence &B,
-  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
+float NWFast_MASM_Seq(XDPMem &Mem, const MASM &A, const Sequence &B,
+  string &Path);
 
-void cmd_swmasm_seq()
+void cmd_nwmasm_seq()
 	{
 	const string &AlnFN = g_Arg1;
 	const string &StructsFN = opt(input);
@@ -25,9 +25,13 @@ void cmd_swmasm_seq()
 
 	float GapOpen = 4;
 	float GapExt = 0.5;
+	if (optset_gapopen)
+		GapOpen = (float) opt(gapopen);
+	if (optset_gapext)
+		GapExt = (float) opt(gapext);
 
 	MASM M;
-	M.FromMSA(Aln, "FomMSA", GapOpen, GapExt);
+	M.FromMSA(Aln, "FromMSA", GapOpen, GapExt);
 	M.ToFile(opt(output));
 
 	MultiSequence Query;
@@ -35,15 +39,18 @@ void cmd_swmasm_seq()
 
 	XDPMem Mem;
 	const uint QuerySeqCount = Query.GetSeqCount();
+	string Cons;
+	M.GetConsensusSeq(Cons);
 	for (uint i = 0; i < QuerySeqCount; ++i)
 		{
 		const Sequence &Q = *Query.GetSequence(i);
-		uint Loi, Loj, Leni, Lenj;
 		string Path;
-		float Score = SWFast_MASM_Seq(Mem, M, Q,
-		  Loi, Loj, Leni, Lenj, Path);
-		Log("%10.3g  %16.16s  %7u  %7u  %s\n",
-		  Score, Q.GetLabel().c_str(), Loi, Loj, Path.c_str());
+		float Score = NWFast_MASM_Seq(Mem, M, Q, Path);
+		WriteLocalAln(g_fLog, M.m_Label.c_str(), (const byte *) Cons.c_str(),
+		  Q.GetLabelCStr(), Q.GetBytePtr(),
+		  0, 0, Path.c_str());
+		Log("%10.3g  %16.16s  %s\n",
+		  Score, Q.GetLabel().c_str(), Path.c_str());
 		Log("\n");
 		}
 	}

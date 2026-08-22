@@ -301,7 +301,7 @@ void MASM::FromFile(const string &FileName)
 		asserta(StrToUint(Fields[1]) == i);
 		const string &FeatureName = Fields[2];
 		m_FeatureNames.push_back(FeatureName);
-		if (FeatureName == "AA")
+		if (Mega::IsAAFeatureName(FeatureName))
 			m_AAFeatureIdx = i;
 		m_AlphaSizes.push_back(StrToUint(Fields[3]));
 		}

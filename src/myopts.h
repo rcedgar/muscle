@@ -142,7 +142,6 @@ FLAG_OPT(missingtestseqok)
 FLAG_OPT(missingtestfileok)
 FLAG_OPT(bysequence)
 FLAG_OPT(reseek)
-FLAG_OPT(mega)
 FLAG_OPT(structs)
 
 // Shared structs / flat host opts (Stage 1)

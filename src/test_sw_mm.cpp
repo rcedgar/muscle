@@ -4,7 +4,7 @@
 #include "xdpmem.h"
 
 float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
-  const vector<vector<byte> > &PB, float Open, float Ext,
+  const vector<vector<byte> > &PB,
   uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
 
 void MakeMegaProfile_AA(const string &Seq,
@@ -113,7 +113,7 @@ static void Test(const vector<string> &RowsA, const string &B,
 
 	uint MMLoi, MMLoj, MMLeni, MMLenj;
 	string MMPath;
-	float MMScore = SWFast_MASM_MegaProf(Mem, MA, PB, g_GapOpen, g_GapExt,
+	float MMScore = SWFast_MASM_MegaProf(Mem, MA, PB,
 	  MMLoi, MMLoj, MMLeni, MMLenj, MMPath);
 
 	g_PS->m_MASM = &MA;

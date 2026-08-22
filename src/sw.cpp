@@ -70,8 +70,8 @@ void TraceBackBitSW(XDPMem &Mem,
   uint LA, uint LB, uint Besti, uint Bestj,
   uint &Leni, uint &Lenj, string &Path)
 	{
-	asserta(Besti < LA);
-	asserta(Bestj < LB);
+	asserta(Besti > 0 && Besti <= LA);
+	asserta(Bestj > 0 && Bestj <= LB);
 	Path.clear();
 	byte **TB = Mem.GetTBBit();
 

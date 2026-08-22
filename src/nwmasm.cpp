@@ -7,10 +7,10 @@ void WriteLocalAln_MASM(FILE *f, const string &LabelA, const MASM &MA,
   const string &LabelQ, const vector<vector<byte> > &Q,
   uint Loi, uint Loj, const char *Path);
 
-float SWFast_MASM(XDPMem &Mem, const MASM &A, const vector<vector<byte> > &B,
-  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
+float NWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
+  const vector<vector<byte> > &PB, string &Path);
 
-void cmd_swmasm()
+void cmd_nwmasm()
 	{
 	const string &MasmFN = g_Arg1;
 	const string &StructsFN = opt(query);
@@ -31,10 +31,9 @@ void cmd_swmasm()
 		ProgressStep(i, QueryProfileCount, "Aligning");
 		const vector<vector<byte> > &Q = Mega::GetProfile(i);
 		const string &LabelQ = Mega::GetLabel(i);
-		uint Loi, Loj, Leni, Lenj;
 		string Path;
-		float Score = SWFast_MASM(Mem, M, Q, Loi, Loj, Leni, Lenj, Path);
-		WriteLocalAln_MASM(g_fLog, LabelM, M, LabelQ, Q, Loi, Loj, Path.c_str());
+		float Score = NWFast_MASM_MegaProf(Mem, M, Q, Path);
+		WriteLocalAln_MASM(g_fLog, LabelM, M, LabelQ, Q, 0, 0, Path.c_str());
 		Log("Score = %.3g\n", Score);
 		Log("\n");
 
@@ -43,6 +42,7 @@ void cmd_swmasm()
 			fprintf(fOut, "%s", LabelM.c_str());
 			fprintf(fOut, "\t%s", LabelQ.c_str());
 			fprintf(fOut, "\t%.3g", Score);
+			fprintf(fOut, "\t%s", Path.c_str());
 			fprintf(fOut, "\n");
 			}
 		}

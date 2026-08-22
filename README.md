@@ -8,9 +8,7 @@ Muscle supports generating an ensemble of alternative alignments with the same h
 
 ### Multiple structure alignment
 
-Structure alignment ("Muscle-3D") is supported as well as conventional amino acid sequence alignment. Muscle accepts the same **STRUCTS** inputs as [reseek](https://github.com/rcedgar/reseek): `.pdb` / `.cif`, `.cal`, `.bca` / `.bcb`, `.files` lists, or a directory. Feature alphabets default to reseek `-stats sf`.
-
-Legacy text `.mega` files (from older `reseek -pdb2mega`) are still accepted but **deprecated**.
+Structure alignment ("Muscle-3D") is supported as well as conventional amino acid sequence alignment. Muscle accepts the same **STRUCTS** inputs as [reseek](https://github.com/rcedgar/reseek): `.pdb` / `.cif`, `.cal`, `.bca` / `.bcb`, `.files` lists, or a directory. Feature alphabets default to reseek `-stats sf`. Text `.mega` files from older `pdb2mega` are no longer supported.
 
 
 [<img src="https://drive5.com/reseek/youtube_snip_muscle3d.gif" width="150">](https://www.youtube.com/watch?v=BzIgqdm9xDs)
@@ -23,9 +21,6 @@ muscle -align STRUCTS -output structs.afa
 reseek -convert STRUCTS -bca structs.bca
 reseek -distmx structs.bca -output structs.distmx
 muscle -super7 structs.bca -distmxin structs.distmx -reseek -output structs.afa
-
-# deprecated: text mega from pdb2mega
-# muscle -align structs.mega -output structs.afa
 </pre>
 
 ### Downloads and installation

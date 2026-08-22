@@ -552,8 +552,7 @@ void Super5::SortMSA_ByInputOrder(MultiSequence &Aln)
 
 void cmd_super5()
 	{
-	if (optset_mega)
-		Die("-super5 does not support -mega, use -super7");
+	Mega::RejectLegacyMega(g_Arg1);
 
 	//LoadGlobalInputMS(opt(super5));
 	MultiSequence InputSeqs;

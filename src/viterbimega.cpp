@@ -274,6 +274,7 @@ void AlignMega2()
 
 void cmd_mega2()
 	{
-	Mega::FromFile(g_Arg1);
+	Mega::RejectLegacyMega(g_Arg1);
+	Mega::FromStructs(g_Arg1);
 	AlignMega2();
 	}

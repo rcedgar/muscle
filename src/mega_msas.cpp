@@ -32,7 +32,7 @@ void cmd_mega_msas()
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
 		{
 		const string &FeatureName = Mega::m_FeatureNames[FeatureIdx];
-		bool IsAA = (FeatureName == "AA");
+		bool IsAA = Mega::IsAAFeatureName(FeatureName);
 		string OutputFN = OutputPrefix + FeatureName;
 
 		FILE *f = CreateStdioFile(OutputFN);

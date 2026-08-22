@@ -163,7 +163,7 @@ void cmd_super7()
 	else
 		{
 		if (Mega::m_Loaded)
-			Die("Must specify -guidetreein or -distmxin with mega");
+			Die("Must specify -guidetreein or -distmxin with STRUCTS");
 		CalcGuideTree_SW_BLOSUM62(InputSeqs, GuideTree);
 		}
 

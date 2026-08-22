@@ -7,7 +7,7 @@ float SWFast_Strings_BLOSUM62(XDPMem &Mem,
   const string &A, const string &B, float Open, float Ext,
   uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
 float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
-  const vector<vector<byte> > &PB, float Open, float Ext,
+  const vector<vector<byte> > &PB,
   uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path);
 
 static uint g_LA;
@@ -80,7 +80,7 @@ static void Test_MASM_Mega(const string &A, const string &B)
 	XDPMem Mem;
 	uint Loi, Loj, Leni, Lenj;
 	string Path;
-	float Score = SWFast_MASM_MegaProf(Mem, MA, PB, g_GapOpen, g_GapExt,
+	float Score = SWFast_MASM_MegaProf(Mem, MA, PB,
 	  Loi, Loj, Leni, Lenj, Path);
 	Log("Test_MASM_Mega %.3g (%u, %u) %s\n",
 	  Score, Loi, Loj, Path.c_str());
@@ -107,7 +107,7 @@ static void Test(const string &A, const string &B)
 	MakeMegaProfile_AA(B, PB);
 	uint MMLoi, MMLoj, MMLeni, MMLenj;
 	string MMPath;
-	float MMScore = SWFast_MASM_MegaProf(Mem, MA, PB, g_GapOpen, g_GapExt,
+	float MMScore = SWFast_MASM_MegaProf(Mem, MA, PB,
 	  MMLoi, MMLoj, MMLeni, MMLenj, MMPath);
 
 	Log("\n");
@@ -166,7 +166,7 @@ static void TestRandom()
 	MakeMegaProfile_AA(B, PB);
 	uint MMLoi, MMLoj, MMLeni, MMLenj;
 	string MMPath;
-	float MMScore = SWFast_MASM_MegaProf(Mem, MA, PB, g_GapOpen, g_GapExt,
+	float MMScore = SWFast_MASM_MegaProf(Mem, MA, PB,
 	  MMLoi, MMLoj, MMLeni, MMLenj, MMPath);
 
 	bool AllOk = true;

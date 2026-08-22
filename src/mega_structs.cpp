@@ -84,11 +84,11 @@ void Mega::FromStructs(const string &FileName)
 	{
 	if (FileName == "")
 		Die("Missing STRUCTS filename");
+	RejectLegacyMega(FileName);
 	if (m_Loaded)
 		Die("Mega already loaded");
 
 	m_Loaded = true;
-	m_FromStructs = true;
 	m_FileName = FileName;
 
 	flat_params params;
@@ -100,7 +100,6 @@ void Mega::FromStructs(const string &FileName)
 	m_AlphaSizes.resize(m_FeatureCount);
 	m_Weights.resize(m_FeatureCount);
 	m_LogOddsMxVec.resize(m_FeatureCount);
-	m_LogProbMxVec.resize(m_FeatureCount);
 	m_LogProbsVec.resize(m_FeatureCount);
 
 	for (uint fi = 0; fi < m_FeatureCount; ++fi)
@@ -110,9 +109,6 @@ void Mega::FromStructs(const string &FileName)
 		m_Weights[fi] = params.m_weights[fi];
 		CopyLogOddsMx(params.m_unweighted_logoddsvec[fi], AS,
 		  m_LogOddsMxVec[fi]);
-		// Pair-HMM match path uses GetMatchScore → log-odds when
-		// m_FromStructs; keep LogProbMx unused / empty-sized for safety.
-		m_LogProbMxVec[fi].clear();
 		m_LogProbsVec[fi].assign(AS, 0.0f);
 		}
 

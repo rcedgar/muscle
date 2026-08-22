@@ -4,22 +4,95 @@
 #include "xdpmem.h"
 #include "swtrace.h"
 #include "masm.h"
+#include "sequence.h"
+#include <algorithm>
 
 void TraceBackBitSW(XDPMem &Mem,
   uint LA, uint LB, uint Besti, uint Bestj,
   uint &Leni, uint &Lenj, string &Path);
 
-float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
-  const vector<vector<byte> > &PB, float Open, float Ext,
+static float InsertOpen(const MASM &MA)
+	{
+	asserta(MA.m_GapOpen != FLT_MAX);
+	return -MA.m_GapOpen/2;
+	}
+
+static float InsertExt(const MASM &MA)
+	{
+	asserta(MA.m_GapExt != FLT_MAX);
+	return -MA.m_GapExt;
+	}
+
+static void AssertColGaps(const MASMCol &Col)
+	{
+	asserta(Col.m_GapOpen != FLT_MAX);
+	asserta(Col.m_GapExt != FLT_MAX);
+	asserta(Col.m_GapClose != FLT_MAX);
+	}
+
+static void TraceBackBitNW(XDPMem &Mem, uint LA, uint LB, char State,
+  string &Path)
+	{
+	Path.clear();
+	byte **TB = Mem.GetTBBit();
+	uint i = LA;
+	uint j = LB;
+	for (;;)
+		{
+		if (i == 0 && j == 0)
+			break;
+		Path += State;
+		byte t;
+		switch (State)
+			{
+		case 'M':
+			asserta(i > 0 && j > 0);
+			t = TB[i-1][j-1];
+			if (t & TRACEBITS_DM)
+				State = 'D';
+			else if (t & TRACEBITS_IM)
+				State = 'I';
+			else
+				State = 'M';
+			--i;
+			--j;
+			break;
+		case 'D':
+			asserta(i > 0);
+			t = TB[i-1][j];
+			if (t & TRACEBITS_MD)
+				State = 'M';
+			else
+				State = 'D';
+			--i;
+			break;
+		case 'I':
+			asserta(j > 0);
+			t = TB[i][j-1];
+			if (t & TRACEBITS_MI)
+				State = 'M';
+			else
+				State = 'I';
+			--j;
+			break;
+		default:
+			Die("TraceBackBitNW, invalid state %c", State);
+			}
+		}
+	reverse(Path.begin(), Path.end());
+	}
+
+static float SWFast_MASM_SMx(XDPMem &Mem, const MASM &MA, const Mx<float> &SMx,
   uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path)
 	{
-#if TRACE && !DOTONLY
-	SMx.LogMe();
-#endif
 	const uint LA = MA.GetColCount();
-	const uint LB = SIZE(PB);
-	asserta(Open <= 0);
-	asserta(Ext <= 0);
+	const uint LB = SMx.GetColCount();
+	asserta(SMx.GetRowCount() == LA);
+	asserta(LA > 0 && LB > 0);
+
+	const float OpenI = InsertOpen(MA);
+	const float ExtI = InsertExt(MA);
+	const float * const *SMxData = SMx.GetData();
 
 	Mem.Alloc(LA+32, LB+32);
 
@@ -31,7 +104,6 @@ float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
 	byte **TB = Mem.GetTBBit();
 	INIT_TRACE(LA, LB, TB);
 
-// Use Mrow[-1], so...
 	Mrow[-1] = MINUS_INFINITY;
 	TRACE_M(0, -1, MINUS_INFINITY);
 
@@ -42,39 +114,36 @@ float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
 		TRACE_M(0, j, MINUS_INFINITY);
 		TRACE_D(0, j, MINUS_INFINITY);
 		}
-	
+
 	float BestScore = 0.0f;
 	uint Besti = UINT_MAX;
 	uint Bestj = UINT_MAX;
 
-// Main loop
-	float M0 = float (0);
+	float M0 = 0.0f;
 	for (uint i = 0; i < LA; ++i)
 		{
-		//const float *SMxRow = SMxData[i];
 		const MASMCol &ColA = MA.GetCol(i);
+		AssertColGaps(ColA);
+		const float OpenD = -ColA.m_GapOpen;
+		const float ExtD = -ColA.m_GapExt;
+		const float CloseD = -ColA.m_GapClose;
+		const float *SMxRow = SMxData[i];
 		float I0 = MINUS_INFINITY;
 		byte *TBrow = TB[i];
 		for (uint j = 0; j < LB; ++j)
 			{
-			const vector<byte> &ColB = PB[j];
 			byte TraceBits = 0;
 			float SavedM0 = M0;
 
-		// MATCH
-			{
-		// M0 = DPM[i][j]
-		// I0 = DPI[i][j]
-		// Drow[j] = DPD[i][j]
 			float xM = M0;
-			if (Drow[j] > xM)
+			if (Drow[j] + CloseD > xM)
 				{
-				xM = Drow[j];
+				xM = Drow[j] + CloseD;
 				TraceBits = TRACEBITS_DM;
 				}
-			if (I0 > xM)
+			if (I0 + OpenI > xM)
 				{
-				xM = I0;
+				xM = I0 + OpenI;
 				TraceBits = TRACEBITS_IM;
 				}
 			if (0.0f >= xM)
@@ -84,9 +153,7 @@ float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
 				}
 
 			M0 = Mrow[j];
-			float MatchScore = ColA.GetMatchScore_MegaProfilePos(ColB);
-			//xM += SMxRow[j];
-			xM += MatchScore;
+			xM += SMxRow[j];
 			if (xM > BestScore)
 				{
 				BestScore = xM;
@@ -96,40 +163,27 @@ float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
 
 			Mrow[j] = xM;
 			TRACE_M(i, j, xM);
-		// Mrow[j] = DPM[i+1][j+1])
-			}
-			
-		// DELETE
-			{
-		// SavedM0 = DPM[i][j]
-		// Drow[j] = DPD[i][j]
-			float md = SavedM0 + Open;
-			Drow[j] += Ext;
+
+			float md = SavedM0 + OpenD;
+			Drow[j] += ExtD;
 			if (md >= Drow[j])
 				{
 				Drow[j] = md;
 				TraceBits |= TRACEBITS_MD;
 				}
 			TRACE_D(i, j, Drow[j]);
-		// Drow[j] = DPD[i+1][j]
-			}
-			
-		// INSERT
-			{
-		// SavedM0 = DPM[i][j]
-		// I0 = DPI[i][j]
-			float mi = SavedM0 + Open;
-			I0 += Ext;
+
+			float mi = SavedM0 + OpenI;
+			I0 += ExtI;
 			if (mi >= I0)
 				{
 				I0 = mi;
 				TraceBits |= TRACEBITS_MI;
 				}
-			}
-			
+
 			TBrow[j] = TraceBits;
 			}
-		
+
 		M0 = MINUS_INFINITY;
 		}
 
@@ -146,4 +200,161 @@ float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
 	Loj = Bestj + 1 - Lenj;
 
 	return BestScore;
+	}
+
+static float NWFast_MASM_SMx(XDPMem &Mem, const MASM &MA, const Mx<float> &SMx,
+  string &Path)
+	{
+	const uint LA = MA.GetColCount();
+	const uint LB = SMx.GetColCount();
+	asserta(SMx.GetRowCount() == LA);
+	asserta(LA > 0 && LB > 0);
+
+	const float OpenI = InsertOpen(MA);
+	const float ExtI = InsertExt(MA);
+	const float * const *SMxData = SMx.GetData();
+
+	Mem.Alloc(LA+32, LB+32);
+
+	float *Mrow = Mem.GetDPRow1();
+	float *Drow = Mem.GetDPRow2();
+	byte **TB = Mem.GetTBBit();
+
+	Mrow[-1] = MINUS_INFINITY;
+	for (uint j = 0; j <= LB; ++j)
+		{
+		Mrow[j] = MINUS_INFINITY;
+		Drow[j] = MINUS_INFINITY;
+		}
+
+	float M0 = 0.0f;
+	for (uint i = 0; i < LA; ++i)
+		{
+		const MASMCol &ColA = MA.GetCol(i);
+		AssertColGaps(ColA);
+		const float OpenD = -ColA.m_GapOpen;
+		const float ExtD = -ColA.m_GapExt;
+		const float CloseD = -ColA.m_GapClose;
+		const float *SMxRow = SMxData[i];
+		float I0 = MINUS_INFINITY;
+		byte *TBrow = TB[i];
+		for (uint j = 0; j < LB; ++j)
+			{
+			byte TraceBits = 0;
+			float SavedM0 = M0;
+
+			float xM = M0;
+			if (Drow[j] + CloseD > xM)
+				{
+				xM = Drow[j] + CloseD;
+				TraceBits = TRACEBITS_DM;
+				}
+			if (I0 + OpenI > xM)
+				{
+				xM = I0 + OpenI;
+				TraceBits = TRACEBITS_IM;
+				}
+
+			M0 = Mrow[j];
+			Mrow[j] = xM + SMxRow[j];
+
+			float md = SavedM0 + OpenD;
+			Drow[j] += ExtD;
+			if (md >= Drow[j])
+				{
+				Drow[j] = md;
+				TraceBits |= TRACEBITS_MD;
+				}
+
+			float mi = SavedM0 + OpenI;
+			I0 += ExtI;
+			if (mi >= I0)
+				{
+				I0 = mi;
+				TraceBits |= TRACEBITS_MI;
+				}
+
+			TBrow[j] = TraceBits;
+			}
+
+		TBrow[LB] = 0;
+		float md = M0 + OpenD;
+		Drow[LB] += ExtD;
+		if (md >= Drow[LB])
+			{
+			Drow[LB] = md;
+			TBrow[LB] = TRACEBITS_MD;
+			}
+
+		M0 = MINUS_INFINITY;
+		}
+
+	byte *TBrow = TB[LA];
+	float I1 = MINUS_INFINITY;
+	for (uint j = 1; j < LB; ++j)
+		{
+		TBrow[j] = 0;
+		float mi = Mrow[int(j)-1] + OpenI;
+		I1 += ExtI;
+		if (mi > I1)
+			{
+			I1 = mi;
+			TBrow[j] = TRACEBITS_MI;
+			}
+		}
+
+	float Score = Mrow[LB-1];
+	char State = 'M';
+	if (Drow[LB] > Score)
+		{
+		Score = Drow[LB];
+		State = 'D';
+		}
+	if (I1 > Score)
+		{
+		Score = I1;
+		State = 'I';
+		}
+
+	TraceBackBitNW(Mem, LA, LB, State, Path);
+	return Score;
+	}
+
+float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
+  const vector<vector<byte> > &PB,
+  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path)
+	{
+	Mx<float> SMx;
+	MA.MakeSMx(PB, SMx);
+	return SWFast_MASM_SMx(Mem, MA, SMx, Loi, Loj, Leni, Lenj, Path);
+	}
+
+float NWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
+  const vector<vector<byte> > &PB, string &Path)
+	{
+	Mx<float> SMx;
+	MA.MakeSMx(PB, SMx);
+	return NWFast_MASM_SMx(Mem, MA, SMx, Path);
+	}
+
+float SWFast_MASM(XDPMem &Mem, const MASM &A, const vector<vector<byte> > &B,
+  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path)
+	{
+	return SWFast_MASM_MegaProf(Mem, A, B, Loi, Loj, Leni, Lenj, Path);
+	}
+
+float SWFast_MASM_Seq(XDPMem &Mem, const MASM &A, const Sequence &B,
+  uint &Loi, uint &Loj, uint &Leni, uint &Lenj, string &Path)
+	{
+	Mx<float> SMx;
+	A.MakeSMx_Sequence(B, SMx);
+	return SWFast_MASM_SMx(Mem, A, SMx, Loi, Loj, Leni, Lenj, Path);
+	}
+
+float NWFast_MASM_Seq(XDPMem &Mem, const MASM &A, const Sequence &B,
+  string &Path)
+	{
+	Mx<float> SMx;
+	A.MakeSMx_Sequence(B, SMx);
+	return NWFast_MASM_SMx(Mem, A, SMx, Path);
 	}

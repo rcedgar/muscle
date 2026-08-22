@@ -635,6 +635,12 @@
     <ClCompile Include="swmasm_seq.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="nwmasm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nwmasm_seq.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="logaln_masm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

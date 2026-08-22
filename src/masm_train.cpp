@@ -18,9 +18,10 @@ void cmd_masm_stats()
 void cmd_masm_train()
 	{
 	const string &AlnFN = g_Arg1;
-	const string &MegaFN = opt(input);
+	const string &StructsFN = opt(input);
 
-	Mega::FromFile(MegaFN);
+	Mega::RejectLegacyMega(StructsFN);
+	Mega::FromStructs(StructsFN);
 
 	MultiSequence Aln;
 	Aln.FromFASTA(AlnFN);
@@ -31,7 +32,14 @@ void cmd_masm_train()
 	else
 		Label = string(BaseName(AlnFN.c_str()));
 
+	float GapOpen = 4;
+	float GapExt = 0.5;
+	if (optset_gapopen)
+		GapOpen = (float) opt(gapopen);
+	if (optset_gapext)
+		GapExt = (float) opt(gapext);
+
 	MASM M;
-	M.FromMSA(Aln, Label, Mega::m_GapOpen, Mega::m_GapExt);
+	M.FromMSA(Aln, Label, GapOpen, GapExt);
 	M.ToFile(opt(output));
 	}

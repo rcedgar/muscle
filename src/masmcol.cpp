@@ -106,6 +106,8 @@ void MASMCol::ToFile(FILE *f) const
 	asserta(SIZE(m_ScoresVec) == FeatureCount);
 	//asserta(SIZE(m_SortOrderVec) == FeatureCount);
 	fprintf(f, "col\t%u\n", m_ColIndex);
+	fprintf(f, "gaps\t%.6g\t%.6g\t%.6g\n",
+	  m_GapOpen, m_GapExt, m_GapClose);
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)
 		{
 		uint AlphaSize = Mega::GetAlphaSize(FeatureIdx);
@@ -141,6 +143,11 @@ void MASMCol::FromFile(FILE *f)
 	ReadTabbedLine(f, Fields, 2);
 	asserta(Fields[0] == "col");
 	m_ColIndex = StrToUint(Fields[1]);
+	ReadTabbedLine(f, Fields, 4);
+	asserta(Fields[0] == "gaps");
+	m_GapOpen = (float) StrToFloat(Fields[1]);
+	m_GapExt = (float) StrToFloat(Fields[2]);
+	m_GapClose = (float) StrToFloat(Fields[3]);
 	m_FreqsVec.clear();
 	m_ScoresVec.clear();
 	m_FreqsVec.resize(FeatureCount);
