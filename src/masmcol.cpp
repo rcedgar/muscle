@@ -117,13 +117,13 @@ void MASMCol::ToFile(FILE *f) const
 		const vector<float> &Freqs = m_FreqsVec[FeatureIdx];
 		fprintf(f, "freqs");
 		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-			fprintf(f, "\t%.3g", Freqs[Letter]);
+			fprintf(f, "\t%.6g", Freqs[Letter]);
 		fprintf(f, "\n");
 
 		const vector<float> &Scores = m_ScoresVec[FeatureIdx];
 		fprintf(f, "scores");
 		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
-			fprintf(f, "\t%.3g", Scores[Letter]);
+			fprintf(f, "\t%.6g", Scores[Letter]);
 		fprintf(f, "\n");
 
 		//const vector<byte> &SortOrder = m_SortOrderVec[FeatureIdx];
@@ -167,10 +167,21 @@ void MASMCol::FromFile(FILE *f)
 		for (uint Letter = 0; Letter < AlphaSize; ++Letter)
 			{
 			float Freq = (float) StrToFloat(Fields[Letter+1]);
+			if (Freq < 0)
+				Die("MASM col %u feature %u letter %u freq %.4g < 0",
+				  m_ColIndex, FeatureIdx, Letter, Freq);
 			Freqs.push_back(Freq);
 			SumFreqs += Freq;
 			}
-		asserta(SumFreqs < 1.001);
+		// %.3g round-trip on a fully occupied column can exceed 1.001
+		if (SumFreqs > 1.05f || SumFreqs < 0)
+			Die("MASM col %u feature %u freqs sum %.4g",
+			  m_ColIndex, FeatureIdx, SumFreqs);
+		if (SumFreqs > 1)
+			{
+			for (uint Letter = 0; Letter < AlphaSize; ++Letter)
+				Freqs[Letter] /= SumFreqs;
+			}
 
 		ReadTabbedLine(f, Fields, AlphaSize+1);
 		asserta(Fields[0] == "scores");

@@ -228,6 +228,7 @@
     <ClCompile Include="cmd_newbench_selectpfams.cpp" />
     <ClCompile Include="cmd_squeeze_inserts.cpp" />
     <ClCompile Include="cmd_msa_prep.cpp" />
+    <ClCompile Include="cmd_calibrate_masm.cpp" />
     <ClCompile Include="cmp_ref_msas.cpp" />
     <ClCompile Include="core_blocks.cpp" />
     <ClCompile Include="enumpaths.cpp" />

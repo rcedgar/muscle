@@ -9,7 +9,7 @@ void WriteLocalAln(FILE *f, const string &LabelA, const byte *A,
   uint Loi, uint Loj, const char *Path);
 
 float NWFast_MASM_Seq(XDPMem &Mem, const MASM &A, const Sequence &B,
-  string &Path);
+  uint &Loj, string &Path);
 
 void cmd_nwmasm_seq()
 	{
@@ -45,10 +45,11 @@ void cmd_nwmasm_seq()
 		{
 		const Sequence &Q = *Query.GetSequence(i);
 		string Path;
-		float Score = NWFast_MASM_Seq(Mem, M, Q, Path);
+		uint Loj;
+		float Score = NWFast_MASM_Seq(Mem, M, Q, Loj, Path);
 		WriteLocalAln(g_fLog, M.m_Label.c_str(), (const byte *) Cons.c_str(),
 		  Q.GetLabelCStr(), Q.GetBytePtr(),
-		  0, 0, Path.c_str());
+		  0, Loj, Path.c_str());
 		Log("%10.3g  %16.16s  %s\n",
 		  Score, Q.GetLabel().c_str(), Path.c_str());
 		Log("\n");

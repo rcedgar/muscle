@@ -8,7 +8,7 @@ void WriteLocalAln_MASM(FILE *f, const string &LabelA, const MASM &MA,
   uint Loi, uint Loj, const char *Path);
 
 float NWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
-  const vector<vector<byte> > &PB, string &Path);
+  const vector<vector<byte> > &PB, uint &Loj, string &Path);
 
 void cmd_nwmasm()
 	{
@@ -32,8 +32,9 @@ void cmd_nwmasm()
 		const vector<vector<byte> > &Q = Mega::GetProfile(i);
 		const string &LabelQ = Mega::GetLabel(i);
 		string Path;
-		float Score = NWFast_MASM_MegaProf(Mem, M, Q, Path);
-		WriteLocalAln_MASM(g_fLog, LabelM, M, LabelQ, Q, 0, 0, Path.c_str());
+		uint Loj;
+		float Score = NWFast_MASM_MegaProf(Mem, M, Q, Loj, Path);
+		WriteLocalAln_MASM(g_fLog, LabelM, M, LabelQ, Q, 0, Loj, Path.c_str());
 		Log("Score = %.3g\n", Score);
 		Log("\n");
 

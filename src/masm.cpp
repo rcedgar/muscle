@@ -4,7 +4,8 @@
 
 static float ScorePP(const MASMCol &PPA, const vector<byte> &ProfColB)
 	{
-	const uint FeatureCount = Mega::GetFeatureCount();
+	asserta(PPA.m_MASM != 0);
+	const uint FeatureCount = PPA.m_MASM->m_FeatureCount;
 
 	float TotalScore = 0;
 	for (uint FeatureIdx = 0; FeatureIdx < FeatureCount; ++FeatureIdx)

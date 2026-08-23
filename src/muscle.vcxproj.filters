@@ -542,6 +542,9 @@
     <ClCompile Include="cmd_msa_prep.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cmd_calibrate_masm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cmd_newbench_selectpfams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

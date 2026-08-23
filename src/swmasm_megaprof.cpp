@@ -30,16 +30,16 @@ static void AssertColGaps(const MASMCol &Col)
 	asserta(Col.m_GapClose != FLT_MAX);
 	}
 
-static void TraceBackBitNW(XDPMem &Mem, uint LA, uint LB, char State,
-  string &Path)
+static void TraceBackBitNW(XDPMem &Mem, uint LA, uint Startj, char State,
+  uint &Loj, string &Path)
 	{
 	Path.clear();
 	byte **TB = Mem.GetTBBit();
 	uint i = LA;
-	uint j = LB;
+	uint j = Startj;
 	for (;;)
 		{
-		if (i == 0 && j == 0)
+		if (i == 0)
 			break;
 		Path += State;
 		byte t;
@@ -79,6 +79,7 @@ static void TraceBackBitNW(XDPMem &Mem, uint LA, uint LB, char State,
 			Die("TraceBackBitNW, invalid state %c", State);
 			}
 		}
+	Loj = j;
 	reverse(Path.begin(), Path.end());
 	}
 
@@ -203,7 +204,7 @@ static float SWFast_MASM_SMx(XDPMem &Mem, const MASM &MA, const Mx<float> &SMx,
 	}
 
 static float NWFast_MASM_SMx(XDPMem &Mem, const MASM &MA, const Mx<float> &SMx,
-  string &Path)
+  uint &Loj, string &Path)
 	{
 	const uint LA = MA.GetColCount();
 	const uint LB = SMx.GetColCount();
@@ -243,27 +244,44 @@ static float NWFast_MASM_SMx(XDPMem &Mem, const MASM &MA, const Mx<float> &SMx,
 			byte TraceBits = 0;
 			float SavedM0 = M0;
 
-			float xM = M0;
-			if (Drow[j] + CloseD > xM)
+			float xM;
+			if (i == 0)
 				{
-				xM = Drow[j] + CloseD;
-				TraceBits = TRACEBITS_DM;
+			// Free leading query gaps: match model col 0 at any j
+				xM = 0.0f;
 				}
-			if (I0 + OpenI > xM)
+			else
 				{
-				xM = I0 + OpenI;
-				TraceBits = TRACEBITS_IM;
+				xM = M0;
+				if (Drow[j] + CloseD > xM)
+					{
+					xM = Drow[j] + CloseD;
+					TraceBits = TRACEBITS_DM;
+					}
+				if (I0 + OpenI > xM)
+					{
+					xM = I0 + OpenI;
+					TraceBits = TRACEBITS_IM;
+					}
 				}
 
 			M0 = Mrow[j];
 			Mrow[j] = xM + SMxRow[j];
 
-			float md = SavedM0 + OpenD;
-			Drow[j] += ExtD;
-			if (md >= Drow[j])
+			if (i == 0)
 				{
-				Drow[j] = md;
+				Drow[j] = OpenD;
 				TraceBits |= TRACEBITS_MD;
+				}
+			else
+				{
+				float md = SavedM0 + OpenD;
+				Drow[j] += ExtD;
+				if (md >= Drow[j])
+					{
+					Drow[j] = md;
+					TraceBits |= TRACEBITS_MD;
+					}
 				}
 
 			float mi = SavedM0 + OpenI;
@@ -289,34 +307,33 @@ static float NWFast_MASM_SMx(XDPMem &Mem, const MASM &MA, const Mx<float> &SMx,
 		M0 = MINUS_INFINITY;
 		}
 
-	byte *TBrow = TB[LA];
-	float I1 = MINUS_INFINITY;
-	for (uint j = 1; j < LB; ++j)
+	float Score = MINUS_INFINITY;
+	char State = 'M';
+	uint Endj = 0;
+	for (uint j = 0; j < LB; ++j)
 		{
-		TBrow[j] = 0;
-		float mi = Mrow[int(j)-1] + OpenI;
-		I1 += ExtI;
-		if (mi > I1)
+		if (Mrow[j] > Score)
 			{
-			I1 = mi;
-			TBrow[j] = TRACEBITS_MI;
+			Score = Mrow[j];
+			State = 'M';
+			Endj = j;
+			}
+		if (Drow[j] > Score)
+			{
+			Score = Drow[j];
+			State = 'D';
+			Endj = j;
 			}
 		}
-
-	float Score = Mrow[LB-1];
-	char State = 'M';
 	if (Drow[LB] > Score)
 		{
 		Score = Drow[LB];
 		State = 'D';
-		}
-	if (I1 > Score)
-		{
-		Score = I1;
-		State = 'I';
+		Endj = LB;
 		}
 
-	TraceBackBitNW(Mem, LA, LB, State, Path);
+	const uint Startj = (State == 'M' ? Endj + 1 : Endj);
+	TraceBackBitNW(Mem, LA, Startj, State, Loj, Path);
 	return Score;
 	}
 
@@ -330,11 +347,11 @@ float SWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
 	}
 
 float NWFast_MASM_MegaProf(XDPMem &Mem, const MASM &MA,
-  const vector<vector<byte> > &PB, string &Path)
+  const vector<vector<byte> > &PB, uint &Loj, string &Path)
 	{
 	Mx<float> SMx;
 	MA.MakeSMx(PB, SMx);
-	return NWFast_MASM_SMx(Mem, MA, SMx, Path);
+	return NWFast_MASM_SMx(Mem, MA, SMx, Loj, Path);
 	}
 
 float SWFast_MASM(XDPMem &Mem, const MASM &A, const vector<vector<byte> > &B,
@@ -352,9 +369,9 @@ float SWFast_MASM_Seq(XDPMem &Mem, const MASM &A, const Sequence &B,
 	}
 
 float NWFast_MASM_Seq(XDPMem &Mem, const MASM &A, const Sequence &B,
-  string &Path)
+  uint &Loj, string &Path)
 	{
 	Mx<float> SMx;
 	A.MakeSMx_Sequence(B, SMx);
-	return NWFast_MASM_SMx(Mem, A, SMx, Path);
+	return NWFast_MASM_SMx(Mem, A, SMx, Loj, Path);
 	}
