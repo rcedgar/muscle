@@ -176,6 +176,10 @@ void MASM::ToFile(FILE *f) const
 	fprintf(f, "MASM\t%u\t%u\t%u\t%.4g\t%.4g\t%s\n",
 	  m_SeqCount, m_ColCount, m_FeatureCount,
 	  m_GapOpen, m_GapExt, m_Label.c_str());
+	if (m_HasCalibrate)
+		fprintf(f, "calibrate\t%.6g\t%.6g\t%.6g\t%u\t%.6g\t%.4g\n",
+		  m_CalibSlope, m_CalibIntercept, m_CalibHi, m_CalibSamples,
+		  m_CalibLowTP, m_CalibCutoff);
 
 	for (uint i = 0; i < m_FeatureCount; ++i)
 		fprintf(f, "feature\t%u\t%s\t%u\n",
@@ -346,6 +350,28 @@ void MASM::FromFile(const string &FileName)
 			asserta(Ok);
 			if (Line == "<END_FASTA")
 				break;
+			}
+		Ok = ReadLineStdioFile(f, Line);
+		asserta(Ok);
+		}
+
+	Split(Line, Fields, '\t');
+	if (!Fields.empty() && Fields[0] == "calibrate")
+		{
+		if (SIZE(Fields) != 5 && SIZE(Fields) != 7)
+			Die("MASM: bad calibrate line");
+		m_HasCalibrate = true;
+		m_CalibSlope = StrToFloat(Fields[1]);
+		m_CalibIntercept = StrToFloat(Fields[2]);
+		m_CalibHi = StrToFloat(Fields[3]);
+		m_CalibSamples = StrToUint(Fields[4]);
+		if (m_CalibSamples == 0)
+			Die("MASM: calibrate samples is 0");
+		m_CalibCutoff = 1e-3;
+		if (SIZE(Fields) == 7)
+			{
+			m_CalibLowTP = StrToFloat(Fields[5]);
+			m_CalibCutoff = StrToFloat(Fields[6]);
 			}
 		Ok = ReadLineStdioFile(f, Line);
 		asserta(Ok);

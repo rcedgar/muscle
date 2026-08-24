@@ -27,6 +27,13 @@ public:
 	float m_GapOpen = FLT_MAX;
 	float m_GapExt = FLT_MAX;
 	uint m_AAFeatureIdx = UINT_MAX;
+	bool m_HasCalibrate = false;
+	double m_CalibSlope = 0;
+	double m_CalibIntercept = 0;
+	double m_CalibHi = 0;
+	uint m_CalibSamples = 0;
+	double m_CalibLowTP = 0;
+	double m_CalibCutoff = 1e-3;
 
 public:
 	void Clear()
@@ -45,6 +52,13 @@ public:
 		m_ResiduePosVec.clear();
 		m_FullUngappedSeqs.clear();
 		m_SeedMSA.Clear();
+		m_HasCalibrate = false;
+		m_CalibSlope = 0;
+		m_CalibIntercept = 0;
+		m_CalibHi = 0;
+		m_CalibSamples = 0;
+		m_CalibLowTP = 0;
+		m_CalibCutoff = 1e-3;
 		}
 
 // MSA sequences must match sequences in Mega
@@ -75,3 +89,9 @@ public:
 	void MakeSMx_Sequence(const Sequence &Q, Mx<float> &SMx) const;
 	void GetConsensusSeq(string &Seq) const;
 	};
+
+void CalibrateMASM(MASM &Target, bool Local, uint N,
+  bool Denovo, const string &MapFN,
+  bool Decoy, const string &DecoyFN,
+  bool Shatter, uint ShatterMin, uint ShatterMax,
+  const string &HistTSVFN);

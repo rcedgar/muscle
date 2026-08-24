@@ -87,7 +87,57 @@ void cmd_masm_train()
 
 	MASM M;
 	M.FromMSA(TrainAln, Label, GapOpen, GapExt, ColMap, FullUngapped);
+
+	if (!opt(nocalibrate))
+		{
+		if (opt(local) && opt(global))
+			Die("masm_train: specify at most one of -local or -global");
+		const bool Local = opt(local);
+
+		bool Denovo = opt(denovo);
+		bool Decoy = optset_decoy;
+		bool Shatter = opt(shatter);
+		uint FPModeCount = 0;
+		if (Denovo)
+			++FPModeCount;
+		if (Decoy)
+			++FPModeCount;
+		if (Shatter)
+			++FPModeCount;
+		if (FPModeCount > 1)
+			Die("masm_train: specify at most one of -denovo, -decoy or -shatter");
+		if (FPModeCount == 0)
+			{
+			if (!MapFN.empty())
+				Denovo = true;
+			else
+				Shatter = true;
+			}
+		if (Denovo && MapFN.empty())
+			Die("masm_train -denovo: map file required (omit -noprep or set -map)");
+		if (Decoy && opt(decoy).empty())
+			Die("masm_train: -decoy requires a MASM file");
+
+		const uint N = optset_n ? opt(n) : 10000;
+		uint ShatterMin = optset_shatter_min ? opt(shatter_min) : 5;
+		uint ShatterMax = optset_shatter_max ? opt(shatter_max) : 15;
+		string HistTSV;
+		if (optset_tsvout)
+			HistTSV = opt(tsvout);
+
+		CalibrateMASM(M, Local, N,
+		  Denovo, MapFN,
+		  Decoy, Decoy ? opt(decoy) : "",
+		  Shatter, ShatterMin, ShatterMax,
+		  HistTSV);
+		}
+
 	M.ToFile(opt(output));
 	ProgressLog("Wrote MASM %u cols to %s\n",
 	  M.GetColCount(), opt(output).c_str());
+	}
+
+void cmd_strumm_build()
+	{
+	cmd_masm_train();
 	}
