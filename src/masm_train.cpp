@@ -70,7 +70,7 @@ void cmd_masm_train()
 		MapFN = opt(map);
 		}
 	else if (PrepPtr != 0 && optset_output)
-		MapFN = opt(output) + ".map";
+		MapFN = string(opt(output)) + ".map";
 	if (!MapFN.empty())
 		WriteMSAPrepMapFile(MapFN, *PrepPtr);
 
@@ -115,7 +115,7 @@ void cmd_masm_train()
 			}
 		if (Denovo && MapFN.empty())
 			Die("masm_train -denovo: map file required (omit -noprep or set -map)");
-		if (Decoy && opt(decoy).empty())
+		if (Decoy && opt(decoy)[0] == 0)
 			Die("masm_train: -decoy requires a MASM file");
 
 		const uint N = optset_n ? opt(n) : 10000;
@@ -134,7 +134,7 @@ void cmd_masm_train()
 
 	M.ToFile(opt(output));
 	ProgressLog("Wrote MASM %u cols to %s\n",
-	  M.GetColCount(), opt(output).c_str());
+	  M.GetColCount(), opt(output));
 	}
 
 void cmd_strumm_build()

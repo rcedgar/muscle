@@ -1,0 +1,17 @@
+---
+description: Do not reuse source basenames that already exist in d5
+alwaysApply: true
+---
+
+# Unique filenames vs d5
+
+`C:\src\muscle` and `C:\src\d5` are sibling repos. **Do not add a source or header whose basename already exists in d5.**
+
+When moving code from muscle into d5:
+
+- Keep the library file in d5 under the original name.
+- Rename whatever remains in muscle (commands, stubs) so the basename is unique.
+
+Example: d5 owns `gzipfileio.cpp` and `myutils.cpp`. Do not recreate those names here.
+
+Before adding `foo.cpp` / `foo.h` here, check `C:\src\d5` for that basename.

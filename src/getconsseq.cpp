@@ -67,6 +67,6 @@ void cmd_consseq()
 	GetConsensusSequence(MSA, ConsSeq);
 
 	FILE *fOut = CreateStdioFile(OutputFileName);
-	SeqToFasta(fOut, ConsSeq, Label);
+	SeqToFasta(fOut, Label, ConsSeq);
 	CloseStdioFile(fOut);
 	}

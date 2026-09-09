@@ -53,7 +53,10 @@
     <ClCompile Include="alpha3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="myutils.cpp">
+    <ClCompile Include="mycmdline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="opts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pairhmm.cpp">
@@ -476,9 +479,6 @@
     <ClCompile Include="cmd_muscle3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="myalloc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="make_substmx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -871,9 +871,6 @@
     <ClInclude Include="multisequence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="myutils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="pprog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1064,9 +1061,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="muscle3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="myalloc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sweeper.h">

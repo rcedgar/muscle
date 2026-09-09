@@ -2,8 +2,10 @@
 #define tree_h
 
 #include <limits.h>
+#include <float.h>
 
 class Clust;
+class TextFile;
 
 const uint NULL_NEIGHBOR = UINT_MAX;
 const double MISSING_LENGTH = DBL_MAX;

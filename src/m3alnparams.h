@@ -1,6 +1,7 @@
 #pragma once
 
 #include <random>
+#include "types.h"
 
 class M3AlnParams
 	{

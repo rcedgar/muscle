@@ -157,7 +157,7 @@ void cmd_permute_tree()
 
 	if (optset_prefix)
 		{
-		const char *Prefix = opt(prefix).c_str();
+		const char *Prefix = opt(prefix);
 
 		string FileNameABC;
 		string FileNameACB;

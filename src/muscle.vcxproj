@@ -126,9 +126,12 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <OpenMPSupport>true</OpenMPSupport>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalIncludeDirectories>.;../../d5/myutils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>psapi.lib;user32.lib;../../d5/build-win/$(Configuration)/myutils.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)muscle.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)muscle.pdb</ProgramDatabaseFile>
@@ -199,9 +202,12 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalIncludeDirectories>.;../../d5/myutils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>psapi.lib;user32.lib;../../d5/build-win/$(Configuration)/myutils.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)muscle.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -329,7 +335,6 @@
     <ClCompile Include="msaselfscore3.cpp" />
     <ClCompile Include="muscle3.cpp" />
     <ClCompile Include="mx.cpp" />
-    <ClCompile Include="myalloc.cpp" />
     <ClCompile Include="mysparsemx.cpp" />
     <ClCompile Include="nwsmall3.cpp" />
     <ClCompile Include="objmgr.cpp" />
@@ -355,7 +360,8 @@
     <ClCompile Include="probcons.cpp" />
     <ClCompile Include="msa.cpp" />
     <ClCompile Include="msa2.cpp" />
-    <ClCompile Include="myutils.cpp" />
+    <ClCompile Include="mycmdline.cpp" />
+    <ClCompile Include="opts.cpp" />
     <ClCompile Include="colscoreefa.cpp" />
     <ClCompile Include="profalign.cpp" />
     <ClCompile Include="profile3.cpp" />
@@ -525,10 +531,8 @@
     <ClInclude Include="muscle.h" />
     <ClInclude Include="muscle3.h" />
     <ClInclude Include="mx.h" />
-    <ClInclude Include="myalloc.h" />
     <ClInclude Include="myopts.h" />
     <ClInclude Include="mysparsemx.h" />
-    <ClInclude Include="myutils.h" />
     <ClInclude Include="obj.h" />
     <ClInclude Include="objmgr.h" />
     <ClInclude Include="objscore.h" />

@@ -209,7 +209,7 @@ void cmd_super6()
 
 	//LoadGlobalInputMS(opt(super6));
 
-	string &OutputPattern = opt(output);
+	const string OutputPattern = opt(output);
 	if (OutputPattern.empty())
 		Die("Must set -output");
 

@@ -623,7 +623,7 @@ void cmd_calibrate_masm()
 		++FPModeCount;
 	if (FPModeCount != 1)
 		Die("calibrate_masm: require exactly one of -denovo, -decoy or -shatter");
-	if (optset_decoy && opt(decoy).empty())
+	if (optset_decoy && opt(decoy)[0] == 0)
 		Die("calibrate_masm: -decoy requires a MASM file");
 	if (!optset_output)
 		Die("calibrate_masm: -output required");
@@ -664,7 +664,7 @@ void cmd_calibrate_masm()
 	  opt(shatter), ShatterMin, ShatterMax,
 	  opt(tsvout));
 	Target.ToFile(opt(output));
-	ProgressLog("Wrote %s\n", opt(output).c_str());
+	ProgressLog("Wrote %s\n", opt(output));
 	}
 
 void cmd_strumm_calibrate()

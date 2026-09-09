@@ -58,7 +58,7 @@ void cmd_mega_msas()
 					++Pos;
 					}
 				}
-			SeqToFasta(f, FeatureRow, Label);
+			SeqToFasta(f, Label, FeatureRow);
 			}
 
 		CloseStdioFile(f);

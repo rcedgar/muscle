@@ -558,7 +558,7 @@ void cmd_super5()
 	MultiSequence InputSeqs;
 	LoadInput(InputSeqs);
 
-	string &OutputPattern = opt(output);
+	const string OutputPattern = opt(output);
 	if (OutputPattern.empty())
 		Die("Must set -output");
 

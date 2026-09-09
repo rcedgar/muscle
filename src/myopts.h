@@ -2,7 +2,9 @@
 #define MY_VERSION	"5.3"
 #endif
 
+#ifndef PROGRAM_NAME
 #define PROGRAM_NAME	"muscle"
+#endif
 
 ////////////////////
 // Commands
@@ -10,7 +12,8 @@
 #include "cmds.h"
 ////////////////////
 
-STR_OPT(log)
+#include "opt_core.h"
+
 STR_OPT(output)
 STR_OPT(output1)
 STR_OPT(output2)
@@ -71,10 +74,8 @@ STR_OPT(masm)
 STR_OPT(strumm)
 STR_OPT(a3m)
 
-UNS_OPT(threads)
 UNS_OPT(consiters)
 UNS_OPT(refineiters)
-UNS_OPT(randseed)
 UNS_OPT(paircount)
 UNS_OPT(n)
 UNS_OPT(shatter_min)
@@ -135,8 +136,6 @@ FLT_OPT(m_il)
 FLT_OPT(is_is)
 FLT_OPT(il_il)
 
-FLAG_OPT(quiet)
-FLAG_OPT(compilerinfo)
 FLAG_OPT(right)
 FLAG_OPT(scaledist)
 FLAG_OPT(eadist)
