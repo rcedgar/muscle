@@ -1010,12 +1010,15 @@ double GetPhysMemBytes()
 	char Line[128];
 	int n = read(fd, Line, sizeof(Line));
 	if (n < 0)
+		close(fd);
 		return 0.0;
 	Line[127] = 0;
 	unsigned kb;
 	n = sscanf(Line, "MemTotal: %u", &kb);
 	if (n != 1)
+		close(fd);
 		return 0.0;
+	close(fd);
 	return double(kb)*1000.0;
 	}
 
